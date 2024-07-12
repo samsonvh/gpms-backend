@@ -21,6 +21,7 @@ namespace GPMS.Backend.Data.Models.Products.ProductionProcesses
         public ProductProductionProcess ProductionProcess { get; set; }
 
         public ICollection<ProductFault> ProductFaults { get; set; } = new List<ProductFault>();
-        public ICollection<ProductionProcessStepResult> ProductionProcessStepResults { get; set; }
+        public ICollection<ProductionProcessStepResult> ProductionProcessStepResults { get; set; } = new List<ProductionProcessStepResult>();
+        public ICollection<ProductionProcessStepIO> ProductionProcessStepIOs { get; set; } = new List<ProductionProcessStepIO>();
     }
 }

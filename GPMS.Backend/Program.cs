@@ -1,9 +1,10 @@
+using GPMS.Backend;
 using GPMS.Backend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var configuration = builder.Configuration;
 // Add services to the container.
-builder.Services.AddDbContext<GPMSDbContext>();
+builder.Services.ConfigureService(configuration);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

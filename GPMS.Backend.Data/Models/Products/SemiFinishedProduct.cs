@@ -13,7 +13,6 @@ namespace GPMS.Backend.Data.Models.Products
         public Guid ProductId { get; set; }
         public Product Product { get; set; }
 
-        public ICollection<ProductionProcessStepIO> ProcessStepIOs { get; set; } = new List<ProductionProcessStepIO>();
         public ICollection<ProductionProcessStepIO> ProductionProcessStepIOs { get; set; } = new List<ProductionProcessStepIO>();
     }
 }
