@@ -18,8 +18,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
 
             builder.HasOne(e => e.WarehouseRequest).WithOne(e => e.WarehouseTicket).HasForeignKey<WarehouseTicket>(e => e.WarehouseRequestId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.Warehouse).WithMany().HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.ProductSpecification).WithMany().HasForeignKey(e => e.ProductSpecificationId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Warehouse).WithMany(e => e.WarehouseTickets).HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductSpecification).WithMany(e => e.WarehouseTickets).HasForeignKey(e => e.ProductSpecificationId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

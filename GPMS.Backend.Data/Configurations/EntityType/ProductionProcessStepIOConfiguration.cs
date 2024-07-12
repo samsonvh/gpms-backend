@@ -22,8 +22,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Type);
 
             builder.HasOne(e => e.SemiFinishedProduct).WithMany(e => e.ProductionProcessStepIOs).HasForeignKey(e => e.SemiFinishedProductId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.Material).WithMany().HasForeignKey(e => e.MaterialId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.ProductionProcessStep).WithMany().HasForeignKey(e => e.ProductionProcessStepId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Material).WithMany(e => e.ProcessStepIOs).HasForeignKey(e => e.MaterialId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionProcessStep).WithMany(e => e.ProductionProcessStepIOs).HasForeignKey(e => e.ProductionProcessStepId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

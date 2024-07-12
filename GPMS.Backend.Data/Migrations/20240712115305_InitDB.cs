@@ -19,7 +19,7 @@ namespace GPMS.Backend.Data.Migrations
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 954, DateTimeKind.Utc).AddTicks(2097)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 72, DateTimeKind.Utc).AddTicks(6710)),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -121,7 +121,7 @@ namespace GPMS.Backend.Data.Migrations
                     Colors = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageURLs = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 975, DateTimeKind.Utc).AddTicks(7205)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 104, DateTimeKind.Utc).AddTicks(2732)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -160,7 +160,7 @@ namespace GPMS.Backend.Data.Migrations
                     ActualStartingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 982, DateTimeKind.Utc).AddTicks(7520)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 115, DateTimeKind.Utc).AddTicks(6392)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -387,11 +387,9 @@ namespace GPMS.Backend.Data.Migrations
                     Consumption = table.Column<float>(type: "real", nullable: true),
                     IsProduct = table.Column<bool>(type: "bit", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    SemiFinishedProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SemiFinishedProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductionProcessStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MaterialId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SemiFinishedProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductionProcessStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -402,11 +400,6 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "Material",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProductionProcessStepIO_Material_MaterialId1",
-                        column: x => x.MaterialId1,
-                        principalTable: "Material",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_ProductionProcessStepIO_ProductionProcessStep_ProductionProcessStepId",
                         column: x => x.ProductionProcessStepId,
                         principalTable: "ProductionProcessStep",
@@ -414,11 +407,6 @@ namespace GPMS.Backend.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ProductionProcessStepIO_SemiFinishedProduct_SemiFinishedProductId",
                         column: x => x.SemiFinishedProductId,
-                        principalTable: "SemiFinishedProduct",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStepIO_SemiFinishedProduct_SemiFinishedProductId1",
-                        column: x => x.SemiFinishedProductId1,
                         principalTable: "SemiFinishedProduct",
                         principalColumn: "Id");
                 });
@@ -455,7 +443,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 14, 10, DateTimeKind.Utc).AddTicks(5760)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 146, DateTimeKind.Utc).AddTicks(1088)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -511,13 +499,11 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 14, 15, DateTimeKind.Utc).AddTicks(1229)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 151, DateTimeKind.Utc).AddTicks(6917)),
                     Type = table.Column<int>(type: "int", nullable: false),
                     WarehouseRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     WarehouseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    WarehouseId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -525,11 +511,6 @@ namespace GPMS.Backend.Data.Migrations
                     table.ForeignKey(
                         name: "FK_WarehouseTicket_ProductSpecification_ProductSpecificationId",
                         column: x => x.ProductSpecificationId,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WarehouseTicket_ProductSpecification_ProductSpecificationId1",
-                        column: x => x.ProductSpecificationId1,
                         principalTable: "ProductSpecification",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -542,11 +523,6 @@ namespace GPMS.Backend.Data.Migrations
                         column: x => x.WarehouseId,
                         principalTable: "Warehouse",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WarehouseTicket_Warehouse_WarehouseId1",
-                        column: x => x.WarehouseId1,
-                        principalTable: "Warehouse",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -557,7 +533,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 964, DateTimeKind.Utc).AddTicks(6434)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 84, DateTimeKind.Utc).AddTicks(9397)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -592,7 +568,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     FaultyQuantity = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 970, DateTimeKind.Utc).AddTicks(544)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 95, DateTimeKind.Utc).AddTicks(2283)),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InspectionRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -618,7 +594,7 @@ namespace GPMS.Backend.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductOrderNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 962, DateTimeKind.Utc).AddTicks(9563)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 82, DateTimeKind.Utc).AddTicks(7843)),
                     InspectionRequestResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -643,7 +619,7 @@ namespace GPMS.Backend.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 999, DateTimeKind.Utc).AddTicks(1887)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 11, 53, 5, 130, DateTimeKind.Utc).AddTicks(4788)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductionSeriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -889,11 +865,6 @@ namespace GPMS.Backend.Data.Migrations
                 column: "MaterialId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepIO_MaterialId1",
-                table: "ProductionProcessStepIO",
-                column: "MaterialId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepIO_ProductionProcessStepId",
                 table: "ProductionProcessStepIO",
                 column: "ProductionProcessStepId");
@@ -902,11 +873,6 @@ namespace GPMS.Backend.Data.Migrations
                 name: "IX_ProductionProcessStepIO_SemiFinishedProductId",
                 table: "ProductionProcessStepIO",
                 column: "SemiFinishedProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepIO_SemiFinishedProductId1",
-                table: "ProductionProcessStepIO",
-                column: "SemiFinishedProductId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepIOResult_StepIOId",
@@ -1041,19 +1007,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductSpecificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WarehouseTicket_ProductSpecificationId1",
-                table: "WarehouseTicket",
-                column: "ProductSpecificationId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WarehouseTicket_WarehouseId",
                 table: "WarehouseTicket",
                 column: "WarehouseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WarehouseTicket_WarehouseId1",
-                table: "WarehouseTicket",
-                column: "WarehouseId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WarehouseTicket_WarehouseRequestId",

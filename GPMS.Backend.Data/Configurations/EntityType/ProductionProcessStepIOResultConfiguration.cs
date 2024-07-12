@@ -14,7 +14,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Quantity).IsRequired(false);
 
             builder.HasOne(e => e.ProductionProcessStepResult).WithMany(e => e.StepIOResults).HasForeignKey(e => e.StepResultId).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.ProductionProcessStepIO).WithMany(e => e.StepIOResults).HasForeignKey(e => e.StepIOId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionProcessStepIO).WithMany(e => e.ProductionProcessStepIOResults).HasForeignKey(e => e.StepIOId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
