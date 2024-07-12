@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GPMS.Backend.Data\GPMS.Backend.Data.csproj" />
     <ProjectReference Include="..\GPMS.Backend.Services\GPMS.Backend.Services.csproj" />
   </ItemGroup>
 
