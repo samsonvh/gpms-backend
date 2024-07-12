@@ -17,9 +17,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Name).HasMaxLength(100);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
-
-            builder.HasMany<ProductSpecification>().WithOne().HasForeignKey(e => e.WarehouseId);
-            builder.HasMany<WarehouseTicket>().WithOne().HasForeignKey(e => e.WarehouseId);
         }
     }
 }

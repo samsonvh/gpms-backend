@@ -14,9 +14,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Unit).HasMaxLength(100);
             builder.Property(e => e.Measure);
 
-            builder.HasOne<ProductSpecification>().WithMany().HasForeignKey(e => e.ProductSpecificationId);
-
-            builder.HasMany<ProductFault>().WithOne().HasForeignKey(e => e.ProductMeasurementId);
+            builder.HasOne(e => e.ProductSpecification).WithMany(e => e.Measurements).HasForeignKey(e => e.ProductSpecificationId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

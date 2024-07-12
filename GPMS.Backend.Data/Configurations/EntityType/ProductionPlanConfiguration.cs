@@ -26,12 +26,9 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Type);
             builder.Property(e => e.Status);
 
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.CreatorId);
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.ReviewerId);
-            builder.HasOne<ProductionPlan>().WithMany().HasForeignKey(e => e.ParentProductionPlanId);
-
-            builder.HasMany<ProductionPlan>().WithOne().HasForeignKey(e => e.ParentProductionPlanId);
-            builder.HasMany<ProductionRequirement>().WithOne().HasForeignKey(e => e.ProductionPlanId);
+            builder.HasOne(e => e.Creator).WithMany(e => e.CreatedProductionPlans).HasForeignKey(e => e.CreatorId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Reviewer).WithMany(e => e.ReviewedProductionPlans).HasForeignKey(e => e.ReviewerId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ParentProductionPlan).WithMany(e => e.ChildProductionPlans).HasForeignKey(e => e.ParentProductionPlanId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

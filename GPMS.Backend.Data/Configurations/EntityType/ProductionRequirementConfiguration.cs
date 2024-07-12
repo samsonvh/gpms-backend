@@ -18,11 +18,14 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Batch).IsRequired(false);
             builder.Property(e => e.Day).IsRequired(false);
 
-            builder.HasOne<ProductSpecification>().WithMany().HasForeignKey(e => e.ProductSpecificationId);
-            builder.HasOne<ProductionPlan>().WithMany().HasForeignKey(e => e.ProductionPlanId);
-
-            builder.HasMany<ProductionEstimation>().WithOne().HasForeignKey(e => e.ProductionRequirementId);
-            builder.HasMany<WarehouseRequest>().WithOne().HasForeignKey(e => e.ProductionRequirementId);
+            builder.HasOne(e => e.ProductSpecification)
+                .WithMany(e => e.ProductionRequirements)
+                .HasForeignKey(e => e.ProductSpecificationId)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionPlan)
+                .WithMany(e => e.ProductionRequirements)
+                .HasForeignKey(e => e.ProductionPlanId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

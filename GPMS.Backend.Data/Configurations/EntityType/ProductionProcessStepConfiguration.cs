@@ -17,9 +17,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.OutputPerHour);
             builder.Property(e => e.OrderNumber);
 
-            builder.HasOne<ProductProductionProcess>().WithMany().HasForeignKey(e => e.ProductionProcessId);
-
-            builder.HasMany<ProductFault>().WithOne().HasForeignKey(e => e.ProductionProcessStepId);
+            builder.HasOne(e => e.ProductionProcess).WithMany(e => e.Steps).HasForeignKey(e => e.ProductionProcessId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

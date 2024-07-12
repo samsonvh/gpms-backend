@@ -20,8 +20,8 @@ namespace GPMS.Backend.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
-            optionsBuilder.UseSqlServer("Server=.\\SQLSERVER_22;Database=GPMS;Trusted_Connection=True;");
-
+            //optionsBuilder.UseSqlServer("Server=.\\SQLSERVER_22;Database=GPMS;Trusted_Connection=True;");
+            optionsBuilder.UseSqlServer("Server=.\\SQLExpress;Database=GPMS;Trusted_Connection=True;TrustServerCertificate=True");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

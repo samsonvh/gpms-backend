@@ -18,17 +18,9 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Position);
             builder.Property(e => e.Status);
 
-            builder.HasOne<Account>().WithOne(e => e.Staff).HasForeignKey<Staff>(e => e.AccountId);
-            builder.HasOne<Department>().WithMany(e => e.Staffs).HasForeignKey(e => e.DepartmentId);
-
-            builder.HasMany<Product>().WithOne(e => e.Creator).HasForeignKey(e => e.CreatorId);
-            builder.HasMany<Product>().WithOne(e => e.Reviewer).HasForeignKey(e => e.ReviewerId).IsRequired(false);
-            builder.HasMany<ProductionPlan>().WithOne(e => e.Creator).HasForeignKey(e => e.CreatorId);
-            builder.HasMany<ProductionPlan>().WithOne(e => e.Reviewer).HasForeignKey(e => e.ReviewerId).IsRequired(false);
-            builder.HasMany<InspectionRequest>().WithOne(e => e.Creator).HasForeignKey(e => e.CreatorId).IsRequired(false);
-            builder.HasMany<InspectionRequest>().WithOne(e => e.Reviewer).HasForeignKey(e => e.ReviewerId).IsRequired(false);
-            builder.HasMany<WarehouseRequest>().WithOne(e => e.Creator).HasForeignKey(e => e.CreatorId).IsRequired(false);
-            builder.HasMany<WarehouseRequest>().WithOne(e => e.Reviewer).HasForeignKey(e => e.ReviewerId).IsRequired(false);
+            builder.HasOne(e => e.Account).WithOne(e => e.Staff).HasForeignKey<Staff>(e => e.AccountId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Department).WithMany(e => e.Staffs).HasForeignKey(e => e.DepartmentId).IsRequired(false);
+            
         }
     }
 }

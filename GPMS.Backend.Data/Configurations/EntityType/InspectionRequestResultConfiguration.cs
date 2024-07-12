@@ -18,11 +18,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.FaultyQuantity);
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
 
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.CreatorId);
-            builder.HasOne<InspectionRequest>().WithOne().HasForeignKey<InspectionRequestResult>(e => e.InspectionRequestId);
-            builder.HasOne<ProductionProcessStepResult>().WithOne(e => e.InspectionRequestResult).HasForeignKey<ProductionProcessStepResult>(e => e.InspectionRequestResultId);
-
-            builder.HasMany<FaultyProduct>().WithOne().HasForeignKey(e => e.InspectionRequestResultId);
+            builder.HasOne(e => e.Creator).WithMany(e => e.InspectionRequestResults).HasForeignKey(e => e.CreatorId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.InspectionRequest).WithOne(e => e.InspectionRequestResult).HasForeignKey<InspectionRequestResult>(e => e.InspectionRequestId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

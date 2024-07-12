@@ -1,5 +1,6 @@
 ﻿using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Models.Requests;
+using GPMS.Backend.Data.Models.Results;
 
 namespace GPMS.Backend.Data.Models.ProductionPlans
 {
@@ -16,5 +17,6 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
         public ProductionEstimation ProductionEstimation { get; set; }
 
         public ICollection<InspectionRequest> InspectionRequests { get; set; } = new List<InspectionRequest>();
+        public ICollection<ProductionProcessStepResult> ProductionProcessStepResults { get; set; }
     }
 }
