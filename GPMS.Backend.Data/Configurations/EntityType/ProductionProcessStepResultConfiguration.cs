@@ -16,11 +16,22 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
             builder.Property(e => e.Status);
 
-            builder.HasOne<InspectionRequestResult>().WithOne().HasForeignKey<ProductionProcessStepResult>(e => e.InspectionRequestResultId).IsRequired(false);
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.CreatorId);
-            builder.HasOne<ProductionSeries>().WithMany().HasForeignKey(e => e.ProductionSeriesId);
-
-            builder.HasMany<ProductionProcessStepIOResult>().WithOne().HasForeignKey(e => e.StepResultId);
+            builder.HasOne(e => e.InspectionRequestResult)
+                .WithOne(e => e.ProductionProcessStepResult)
+                .HasForeignKey<ProductionProcessStepResult>(e => e.InspectionRequestResultId)
+                .IsRequired(false).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Creator)
+                .WithMany(e => e.productionProcessStepResults)
+                .HasForeignKey(e => e.CreatorId)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionSeries)
+                .WithMany(e => e.ProductionProcessStepResults)
+                .HasForeignKey(e => e.ProductionSeriesId)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionProcessStep)
+                .WithMany(e => e.ProductionProcessStepResults)
+                .HasForeignKey(e => e.ProductionProcessStepId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

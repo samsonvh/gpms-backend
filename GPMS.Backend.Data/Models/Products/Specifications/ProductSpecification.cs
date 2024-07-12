@@ -12,13 +12,15 @@ namespace GPMS.Backend.Data.Models.Products.Specifications
         public int InventoryQuantity { get; set; }
 
         public Guid ProductId { get; set; }
-        public Product Product { get; set; }
+        public  Product Product { get; set; }
         public Guid WarehouseId { get; set; }
-        public Warehouse Warehouse { get; set; }
+        public  Warehouse Warehouse { get; set; }
 
         public ICollection<ProductionRequirement> ProductionRequirements { get; set; } = new List<ProductionRequirement>();
         public ICollection<Measurement> Measurements { get; set; } = new List<Measurement>();
         public ICollection<FaultyProduct> FaultyProducts { get; set; } = new List<FaultyProduct>();
         public ICollection<WarehouseTicket> WarehouseTickets { get; set; } = new List<WarehouseTicket>();
+        public ICollection<BillOfMaterial> BillOfMaterials { get; set; } = new List<BillOfMaterial>();
+        public ICollection<QualityStandard> QualityStandards {get; set;} = new List<QualityStandard>();
     }
 }

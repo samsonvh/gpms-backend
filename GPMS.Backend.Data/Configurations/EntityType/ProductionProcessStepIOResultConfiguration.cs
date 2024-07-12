@@ -13,8 +13,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Consumption).IsRequired(false);
             builder.Property(e => e.Quantity).IsRequired(false);
 
-            builder.HasOne<ProductionProcessStepResult>().WithMany().HasForeignKey(e => e.StepResultId);
-            builder.HasOne<ProductionProcessStepIO>().WithMany().HasForeignKey(e => e.StepIOId);
+            builder.HasOne(e => e.ProductionProcessStepResult).WithMany(e => e.StepIOResults).HasForeignKey(e => e.StepResultId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionProcessStepIO).WithMany(e => e.StepIOResults).HasForeignKey(e => e.StepIOId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

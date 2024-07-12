@@ -15,8 +15,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         {
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Name).HasMaxLength(100).IsRequired();
-
-            builder.HasMany<Staff>().WithOne(e => e.Department).HasForeignKey(e => e.DepartmentId);
         }
     }
 }

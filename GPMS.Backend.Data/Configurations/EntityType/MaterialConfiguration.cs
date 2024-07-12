@@ -19,10 +19,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.ConsumptionUnit).HasMaxLength(20);
             builder.Property(e => e.ColorName).HasMaxLength(20);
             builder.Property(e => e.ColorCode).HasMaxLength(20);
-
-            builder.HasMany<BillOfMaterial>().WithOne().HasForeignKey(e => e.MaterialId);
-            builder.HasMany<QualityStandard>().WithOne().HasForeignKey(e => e.MaterialId);
-            builder.HasMany<ProductionProcessStepIO>().WithOne().HasForeignKey(e => e.MaterialId);
         }
     }
 }

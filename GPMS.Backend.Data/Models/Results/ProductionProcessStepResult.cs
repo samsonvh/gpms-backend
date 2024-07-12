@@ -1,5 +1,6 @@
 ﻿using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
+using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Staffs;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace GPMS.Backend.Data.Models.Results
         public ProductionSeries ProductionSeries { get; set; }
         public Guid? InspectionRequestResultId { get; set; }
         public InspectionRequestResult? InspectionRequestResult { get; set; }
+        public Guid? ProductionProcessStepId { get; set; }
+        public ProductionProcessStep? ProductionProcessStep { get; set; }
 
         public ICollection<ProductionProcessStepIOResult> StepIOResults { get; set; } = new List<ProductionProcessStepIOResult>();
     }

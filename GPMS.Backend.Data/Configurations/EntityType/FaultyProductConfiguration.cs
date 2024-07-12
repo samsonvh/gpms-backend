@@ -14,10 +14,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
 
-            builder.HasOne<InspectionRequestResult>().WithMany().HasForeignKey(e => e.InspectionRequestResultId);
-            builder.HasOne<ProductSpecification>().WithMany().HasForeignKey(e => e.SpecificationId);
-
-            builder.HasMany<ProductFault>().WithOne().HasForeignKey(e => e.FaultyProductId);
+            builder.HasOne(e => e.InspectionRequestResult).WithMany(e => e.FaultyProducts).HasForeignKey(e => e.InspectionRequestResultId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Specification).WithMany(e => e.FaultyProducts).HasForeignKey(e => e.SpecificationId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

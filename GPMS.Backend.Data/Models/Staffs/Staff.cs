@@ -3,6 +3,7 @@ using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Requests;
+using GPMS.Backend.Data.Models.Results;
 
 namespace GPMS.Backend.Data.Models.Staffs
 {
@@ -27,5 +28,7 @@ namespace GPMS.Backend.Data.Models.Staffs
         public ICollection<InspectionRequest> ReviewedInspectionRequests { get; set; } = new List<InspectionRequest>();
         public ICollection<WarehouseRequest> CreatedWarehouseRequests { get; set; } = new List<WarehouseRequest>();
         public ICollection<WarehouseRequest> ReviewedWarehouseRequests { get; set; } = new List<WarehouseRequest>();
+        public ICollection<InspectionRequestResult> InspectionRequestResults { get; set; } = new List<InspectionRequestResult>();
+        public ICollection<ProductionProcessStepResult> productionProcessStepResults { get; set; } = new List<ProductionProcessStepResult>();
     }
 }

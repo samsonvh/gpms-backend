@@ -18,10 +18,9 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
             builder.Property(e => e.Status);
 
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.CreatorId);
-            builder.HasOne<Staff>().WithMany().HasForeignKey(e => e.ReviewerId).IsRequired(false);
-            builder.HasOne<ProductionSeries>().WithMany().HasForeignKey(e => e.ProductionSeriesId);
-            builder.HasOne<InspectionRequestResult>().WithOne(e => e.InspectionRequest).HasForeignKey<InspectionRequestResult>(e => e.InspectionRequestId).IsRequired(false);
+            builder.HasOne(e => e.Creator).WithMany(e => e.CreatedInspectionRequests).HasForeignKey(e => e.CreatorId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Reviewer).WithMany(e => e.ReviewedInspectionRequests).HasForeignKey(e => e.ReviewerId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionSeries).WithMany(e => e.InspectionRequests).HasForeignKey(e => e.ProductionSeriesId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

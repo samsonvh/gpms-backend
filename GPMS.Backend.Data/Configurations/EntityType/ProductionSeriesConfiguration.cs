@@ -17,9 +17,10 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.CurrentProcess).HasMaxLength(100).IsRequired(false);
             builder.Property(e => e.Status);
 
-            builder.HasOne<ProductionEstimation>().WithMany().HasForeignKey(e => e.ProductionEstimationId);
-
-            builder.HasMany<InspectionRequest>().WithOne().HasForeignKey(e => e.ProductionSeriesId);
+            builder.HasOne(e => e.ProductionEstimation)
+                .WithMany(e => e.ProductionSeries)
+                .HasForeignKey(e => e.ProductionEstimationId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

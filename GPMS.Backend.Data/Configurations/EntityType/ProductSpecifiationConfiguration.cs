@@ -17,13 +17,8 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Color).HasMaxLength(100);
             builder.Property(e => e.InventoryQuantity);
 
-            builder.HasOne<Product>().WithMany().HasForeignKey(e => e.ProductId);
-            builder.HasOne<Warehouse>().WithMany().HasForeignKey(e => e.WarehouseId);
-
-            builder.HasMany<ProductionRequirement>().WithOne().HasForeignKey(e => e.ProductSpecificationId);
-            builder.HasMany<Measurement>().WithOne().HasForeignKey(e => e.ProductSpecificationId);
-            builder.HasMany<FaultyProduct>().WithOne().HasForeignKey(e => e.SpecificationId);
-            builder.HasMany<WarehouseTicket>().WithOne().HasForeignKey(e => e.ProductSpecificationId);
+            builder.HasOne(e => e.Product).WithMany(e => e.Specifications).HasForeignKey(e => e.ProductId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Warehouse).WithMany(e => e.Specifications).HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

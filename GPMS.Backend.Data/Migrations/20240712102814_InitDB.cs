@@ -6,20 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace GPMS.Backend.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialGPMS : Migration
+    public partial class InitDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Staff");
-
-            migrationBuilder.DropTable(
-                name: "Account");
-
-            migrationBuilder.DropTable(
-                name: "Department");
-
             migrationBuilder.CreateTable(
                 name: "Accounts",
                 columns: table => new
@@ -28,7 +19,7 @@ namespace GPMS.Backend.Data.Migrations
                     Code = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 820, DateTimeKind.Utc).AddTicks(2023)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 954, DateTimeKind.Utc).AddTicks(2097)),
                     Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -101,9 +92,7 @@ namespace GPMS.Backend.Data.Migrations
                     Position = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -112,23 +101,10 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_Staffs_Accounts_AccountId",
                         column: x => x.AccountId,
                         principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Staffs_Accounts_AccountId1",
-                        column: x => x.AccountId1,
-                        principalTable: "Accounts",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Staffs_Departments_DepartmentId",
                         column: x => x.DepartmentId,
-                        principalTable: "Departments",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Staffs_Departments_DepartmentId1",
-                        column: x => x.DepartmentId1,
                         principalTable: "Departments",
                         principalColumn: "Id");
                 });
@@ -145,14 +121,11 @@ namespace GPMS.Backend.Data.Migrations
                     Colors = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ImageURLs = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 873, DateTimeKind.Utc).AddTicks(9354)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 975, DateTimeKind.Utc).AddTicks(7205)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CategoryId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StaffId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,33 +134,15 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_Product_Category_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Product_Category_CategoryId1",
-                        column: x => x.CategoryId1,
-                        principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Product_Staffs_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Product_Staffs_ReviewerId",
                         column: x => x.ReviewerId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Product_Staffs_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Product_Staffs_StaffId1",
-                        column: x => x.StaffId1,
                         principalTable: "Staffs",
                         principalColumn: "Id");
                 });
@@ -205,14 +160,11 @@ namespace GPMS.Backend.Data.Migrations
                     ActualStartingDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CompletionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Type = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 895, DateTimeKind.Utc).AddTicks(8354)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 982, DateTimeKind.Utc).AddTicks(7520)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ParentProductionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ParentProductionPlanId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StaffId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ParentProductionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -223,29 +175,13 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "ProductionPlan",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProductionPlan_ProductionPlan_ParentProductionPlanId1",
-                        column: x => x.ParentProductionPlanId1,
-                        principalTable: "ProductionPlan",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_ProductionPlan_Staffs_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionPlan_Staffs_ReviewerId",
                         column: x => x.ReviewerId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ProductionPlan_Staffs_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ProductionPlan_Staffs_StaffId1",
-                        column: x => x.StaffId1,
                         principalTable: "Staffs",
                         principalColumn: "Id");
                 });
@@ -259,8 +195,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     OrderNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -269,14 +204,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductProductionProcess_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductProductionProcess_Product_ProductId1",
-                        column: x => x.ProductId1,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -288,9 +216,7 @@ namespace GPMS.Backend.Data.Migrations
                     Color = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     InventoryQuantity = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WarehouseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WarehouseId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    WarehouseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -299,26 +225,12 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductSpecification_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductSpecification_Product_ProductId1",
-                        column: x => x.ProductId1,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductSpecification_Warehouse_WarehouseId",
                         column: x => x.WarehouseId,
                         principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductSpecification_Warehouse_WarehouseId1",
-                        column: x => x.WarehouseId1,
-                        principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -330,8 +242,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -340,14 +251,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_SemiFinishedProduct_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SemiFinishedProduct_Product_ProductId1",
-                        column: x => x.ProductId1,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -361,8 +265,7 @@ namespace GPMS.Backend.Data.Migrations
                     StandardTime = table.Column<float>(type: "real", nullable: false),
                     OutputPerHour = table.Column<float>(type: "real", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    ProductionProcessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionProcessId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductionProcessId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -371,14 +274,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductionProcessStep_ProductProductionProcess_ProductionProcessId",
                         column: x => x.ProductionProcessId,
                         principalTable: "ProductProductionProcess",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStep_ProductProductionProcess_ProductionProcessId1",
-                        column: x => x.ProductionProcessId1,
-                        principalTable: "ProductProductionProcess",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -390,9 +286,7 @@ namespace GPMS.Backend.Data.Migrations
                     Consumption = table.Column<float>(type: "real", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MaterialId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -401,26 +295,12 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_BillOfMaterial_Material_MaterialId",
                         column: x => x.MaterialId,
                         principalTable: "Material",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BillOfMaterial_Material_MaterialId1",
-                        column: x => x.MaterialId1,
-                        principalTable: "Material",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_BillOfMaterial_ProductSpecification_ProductSpecificationId",
                         column: x => x.ProductSpecificationId,
                         principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BillOfMaterial_ProductSpecification_ProductSpecificationId1",
-                        column: x => x.ProductSpecificationId1,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -431,8 +311,7 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Measure = table.Column<float>(type: "real", nullable: false),
                     Unit = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -441,14 +320,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_Measurement_ProductSpecification_ProductSpecificationId",
                         column: x => x.ProductSpecificationId,
                         principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Measurement_ProductSpecification_ProductSpecificationId1",
-                        column: x => x.ProductSpecificationId1,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -463,9 +335,7 @@ namespace GPMS.Backend.Data.Migrations
                     Batch = table.Column<int>(type: "int", nullable: true),
                     Day = table.Column<int>(type: "int", nullable: true),
                     ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionPlanId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductionPlanId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -474,26 +344,12 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductionRequirement_ProductSpecification_ProductSpecificationId",
                         column: x => x.ProductSpecificationId,
                         principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionRequirement_ProductSpecification_ProductSpecificationId1",
-                        column: x => x.ProductSpecificationId1,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionRequirement_ProductionPlan_ProductionPlanId",
                         column: x => x.ProductionPlanId,
                         principalTable: "ProductionPlan",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionRequirement_ProductionPlan_ProductionPlanId1",
-                        column: x => x.ProductionPlanId1,
-                        principalTable: "ProductionPlan",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -505,9 +361,7 @@ namespace GPMS.Backend.Data.Migrations
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     ImageURL = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    MaterialId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -518,22 +372,10 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "Material",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_QualityStandard_Material_MaterialId1",
-                        column: x => x.MaterialId1,
-                        principalTable: "Material",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_QualityStandard_ProductSpecification_ProductSpecificationId",
                         column: x => x.ProductSpecificationId,
                         principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_QualityStandard_ProductSpecification_ProductSpecificationId1",
-                        column: x => x.ProductSpecificationId1,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -546,11 +388,10 @@ namespace GPMS.Backend.Data.Migrations
                     IsProduct = table.Column<bool>(type: "bit", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     SemiFinishedProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SemiFinishedProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     MaterialId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    MaterialId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProductionProcessStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionProcessStepId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    MaterialId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SemiFinishedProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -569,14 +410,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductionProcessStepIO_ProductionProcessStep_ProductionProcessStepId",
                         column: x => x.ProductionProcessStepId,
                         principalTable: "ProductionProcessStep",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStepIO_ProductionProcessStep_ProductionProcessStepId1",
-                        column: x => x.ProductionProcessStepId1,
-                        principalTable: "ProductionProcessStep",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionProcessStepIO_SemiFinishedProduct_SemiFinishedProductId",
                         column: x => x.SemiFinishedProductId,
@@ -600,8 +434,7 @@ namespace GPMS.Backend.Data.Migrations
                     Month = table.Column<int>(type: "int", nullable: true),
                     Batch = table.Column<int>(type: "int", nullable: true),
                     DayNumber = table.Column<int>(type: "int", nullable: true),
-                    ProductionRequirementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionRequirementId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductionRequirementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -609,12 +442,6 @@ namespace GPMS.Backend.Data.Migrations
                     table.ForeignKey(
                         name: "FK_ProductionEstimation_ProductionRequirement_ProductionRequirementId",
                         column: x => x.ProductionRequirementId,
-                        principalTable: "ProductionRequirement",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionEstimation_ProductionRequirement_ProductionRequirementId1",
-                        column: x => x.ProductionRequirementId1,
                         principalTable: "ProductionRequirement",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -628,14 +455,11 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 986, DateTimeKind.Utc).AddTicks(4178)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 14, 10, DateTimeKind.Utc).AddTicks(5760)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ReviewerId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductionRequirementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionRequirementId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductionRequirementId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -644,33 +468,15 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_WarehouseRequest_ProductionRequirement_ProductionRequirementId",
                         column: x => x.ProductionRequirementId,
                         principalTable: "ProductionRequirement",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_WarehouseRequest_ProductionRequirement_ProductionRequirementId1",
-                        column: x => x.ProductionRequirementId1,
-                        principalTable: "ProductionRequirement",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_WarehouseRequest_Staffs_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Staffs",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_WarehouseRequest_Staffs_CreatorId1",
-                        column: x => x.CreatorId1,
-                        principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_WarehouseRequest_Staffs_ReviewerId",
                         column: x => x.ReviewerId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WarehouseRequest_Staffs_ReviewerId1",
-                        column: x => x.ReviewerId1,
                         principalTable: "Staffs",
                         principalColumn: "Id");
                 });
@@ -685,8 +491,7 @@ namespace GPMS.Backend.Data.Migrations
                     FaultyQuantity = table.Column<int>(type: "int", nullable: true),
                     CurrentProcess = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ProductionEstimationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionEstimationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ProductionEstimationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -695,14 +500,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductionSeries_ProductionEstimation_ProductionEstimationId",
                         column: x => x.ProductionEstimationId,
                         principalTable: "ProductionEstimation",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionSeries_ProductionEstimation_ProductionEstimationId1",
-                        column: x => x.ProductionEstimationId1,
-                        principalTable: "ProductionEstimation",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -713,14 +511,13 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 56, 0, DateTimeKind.Utc).AddTicks(547)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 14, 15, DateTimeKind.Utc).AddTicks(1229)),
                     Type = table.Column<int>(type: "int", nullable: false),
                     WarehouseRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    WarehouseRequestId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     WarehouseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    WarehouseId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductSpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductSpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    WarehouseId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -741,22 +538,15 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "WarehouseRequest",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_WarehouseTicket_WarehouseRequest_WarehouseRequestId1",
-                        column: x => x.WarehouseRequestId1,
-                        principalTable: "WarehouseRequest",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_WarehouseTicket_Warehouse_WarehouseId",
                         column: x => x.WarehouseId,
                         principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_WarehouseTicket_Warehouse_WarehouseId1",
                         column: x => x.WarehouseId1,
                         principalTable: "Warehouse",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -767,14 +557,11 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 844, DateTimeKind.Utc).AddTicks(7733)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 964, DateTimeKind.Utc).AddTicks(6434)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ReviewerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductionSeriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionSeriesId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StaffId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StaffId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductionSeriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -783,14 +570,7 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_InspectionRequest_ProductionSeries_ProductionSeriesId",
                         column: x => x.ProductionSeriesId,
                         principalTable: "ProductionSeries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_InspectionRequest_ProductionSeries_ProductionSeriesId1",
-                        column: x => x.ProductionSeriesId1,
-                        principalTable: "ProductionSeries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_InspectionRequest_Staffs_CreatorId",
                         column: x => x.CreatorId,
@@ -799,16 +579,6 @@ namespace GPMS.Backend.Data.Migrations
                     table.ForeignKey(
                         name: "FK_InspectionRequest_Staffs_ReviewerId",
                         column: x => x.ReviewerId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_InspectionRequest_Staffs_StaffId",
-                        column: x => x.StaffId,
-                        principalTable: "Staffs",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_InspectionRequest_Staffs_StaffId1",
-                        column: x => x.StaffId1,
                         principalTable: "Staffs",
                         principalColumn: "Id");
                 });
@@ -822,11 +592,9 @@ namespace GPMS.Backend.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     FaultyQuantity = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 854, DateTimeKind.Utc).AddTicks(4597)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 970, DateTimeKind.Utc).AddTicks(544)),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InspectionRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InspectionRequestId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    InspectionRequestId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -837,23 +605,10 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "InspectionRequest",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_InspectionRequestResult_InspectionRequest_InspectionRequestId1",
-                        column: x => x.InspectionRequestId1,
-                        principalTable: "InspectionRequest",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_InspectionRequestResult_Staffs_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_InspectionRequestResult_Staffs_CreatorId1",
-                        column: x => x.CreatorId1,
-                        principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -863,11 +618,9 @@ namespace GPMS.Backend.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductOrderNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 837, DateTimeKind.Utc).AddTicks(4557)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 962, DateTimeKind.Utc).AddTicks(9563)),
                     InspectionRequestResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    InspectionRequestResultId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SpecificationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    SpecificationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -876,26 +629,12 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_FaultyProduct_InspectionRequestResult_InspectionRequestResultId",
                         column: x => x.InspectionRequestResultId,
                         principalTable: "InspectionRequestResult",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FaultyProduct_InspectionRequestResult_InspectionRequestResultId1",
-                        column: x => x.InspectionRequestResultId1,
-                        principalTable: "InspectionRequestResult",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_FaultyProduct_ProductSpecification_SpecificationId",
                         column: x => x.SpecificationId,
                         principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FaultyProduct_ProductSpecification_SpecificationId1",
-                        column: x => x.SpecificationId1,
-                        principalTable: "ProductSpecification",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -904,14 +643,12 @@ namespace GPMS.Backend.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 5, 58, 55, 920, DateTimeKind.Utc).AddTicks(1264)),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValue: new DateTime(2024, 7, 12, 10, 28, 13, 999, DateTimeKind.Utc).AddTicks(1887)),
                     Status = table.Column<int>(type: "int", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreatorId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductionSeriesId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionSeriesId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     InspectionRequestResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    InspectionRequestResultId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductionProcessStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -922,34 +659,20 @@ namespace GPMS.Backend.Data.Migrations
                         principalTable: "InspectionRequestResult",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProductionProcessStepResult_InspectionRequestResult_InspectionRequestResultId1",
-                        column: x => x.InspectionRequestResultId1,
-                        principalTable: "InspectionRequestResult",
+                        name: "FK_ProductionProcessStepResult_ProductionProcessStep_ProductionProcessStepId",
+                        column: x => x.ProductionProcessStepId,
+                        principalTable: "ProductionProcessStep",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionProcessStepResult_ProductionSeries_ProductionSeriesId",
                         column: x => x.ProductionSeriesId,
                         principalTable: "ProductionSeries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStepResult_ProductionSeries_ProductionSeriesId1",
-                        column: x => x.ProductionSeriesId1,
-                        principalTable: "ProductionSeries",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionProcessStepResult_Staffs_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStepResult_Staffs_CreatorId1",
-                        column: x => x.CreatorId1,
-                        principalTable: "Staffs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -959,13 +682,9 @@ namespace GPMS.Backend.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     FaultyProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FaultyProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     QualityStandardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    QualityStandardId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductionProcessStepId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionProcessStepId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductMeasurementId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    ProductMeasurementId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    ProductMeasurementId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -974,48 +693,22 @@ namespace GPMS.Backend.Data.Migrations
                         name: "FK_ProductFault_FaultyProduct_FaultyProductId",
                         column: x => x.FaultyProductId,
                         principalTable: "FaultyProduct",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductFault_FaultyProduct_FaultyProductId1",
-                        column: x => x.FaultyProductId1,
-                        principalTable: "FaultyProduct",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductFault_Measurement_ProductMeasurementId",
                         column: x => x.ProductMeasurementId,
                         principalTable: "Measurement",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ProductFault_Measurement_ProductMeasurementId1",
-                        column: x => x.ProductMeasurementId1,
-                        principalTable: "Measurement",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_ProductFault_ProductionProcessStep_ProductionProcessStepId",
                         column: x => x.ProductionProcessStepId,
                         principalTable: "ProductionProcessStep",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductFault_ProductionProcessStep_ProductionProcessStepId1",
-                        column: x => x.ProductionProcessStepId1,
-                        principalTable: "ProductionProcessStep",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductFault_QualityStandard_QualityStandardId",
                         column: x => x.QualityStandardId,
                         principalTable: "QualityStandard",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductFault_QualityStandard_QualityStandardId1",
-                        column: x => x.QualityStandardId1,
-                        principalTable: "QualityStandard",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1026,37 +719,21 @@ namespace GPMS.Backend.Data.Migrations
                     Consumption = table.Column<float>(type: "real", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     StepResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionProcessStepResultId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StepIOId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductionProcessStepIOId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    StepIOId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ProductionProcessStepIOResult", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductionProcessStepIOResult_ProductionProcessStepIO_ProductionProcessStepIOId",
-                        column: x => x.ProductionProcessStepIOId,
-                        principalTable: "ProductionProcessStepIO",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ProductionProcessStepIOResult_ProductionProcessStepIO_StepIOId",
                         column: x => x.StepIOId,
                         principalTable: "ProductionProcessStepIO",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductionProcessStepIOResult_ProductionProcessStepResult_ProductionProcessStepResultId",
-                        column: x => x.ProductionProcessStepResultId,
-                        principalTable: "ProductionProcessStepResult",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProductionProcessStepIOResult_ProductionProcessStepResult_StepResultId",
                         column: x => x.StepResultId,
                         principalTable: "ProductionProcessStepResult",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -1071,19 +748,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "MaterialId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BillOfMaterial_MaterialId1",
-                table: "BillOfMaterial",
-                column: "MaterialId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BillOfMaterial_ProductSpecificationId",
                 table: "BillOfMaterial",
                 column: "ProductSpecificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BillOfMaterial_ProductSpecificationId1",
-                table: "BillOfMaterial",
-                column: "ProductSpecificationId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FaultyProduct_InspectionRequestResultId",
@@ -1091,19 +758,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "InspectionRequestResultId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FaultyProduct_InspectionRequestResultId1",
-                table: "FaultyProduct",
-                column: "InspectionRequestResultId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FaultyProduct_SpecificationId",
                 table: "FaultyProduct",
                 column: "SpecificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FaultyProduct_SpecificationId1",
-                table: "FaultyProduct",
-                column: "SpecificationId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InspectionRequest_CreatorId",
@@ -1116,24 +773,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionSeriesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InspectionRequest_ProductionSeriesId1",
-                table: "InspectionRequest",
-                column: "ProductionSeriesId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_InspectionRequest_ReviewerId",
                 table: "InspectionRequest",
                 column: "ReviewerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InspectionRequest_StaffId",
-                table: "InspectionRequest",
-                column: "StaffId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InspectionRequest_StaffId1",
-                table: "InspectionRequest",
-                column: "StaffId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InspectionRequestResult_Code",
@@ -1147,20 +789,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_InspectionRequestResult_CreatorId1",
-                table: "InspectionRequestResult",
-                column: "CreatorId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_InspectionRequestResult_InspectionRequestId",
                 table: "InspectionRequestResult",
                 column: "InspectionRequestId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_InspectionRequestResult_InspectionRequestId1",
-                table: "InspectionRequestResult",
-                column: "InspectionRequestId1",
                 unique: true);
 
             migrationBuilder.CreateIndex(
@@ -1175,19 +806,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductSpecificationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Measurement_ProductSpecificationId1",
-                table: "Measurement",
-                column: "ProductSpecificationId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Product_CategoryId",
                 table: "Product",
                 column: "CategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoryId1",
-                table: "Product",
-                column: "CategoryId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_Code",
@@ -1206,24 +827,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ReviewerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_StaffId",
-                table: "Product",
-                column: "StaffId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Product_StaffId1",
-                table: "Product",
-                column: "StaffId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductFault_FaultyProductId",
                 table: "ProductFault",
                 column: "FaultyProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductFault_FaultyProductId1",
-                table: "ProductFault",
-                column: "FaultyProductId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductFault_ProductionProcessStepId",
@@ -1231,21 +837,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionProcessStepId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductFault_ProductionProcessStepId1",
-                table: "ProductFault",
-                column: "ProductionProcessStepId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductFault_ProductMeasurementId",
                 table: "ProductFault",
-                column: "ProductMeasurementId",
-                unique: true,
-                filter: "[ProductMeasurementId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductFault_ProductMeasurementId1",
-                table: "ProductFault",
-                column: "ProductMeasurementId1");
+                column: "ProductMeasurementId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductFault_QualityStandardId",
@@ -1253,19 +847,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "QualityStandardId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductFault_QualityStandardId1",
-                table: "ProductFault",
-                column: "QualityStandardId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionEstimation_ProductionRequirementId",
                 table: "ProductionEstimation",
                 column: "ProductionRequirementId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionEstimation_ProductionRequirementId1",
-                table: "ProductionEstimation",
-                column: "ProductionRequirementId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionPlan_Code",
@@ -1284,24 +868,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ParentProductionPlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionPlan_ParentProductionPlanId1",
-                table: "ProductionPlan",
-                column: "ParentProductionPlanId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionPlan_ReviewerId",
                 table: "ProductionPlan",
                 column: "ReviewerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionPlan_StaffId",
-                table: "ProductionPlan",
-                column: "StaffId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionPlan_StaffId1",
-                table: "ProductionPlan",
-                column: "StaffId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStep_Code",
@@ -1313,11 +882,6 @@ namespace GPMS.Backend.Data.Migrations
                 name: "IX_ProductionProcessStep_ProductionProcessId",
                 table: "ProductionProcessStep",
                 column: "ProductionProcessId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStep_ProductionProcessId1",
-                table: "ProductionProcessStep",
-                column: "ProductionProcessId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepIO_MaterialId",
@@ -1335,11 +899,6 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionProcessStepId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepIO_ProductionProcessStepId1",
-                table: "ProductionProcessStepIO",
-                column: "ProductionProcessStepId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepIO_SemiFinishedProductId",
                 table: "ProductionProcessStepIO",
                 column: "SemiFinishedProductId");
@@ -1348,16 +907,6 @@ namespace GPMS.Backend.Data.Migrations
                 name: "IX_ProductionProcessStepIO_SemiFinishedProductId1",
                 table: "ProductionProcessStepIO",
                 column: "SemiFinishedProductId1");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepIOResult_ProductionProcessStepIOId",
-                table: "ProductionProcessStepIOResult",
-                column: "ProductionProcessStepIOId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepIOResult_ProductionProcessStepResultId",
-                table: "ProductionProcessStepIOResult",
-                column: "ProductionProcessStepResultId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepIOResult_StepIOId",
@@ -1375,11 +924,6 @@ namespace GPMS.Backend.Data.Migrations
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepResult_CreatorId1",
-                table: "ProductionProcessStepResult",
-                column: "CreatorId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepResult_InspectionRequestResultId",
                 table: "ProductionProcessStepResult",
                 column: "InspectionRequestResultId",
@@ -1387,11 +931,9 @@ namespace GPMS.Backend.Data.Migrations
                 filter: "[InspectionRequestResultId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepResult_InspectionRequestResultId1",
+                name: "IX_ProductionProcessStepResult_ProductionProcessStepId",
                 table: "ProductionProcessStepResult",
-                column: "InspectionRequestResultId1",
-                unique: true,
-                filter: "[InspectionRequestResultId1] IS NOT NULL");
+                column: "ProductionProcessStepId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionProcessStepResult_ProductionSeriesId",
@@ -1399,29 +941,14 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionSeriesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionProcessStepResult_ProductionSeriesId1",
-                table: "ProductionProcessStepResult",
-                column: "ProductionSeriesId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionRequirement_ProductionPlanId",
                 table: "ProductionRequirement",
                 column: "ProductionPlanId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionRequirement_ProductionPlanId1",
-                table: "ProductionRequirement",
-                column: "ProductionPlanId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductionRequirement_ProductSpecificationId",
                 table: "ProductionRequirement",
                 column: "ProductSpecificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductionRequirement_ProductSpecificationId1",
-                table: "ProductionRequirement",
-                column: "ProductSpecificationId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductionSeries_Code",
@@ -1435,11 +962,6 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionEstimationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductionSeries_ProductionEstimationId1",
-                table: "ProductionSeries",
-                column: "ProductionEstimationId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductProductionProcess_Code",
                 table: "ProductProductionProcess",
                 column: "Code",
@@ -1451,19 +973,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductProductionProcess_ProductId1",
-                table: "ProductProductionProcess",
-                column: "ProductId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductSpecification_ProductId",
                 table: "ProductSpecification",
                 column: "ProductId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductSpecification_ProductId1",
-                table: "ProductSpecification",
-                column: "ProductId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductSpecification_WarehouseId",
@@ -1471,29 +983,14 @@ namespace GPMS.Backend.Data.Migrations
                 column: "WarehouseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductSpecification_WarehouseId1",
-                table: "ProductSpecification",
-                column: "WarehouseId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_QualityStandard_MaterialId",
                 table: "QualityStandard",
                 column: "MaterialId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QualityStandard_MaterialId1",
-                table: "QualityStandard",
-                column: "MaterialId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_QualityStandard_ProductSpecificationId",
                 table: "QualityStandard",
                 column: "ProductSpecificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_QualityStandard_ProductSpecificationId1",
-                table: "QualityStandard",
-                column: "ProductSpecificationId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SemiFinishedProduct_Code",
@@ -1507,20 +1004,10 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SemiFinishedProduct_ProductId1",
-                table: "SemiFinishedProduct",
-                column: "ProductId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Staffs_AccountId",
                 table: "Staffs",
                 column: "AccountId",
                 unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Staffs_AccountId1",
-                table: "Staffs",
-                column: "AccountId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Staffs_Code",
@@ -1534,19 +1021,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "DepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Staffs_DepartmentId1",
-                table: "Staffs",
-                column: "DepartmentId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WarehouseRequest_CreatorId",
                 table: "WarehouseRequest",
                 column: "CreatorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WarehouseRequest_CreatorId1",
-                table: "WarehouseRequest",
-                column: "CreatorId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WarehouseRequest_ProductionRequirementId",
@@ -1554,19 +1031,9 @@ namespace GPMS.Backend.Data.Migrations
                 column: "ProductionRequirementId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WarehouseRequest_ProductionRequirementId1",
-                table: "WarehouseRequest",
-                column: "ProductionRequirementId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_WarehouseRequest_ReviewerId",
                 table: "WarehouseRequest",
                 column: "ReviewerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WarehouseRequest_ReviewerId1",
-                table: "WarehouseRequest",
-                column: "ReviewerId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_WarehouseTicket_ProductSpecificationId",
@@ -1594,11 +1061,6 @@ namespace GPMS.Backend.Data.Migrations
                 column: "WarehouseRequestId",
                 unique: true,
                 filter: "[WarehouseRequestId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WarehouseTicket_WarehouseRequestId1",
-                table: "WarehouseTicket",
-                column: "WarehouseRequestId1");
         }
 
         /// <inheritdoc />
@@ -1638,19 +1100,19 @@ namespace GPMS.Backend.Data.Migrations
                 name: "Material");
 
             migrationBuilder.DropTable(
-                name: "ProductionProcessStep");
-
-            migrationBuilder.DropTable(
                 name: "SemiFinishedProduct");
 
             migrationBuilder.DropTable(
                 name: "InspectionRequestResult");
 
             migrationBuilder.DropTable(
-                name: "ProductProductionProcess");
+                name: "ProductionProcessStep");
 
             migrationBuilder.DropTable(
                 name: "InspectionRequest");
+
+            migrationBuilder.DropTable(
+                name: "ProductProductionProcess");
 
             migrationBuilder.DropTable(
                 name: "ProductionSeries");
@@ -1684,73 +1146,6 @@ namespace GPMS.Backend.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Departments");
-
-            migrationBuilder.CreateTable(
-                name: "Account",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Account", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Department",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Department", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Staff",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DepartmentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Position = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Staff", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Staff_Account",
-                        column: x => x.AccountId,
-                        principalTable: "Account",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Staff_Department",
-                        column: x => x.DepartmentId,
-                        principalTable: "Department",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Staff_AccountId",
-                table: "Staff",
-                column: "AccountId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Staff_DepartmentId",
-                table: "Staff",
-                column: "DepartmentId");
         }
     }
 }

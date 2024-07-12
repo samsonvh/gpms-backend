@@ -13,10 +13,10 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
 
-            builder.HasOne<FaultyProduct>().WithMany().HasForeignKey(e => e.FaultyProductId);
-            builder.HasOne<QualityStandard>().WithMany().HasForeignKey(e => e.QualityStandardId);
-            builder.HasOne<ProductionProcessStep>().WithMany().HasForeignKey(e => e.ProductionProcessStepId);
-            builder.HasOne<Measurement>().WithOne().HasForeignKey<ProductFault>(e => e.ProductMeasurementId).IsRequired(false);
+            builder.HasOne(e => e.FaultyProduct).WithMany(e => e.ProductFaults).HasForeignKey(e => e.FaultyProductId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.QualityStandard).WithMany(e => e.ProductFaults).HasForeignKey(e => e.QualityStandardId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductionProcessStep).WithMany(e => e.ProductFaults).HasForeignKey(e => e.ProductionProcessStepId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.ProductMeasurement).WithMany(e => e.ProductFaults).HasForeignKey(e => e.ProductMeasurementId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

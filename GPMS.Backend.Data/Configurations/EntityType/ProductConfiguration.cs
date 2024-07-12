@@ -22,13 +22,9 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Status);
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
 
-            builder.HasOne<Category>().WithMany(e => e.Products).HasForeignKey(e => e.CategoryId);
-            builder.HasOne<Staff>().WithMany(e => e.CreatedProducts).HasForeignKey(e => e.CreatorId);
-            builder.HasOne<Staff>().WithMany(e => e.ReviewedProducts).HasForeignKey(e => e.ReviewerId).IsRequired(false);
-
-            builder.HasMany<ProductSpecification>().WithOne(e => e.Product).HasForeignKey(e => e.ProductId);
-            builder.HasMany<SemiFinishedProduct>().WithOne(e => e.Product).HasForeignKey(e => e.ProductId);
-            builder.HasMany<ProductProductionProcess>().WithOne(e => e.Product).HasForeignKey(e => e.ProductId);
+            builder.HasOne(e => e.Category).WithMany(e => e.Products).HasForeignKey(e => e.CategoryId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Creator).WithMany(e => e.CreatedProducts).HasForeignKey(e => e.CreatorId).OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(e => e.Reviewer).WithMany(e => e.ReviewedProducts).HasForeignKey(e => e.ReviewerId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
