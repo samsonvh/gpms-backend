@@ -1,5 +1,6 @@
 using GPMS.Backend;
 using GPMS.Backend.Data;
+using GPMS.Backend.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -22,5 +23,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.Run();
