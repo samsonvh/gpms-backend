@@ -70,7 +70,7 @@ namespace GPMS.Backend
         //Inspection Requests
         public const string INSPECTION_REQUESTS_OF_SERIES_ID_V1 = SERIES_ID_OF_ESTIMATION_ID_V1 + "/inspection-requests";
         public const string INSPECTION_REQUEST_ID_OF_SERIES_ID_V1 = INSPECTION_REQUESTS_OF_SERIES_ID_V1 + "/{inspectionRequestId}";
-        //Inspection Reports
+        //Inspection Request Result
         public const string INSPECTION_REQUEST_RESULTS_OF_INSPECTION_REQUEST_ID_V1 = INSPECTION_REQUEST_ID_OF_SERIES_ID_V1 + "/inspection-request-results";
         public const string INSPECTION_REUQUEST_RESULT_ID_OF_INSPECTION_REQUEST_ID_V1 = INSPECTION_REQUEST_RESULTS_OF_INSPECTION_REQUEST_ID_V1 + "/{inspectionRequestResultId}";
         //Faulty Products
