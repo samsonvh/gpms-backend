@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 
 namespace GPMS.Backend.Controllers
 {
-    [Route("[controller]")]
-    public class AccountsController : ControllerBase
+    [ApiController]
+    public class StaffController : ControllerBase
     {
-        private readonly ILogger<AccountsController> _logger;
+        private readonly ILogger<StaffController> _logger;
 
-        public AccountsController(ILogger<AccountsController> logger)
+        public StaffController(ILogger<StaffController> logger)
         {
             _logger = logger;
         }

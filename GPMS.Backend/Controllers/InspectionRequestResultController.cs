@@ -9,11 +9,11 @@ using Microsoft.Extensions.Logging;
 namespace GPMS.Backend.Controllers
 {
     [ApiController]
-    public class WarehouseController : ControllerBase
+    public class InspectionRequestResultController : ControllerBase
     {
-        private readonly ILogger<WarehouseController> _logger;
+        private readonly ILogger<InspectionRequestResultController> _logger;
 
-        public WarehouseController(ILogger<WarehouseController> logger)
+        public InspectionRequestResultController(ILogger<InspectionRequestResultController> logger)
         {
             _logger = logger;
         }
