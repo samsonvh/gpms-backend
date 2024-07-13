@@ -18,5 +18,11 @@ namespace GPMS.Backend.Controllers
         {
             _logger = logger;
         }
+        [HttpPost]
+        [Route(APIEndPoint.AUTHENTICATION_CREDENTIALS_V1)]
+        public async Task<IActionResult> LoginWithCredential()
+        {
+            return Ok();
+        }
     }
 }
