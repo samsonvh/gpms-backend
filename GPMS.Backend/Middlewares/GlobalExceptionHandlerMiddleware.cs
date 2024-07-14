@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -25,17 +26,31 @@ namespace GPMS.Backend.Middlewares
             {
 
                 _logger.LogError($"Error: {ex.Message}");
-                
+
                 //Set up the response status code 
                 context.Response.StatusCode = ex.StatusCode;
                 //Set up the response type to Json
                 context.Response.ContentType = "application/json";
                 //Create API Exception and serialize to Json 
-                var errorResponse = new {statuscode = ex.StatusCode, message = ex.Message, data = ex.Data };
+                var errorResponse = new { statuscode = ex.StatusCode, message = ex.Message, data = ex.Data };
                 var result = JsonConvert.SerializeObject(errorResponse);
                 //Write error json to response body 
                 await context.Response.WriteAsync(result);
 
+            }
+            catch (ValidationException ex)
+            {
+                _logger.LogError($"Error: {ex.Message}");
+
+                //Set up the response status code 
+                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                //Set up the response type to Json
+                context.Response.ContentType = "application/json";
+                //Create API Exception and serialize to Json 
+                var errorResponse = new { statuscode = context.Response.StatusCode, message = ex.Message, data = ex.Data };
+                var result = JsonConvert.SerializeObject(errorResponse);
+                //Write error json to response body 
+                await context.Response.WriteAsync(result);
             }
             catch (Exception ex)
             {
@@ -46,7 +61,7 @@ namespace GPMS.Backend.Middlewares
                 //Set up the response type to Json
                 context.Response.ContentType = "application/json";
                 //Create Exception and serialize to Json 
-                var errorResponse = new {statuscode = context.Response.StatusCode, message = ex.Message, data = ex.Data };
+                var errorResponse = new { statuscode = context.Response.StatusCode, message = ex.Message, data = ex.Data };
                 var exception = JsonConvert.SerializeObject(errorResponse);
                 //Write error json to response body
                 await context.Response.WriteAsync(exception);
