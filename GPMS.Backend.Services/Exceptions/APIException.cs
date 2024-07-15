@@ -11,7 +11,7 @@ namespace GPMS.Backend.Services.Exceptions
         public int StatusCode { get; set; }
         public string Message { get; set; }
         public object Data { get; set; }
-        public APIException(int StatusCode ,string Message, object Data = null)
+        public APIException(int StatusCode, string Message, object Data = null)
         {
             this.StatusCode = StatusCode;
             this.Message = Message;

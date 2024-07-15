@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using FluentValidation;
 using GPMS.Backend.Services.Exceptions;
 using Newtonsoft.Json;
 
@@ -38,7 +39,7 @@ namespace GPMS.Backend.Middlewares
                 await context.Response.WriteAsync(result);
 
             }
-            catch (ValidationException ex)
+            catch (FluentValidation.ValidationException ex)
             {
                 _logger.LogError($"Error: {ex.Message}");
 
@@ -47,7 +48,16 @@ namespace GPMS.Backend.Middlewares
                 //Set up the response type to Json
                 context.Response.ContentType = "application/json";
                 //Create API Exception and serialize to Json 
-                var errorResponse = new { statuscode = context.Response.StatusCode, message = ex.Message, data = ex.Data };
+                List<FormError> errorList = new List<FormError>();
+                foreach (var error in ex.Errors)
+                {
+                    errorList.Add(new FormError
+                    {
+                        ErrorMessage = error.ErrorMessage,
+                        Property = error.PropertyName
+                    });
+                }
+                var errorResponse = new { statuscode = context.Response.StatusCode, message = ex.Message, data = errorList };
                 var result = JsonConvert.SerializeObject(errorResponse);
                 //Write error json to response body 
                 await context.Response.WriteAsync(result);
