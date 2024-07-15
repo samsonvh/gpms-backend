@@ -15,6 +15,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<ProductionPlan> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Code).HasMaxLength(20);
             builder.HasIndex(e => e.Code).IsUnique();
             builder.Property(e => e.Name).HasMaxLength(100);

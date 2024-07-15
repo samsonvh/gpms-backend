@@ -4,6 +4,7 @@ using GPMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GPMS.Backend.Data.Migrations
 {
     [DbContext(typeof(GPMSDbContext))]
-    partial class GPMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240715113827_Add Value Generate On Add To Id To All Entity")]
+    partial class AddValueGenerateOnAddToIdToAllEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

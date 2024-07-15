@@ -13,6 +13,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<ProductSpecification> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Size).HasMaxLength(100);
             builder.Property(e => e.Color).HasMaxLength(100);
             builder.Property(e => e.InventoryQuantity);

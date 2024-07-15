@@ -11,6 +11,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<ProductionRequirement> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Quantity);
             builder.Property(e => e.OvertimeQuantity);
             builder.Property(e => e.Quarter).IsRequired(false);

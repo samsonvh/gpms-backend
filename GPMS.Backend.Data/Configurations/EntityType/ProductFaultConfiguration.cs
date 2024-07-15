@@ -11,6 +11,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<ProductFault> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
 
             builder.HasOne(e => e.FaultyProduct).WithMany(e => e.ProductFaults).HasForeignKey(e => e.FaultyProductId).OnDelete(DeleteBehavior.NoAction);

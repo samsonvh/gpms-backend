@@ -4,6 +4,7 @@ using GPMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GPMS.Backend.Data.Migrations
 {
     [DbContext(typeof(GPMSDbContext))]
-    partial class GPMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240715103952_RemoveTypeInProduct")]
+    partial class RemoveTypeInProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +79,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 418, DateTimeKind.Utc).AddTicks(1220));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 668, DateTimeKind.Utc).AddTicks(7655));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -283,7 +286,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 405, DateTimeKind.Utc).AddTicks(4841));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 655, DateTimeKind.Utc).AddTicks(9092));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -614,7 +617,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 385, DateTimeKind.Utc).AddTicks(7881));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 637, DateTimeKind.Utc).AddTicks(1558));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -660,7 +663,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 458, DateTimeKind.Utc).AddTicks(8890));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 708, DateTimeKind.Utc).AddTicks(1344));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -706,7 +709,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 382, DateTimeKind.Utc).AddTicks(8928));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 634, DateTimeKind.Utc).AddTicks(2191));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -744,7 +747,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 396, DateTimeKind.Utc).AddTicks(1035));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 646, DateTimeKind.Utc).AddTicks(7726));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -848,7 +851,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 439, DateTimeKind.Utc).AddTicks(7577));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 689, DateTimeKind.Utc).AddTicks(4234));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -898,7 +901,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 368, DateTimeKind.Utc).AddTicks(5673));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 620, DateTimeKind.Utc).AddTicks(3961));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -1007,7 +1010,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 15, 11, 38, 26, 467, DateTimeKind.Utc).AddTicks(1520));
+                        .HasDefaultValue(new DateTime(2024, 7, 15, 10, 39, 51, 716, DateTimeKind.Utc).AddTicks(1771));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
