@@ -60,9 +60,13 @@ namespace GPMS.Backend
             //Add Service 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IAccountService, AccountService>();
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
+
+            //Add Mapper
+            services.AddAutoMapper(typeof(AutoMapperProfileUtils));
         }
     }
 }

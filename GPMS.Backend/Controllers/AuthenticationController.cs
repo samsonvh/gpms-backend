@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
+using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -29,7 +29,7 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.AUTHENTICATION_CREDENTIALS_V1)]
         [SwaggerOperation(Summary = "Login to system using email and password")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Login Successfully", typeof(LoginResponseDTO))]
-        [SwaggerResponse((int)HttpStatusCode.Unauthorized,"Login Failed" )]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Login Failed")]
         [Produces("application/json")]
         public async Task<IActionResult> LoginWithCredential([FromBody] LoginInputDTO loginInputDTO)
         {
@@ -38,14 +38,14 @@ namespace GPMS.Backend.Controllers
         }
         [HttpGet]
         [Route("api/v1/getpasswordhashed")]
-        public async Task<IActionResult> GetPasswordHashed ([FromQuery] string password)
+        public async Task<IActionResult> GetPasswordHashed([FromQuery] string password)
         {
             return Ok(BCrypt.Net.BCrypt.HashPassword(password));
         }
         [HttpGet]
         [Route("api/v1/authentication/testauthorize")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> TestAuthorize ()
+        public async Task<IActionResult> TestAuthorize()
         {
             return Ok("Test Authorize Successfully");
         }
