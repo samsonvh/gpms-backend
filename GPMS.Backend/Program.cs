@@ -1,6 +1,8 @@
+using FluentValidation.AspNetCore;
 using GPMS.Backend;
 using GPMS.Backend.Data;
 using GPMS.Backend.Middlewares;
+using GPMS.Backend.Services.Utils.Validators;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,8 @@ Log.Logger = new LoggerConfiguration()
 // Add services to the container.
 builder.Services.ConfigureService(configuration);
 builder.Services.AddControllers();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -27,12 +31,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 app.UseSerilogRequestLogging();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
-app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
+
 
 app.Run();

@@ -9,7 +9,7 @@ namespace GPMS.Backend.Services.Exceptions
     {
         public FormError()
         {
-            
+
         }
         public FormError(string Property, string ErrorMessage)
         {

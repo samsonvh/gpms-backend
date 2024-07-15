@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,14 +34,19 @@ namespace GPMS.Backend.Data.Repositories.Implementation
             return _dbContext.Set<Entity>().Find(id);
         }
 
+        public IQueryable<Entity> GetAll()
+        {
+            return _dbContext.Set<Entity>();
+        }
+
         public async Task Save()
         {
             await _dbContext.SaveChangesAsync();
         }
 
-        public IQueryable<Entity> Search()
+        public IQueryable<Entity> Search(Expression<Func<Entity, bool>> expression)
         {
-            return _dbContext.Set<Entity>();
+            return _dbContext.Set<Entity>().Where(expression);
         }
 
         public void Update(Entity entity)
