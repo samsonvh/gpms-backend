@@ -12,6 +12,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<WarehouseRequest> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Name).HasMaxLength(100);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             builder.Property(e => e.Quantity);

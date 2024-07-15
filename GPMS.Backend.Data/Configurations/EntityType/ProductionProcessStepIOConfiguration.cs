@@ -16,6 +16,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<ProductionProcessStepIO> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Quantity).IsRequired(false);
             builder.Property(e => e.Consumption).IsRequired(false);
             builder.Property(e => e.IsProduct);

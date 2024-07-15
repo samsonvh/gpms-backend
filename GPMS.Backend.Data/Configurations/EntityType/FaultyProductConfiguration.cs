@@ -10,6 +10,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<FaultyProduct> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.ProductOrderNumber);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);

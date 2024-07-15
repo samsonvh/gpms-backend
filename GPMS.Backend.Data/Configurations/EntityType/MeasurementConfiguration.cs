@@ -10,6 +10,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
         public void Configure(EntityTypeBuilder<Measurement> builder)
         {
             builder.HasKey(e => e.Id);
+            builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Name).HasMaxLength(100);
             builder.Property(e => e.Unit).HasMaxLength(100);
             builder.Property(e => e.Measure);
