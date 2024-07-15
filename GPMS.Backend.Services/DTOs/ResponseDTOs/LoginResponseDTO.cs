@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Staffs;
 
-namespace GPMS.Backend.Services.DTOs
+namespace GPMS.Backend.Services.DTOs.ResponseDTOs
 {
     public class LoginResponseDTO
     {
