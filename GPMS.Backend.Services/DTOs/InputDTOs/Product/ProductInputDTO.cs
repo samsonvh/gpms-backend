@@ -15,7 +15,7 @@ namespace GPMS.Backend.Services.DTOs.Product.InputDTOs.Product
         public string? Description { get; set; }
         public string Sizes { get; set; }
         public string Colors { get; set; }
-        public List<IFormFile> Images { get; set; }
+        public List<IFormFile>? Images { get; set; }
 
         
         public CategoryInputDTO Category { get; set; }

@@ -21,7 +21,7 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9 ]*$").WithMessage("Name can not contains special character");
             RuleFor(inputDTO => inputDTO.Description).MaximumLength(500).WithMessage("Description can not longer than 500 characters");
             RuleFor(inputDTO => inputDTO.Steps).NotNull().WithMessage("Step list is required");
-            RuleFor(inputDTO => inputDTO.OrderNumber).GreaterThan(0).WithMessage("Step list is required");
+            RuleFor(inputDTO => inputDTO.OrderNumber).GreaterThan(0).WithMessage(" is required");
         }
     }
 }
