@@ -29,7 +29,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new ValidationException("Login Input Invalid", validateResult.Errors);
             }
             IQueryable<Account> query = _accountRepository.Search(account => account.Email.Equals(loginInputDTO.Email))
-                                                            .Include(account => account.Staff);
+                                                            .Include(account => account.Staff)
+                                                            .Include(account => account.Staff.Department);
             Account existedAccount = await query.FirstOrDefaultAsync();
             if (existedAccount == null)
             {
@@ -50,10 +51,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             LoginResponseDTO loginResponseDTO = new LoginResponseDTO
             {
                 Code = existedAccount.Code,
-                Email = existedAccount.Email,
                 FullName = existedAccount.Staff.FullName,
                 Position = existedAccount.Staff.Position,
-                Status = existedAccount.Status,
+                Department = existedAccount.Staff.Department.Name,
                 Token = JWTUtils.GenerateJWTToken(existedAccount)
             };
             return loginResponseDTO;
