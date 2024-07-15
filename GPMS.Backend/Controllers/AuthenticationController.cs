@@ -16,7 +16,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace GPMS.Backend.Controllers
 {
     [ApiController]
-    public class AuthenticationController : ControllerBase  
+    public class AuthenticationController : ControllerBase
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IAuthenticationService _authenticationService;
@@ -29,12 +29,19 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.AUTHENTICATION_CREDENTIALS_V1)]
         [SwaggerOperation(Summary = "Login to system using email and password")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Login Successfully", typeof(LoginResponseDTO))]
-        [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Login Failed")]
+        [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Unauthorized")]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden, "Forbidden")]
         [Produces("application/json")]
         public async Task<IActionResult> LoginWithCredential([FromBody] LoginInputDTO loginInputDTO)
         {
             LoginResponseDTO loginResponseDTO = await _authenticationService.LoginWithCredential(loginInputDTO);
-            return Ok(loginResponseDTO);
+            BaseReponse baseReponse = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Login Successfully",
+                Data = loginResponseDTO
+            };
+            return Ok(baseReponse);
         }
         [HttpGet]
         [Route("api/v1/getpasswordhashed")]

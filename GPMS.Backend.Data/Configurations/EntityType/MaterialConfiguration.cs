@@ -17,7 +17,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Name).HasMaxLength(100);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             builder.Property(e => e.ConsumptionUnit).HasMaxLength(20);
-            builder.Property(e => e.ConsumptionUnit).HasMaxLength(20);
+            builder.Property(e => e.SizeWidthUnit).HasMaxLength(20);
             builder.Property(e => e.ColorName).HasMaxLength(20);
             builder.Property(e => e.ColorCode).HasMaxLength(20);
         }
