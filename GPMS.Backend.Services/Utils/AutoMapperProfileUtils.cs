@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GPMS.Backend.Data.Enums.Others;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
@@ -23,6 +24,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<Account, AccountDTO>()
                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName));
             CreateMap<Account, CreateUpdateResponseDTO<Account>>();
+            CreateMap<Account, ChangeStatusResponseDTO<Account, AccountStatus>>();
 
             //staff
             CreateMap<StaffInputDTO, Staff>()
