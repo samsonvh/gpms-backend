@@ -15,5 +15,6 @@ namespace GPMS.Backend.Services.Services
     {
         Task<IEnumerable<AccountListingDTO>> GetAllAccounts();
         Task<CreateUpdateResponseDTO<Account>> Add(AccountInputDTO inputDTO);
+        Task<AccountDTO> Details(Guid id);
     }
 }
