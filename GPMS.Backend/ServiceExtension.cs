@@ -64,6 +64,7 @@ namespace GPMS.Backend
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
+            services.AddTransient<IValidator<AccountInputDTO>, AccountInputDTOValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
