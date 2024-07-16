@@ -11,6 +11,8 @@ using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
+using GPMS.Backend.Data.Models.Staffs;
 
 namespace GPMS.Backend.Controllers
 {
@@ -38,5 +40,22 @@ namespace GPMS.Backend.Controllers
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = staff });
         }
 
+        [HttpPatch]
+        [Route(APIEndPoint.STAFFS_ID_V1)]
+        [SwaggerOperation(Summary = "Change stauts staff")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change status staff successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Produces("application/json")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] StaffStatus status)
+        {
+            var staff = await _staffService.ChangeStatus(id, status);
+            var responseData = new ChangeStatusResponseDTO<Staff, StaffStatus>
+            {
+                Id = staff.Id,
+                Status = staff.Status,
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of account sucessfully", Data = responseData });
+        }
     }
 }
