@@ -4,6 +4,7 @@ using GPMS.Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GPMS.Backend.Data.Migrations
 {
     [DbContext(typeof(GPMSDbContext))]
-    partial class GPMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716065523_Make DepartmentID in Staff Null")]
+    partial class MakeDepartmentIDinStaffNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

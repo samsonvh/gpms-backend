@@ -16,7 +16,7 @@ namespace GPMS.Backend.Data.Models.Staffs
         public StaffStatus Status { get; set; }
 
         public Guid AccountId { get; set; }
-        public Guid DepartmentId { get; set; }
+        public Guid? DepartmentId { get; set; }
         public Account Account { get; set; }
         public Department? Department { get; set; }
 
