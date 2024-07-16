@@ -62,6 +62,7 @@ namespace GPMS.Backend
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
+            services.AddScoped<IStaffService, StaffService>();  
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
