@@ -24,9 +24,9 @@ namespace GPMS.Backend.Data
         }
         public GPMSDbContext(DbContextOptions<GPMSDbContext> options) : base(options) {}
 
-        public DbSet<Department> Department { get; set; }
-        public DbSet<Account> Account { get; set; }
-        public DbSet<Staff> Staff { get; set; }
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Staff> Staffs { get; set; }
         public DbSet<ProductionEstimation> ProductionEstimation { get; set; }
         public DbSet<ProductionPlan> ProductionPlan { get; set; }
         public DbSet<ProductionRequirement> ProductionRequirement { get; set; }
