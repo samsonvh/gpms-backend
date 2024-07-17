@@ -35,6 +35,10 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(staff => staff.Position, opt => opt.MapFrom(dto => dto.Position))
                 .ForMember(staff => staff.DepartmentId, opt => opt.MapFrom(dto => dto.DepartmentId))
                 .ForMember(staff => staff.Account, opt => opt.Ignore());
+
+            //department
+            CreateMap<Department, DepartmentListingDTO>();
+
             //category
             CreateMap<CategoryInputDTO, Category>();
             CreateMap<Category, CategoryDTO>().ReverseMap();
