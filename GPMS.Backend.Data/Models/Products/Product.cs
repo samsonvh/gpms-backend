@@ -21,7 +21,7 @@ namespace GPMS.Backend.Data.Models.Products
         public Category Category { get; set; }
         public Guid CreatorId { get; set; }
         public Staff Creator { get; set; }
-        public Guid ReviewerId { get; set; }
+        public Guid? ReviewerId { get; set; }
         public Staff? Reviewer { get; set; }
 
         public ICollection<ProductSpecification> Specifications { get; set; } = new List<ProductSpecification>();

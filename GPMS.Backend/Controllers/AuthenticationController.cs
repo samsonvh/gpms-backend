@@ -54,6 +54,7 @@ namespace GPMS.Backend.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> TestAuthorize()
         {
+            
             return Ok("Test Authorize Successfully");
         }
     }
