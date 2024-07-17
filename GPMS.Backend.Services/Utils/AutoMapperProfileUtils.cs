@@ -22,7 +22,8 @@ namespace GPMS.Backend.Services.Utils
             //account
             CreateMap<Account, AccountListingDTO>();
             CreateMap<AccountInputDTO, Account>();
-            CreateMap<Account, AccountDTO>();
+            CreateMap<Account, AccountDTO>()
+                .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName));
             CreateMap<Account, CreateUpdateResponseDTO<Account>>();
 
             //staff

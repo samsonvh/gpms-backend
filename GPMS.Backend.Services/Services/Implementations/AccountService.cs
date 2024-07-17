@@ -144,5 +144,18 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return _mapper.Map<IEnumerable<AccountListingDTO>>(accounts);
         }
+
+        public async Task<AccountDTO> Details(Guid id)
+        {
+            var account = await _accountRepository
+                .Search(account => account.Id == id)
+                .Include(account => account.Staff)
+                .FirstOrDefaultAsync();
+            if (account == null)
+            {
+                throw new APIException(404, "Account not found because it may have been deleted or does not exist.");
+            }
+            return _mapper.Map<AccountDTO>(account);
+        }
     }
 }

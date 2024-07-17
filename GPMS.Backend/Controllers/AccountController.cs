@@ -40,6 +40,18 @@ namespace GPMS.Backend.Controllers
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get all accounts sucessfully", Data = account });
         }
 
+        [HttpGet]
+        [Route(APIEndPoint.ACCOUNTS_ID_V1)]
+        [SwaggerOperation(Summary = "Get details of account")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Details([FromRoute] Guid id)
+        {
+            var account = await _accountService.Details(id);
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of account sucessfully", Data = account });
+        }
+
         [HttpPost]
         [Route(APIEndPoint.ACCOUNTS_V1)]
         [SwaggerOperation(Summary = "Provide account")]
