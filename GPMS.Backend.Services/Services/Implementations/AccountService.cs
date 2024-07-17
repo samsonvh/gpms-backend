@@ -54,6 +54,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             await CheckUniqueStaffCode(inputDTO.StaffInputDTO.Code);
             await CheckValidDepartmentId(inputDTO.StaffInputDTO.DepartmentId);
 
+            if (inputDTO.StaffInputDTO.Position != StaffPosition.FactoryDirector)
+            {
+                await CheckValidDepartmentId(inputDTO.StaffInputDTO.DepartmentId);
+            }
+
             //create account and staff
             var account = _mapper.Map<Account>(inputDTO);
             account.Status = AccountStatus.Active;
@@ -61,11 +66,6 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             var staff = _mapper.Map<Staff>(inputDTO.StaffInputDTO);
             staff.Status = StaffStatus.Active;
-
-            if (staff.Position == StaffPosition.FactoryDirector)
-            {
-                staff.DepartmentId = null;
-            }
 
             if (inputDTO.StaffInputDTO.Position == StaffPosition.FactoryDirector && inputDTO.StaffInputDTO.DepartmentId != null)
             {
@@ -126,12 +126,17 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         private async Task CheckValidDepartmentId(Guid? departmentId)
         {
-            var existingDepartment = await _departmentRepository
-                .Search(deparment => deparment.Id == departmentId)
-                .FirstOrDefaultAsync();
-            if (existingDepartment == null)
+            if (departmentId.HasValue)
             {
-                throw new APIException(400, "Department not found.");
+                
+                var existingDepartment = await _departmentRepository
+                    .Search(department => department.Id == departmentId.Value)
+                    .FirstOrDefaultAsync();
+
+                if (existingDepartment == null)
+                {
+                    throw new APIException(400, "Invalid DepartmentId. Department not found.");
+                }
             }
         }
 
