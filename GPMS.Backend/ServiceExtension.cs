@@ -68,9 +68,7 @@ namespace GPMS.Backend
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
-<<<<<<< HEAD
             services.AddScoped<IStaffService, StaffService>();  
-=======
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ISemiFinishedProductService, SemiFinishProductService>();
@@ -82,7 +80,6 @@ namespace GPMS.Backend
             services.AddScoped<IProcessService, ProcessService>();
             services.AddScoped<IStepService, StepService>();
             services.AddScoped<IStepIOService, StepIOService>();
->>>>>>> dev
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
