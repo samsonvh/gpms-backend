@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,10 +26,12 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task<IEnumerable<StaffListingDTO>> GetAllStaffs()
         {
-            var staffs = await _staffRepository.GetAll().ToListAsync();
+            var staffs = await _staffRepository.GetAll()
+                                                .Include(department => department.Department)
+                                                .ToListAsync();
             if (staffs == null)
             {
-                throw new APIException(404, "Staff not found because it may have been deleted or does not exist.");
+                throw new APIException((int)HttpStatusCode.NotFound, "Staff not found because it may have been deleted or does not exist.");
             }
             return _mapper.Map<IEnumerable<StaffListingDTO>>(staffs);
         }
