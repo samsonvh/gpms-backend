@@ -1,17 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
+using GPMS.Backend.Data.Models.Staffs;
+using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.InputDTOs;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Products.Specifications;
-using GPMS.Backend.Data.Models.Staffs;
-using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
-using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 
@@ -23,6 +21,17 @@ namespace GPMS.Backend.Services.Utils
         {
             //account
             CreateMap<Account, AccountListingDTO>();
+            CreateMap<AccountInputDTO, Account>();
+            CreateMap<Account, AccountDTO>();
+            CreateMap<Account, CreateUpdateResponseDTO<Account>>();
+
+            //staff
+            CreateMap<StaffInputDTO, Staff>()
+                .ForMember(staff => staff.Code, opt => opt.MapFrom(dto => dto.Code))
+                .ForMember(staff => staff.FullName, opt => opt.MapFrom(dto => dto.FullName))
+                .ForMember(staff => staff.Position, opt => opt.MapFrom(dto => dto.Position))
+                .ForMember(staff => staff.DepartmentId, opt => opt.MapFrom(dto => dto.DepartmentId))
+                .ForMember(staff => staff.Account, opt => opt.Ignore());
             //category
             CreateMap<CategoryInputDTO, Category>();
             CreateMap<Category, CategoryDTO>().ReverseMap();
@@ -33,7 +42,7 @@ namespace GPMS.Backend.Services.Utils
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             //Material
-            CreateMap<MaterialInputDTO,Material>();
+            CreateMap<MaterialInputDTO, Material>();
             //Specification
             CreateMap<SpecificationInputDTO, ProductSpecification>()
             .ForMember(specification => specification.Measurements, options => options.Ignore())
@@ -50,8 +59,7 @@ namespace GPMS.Backend.Services.Utils
             //Step
             CreateMap<StepInputDTO, ProductionProcessStep>();
             //Step IO
-            CreateMap<StepIOInputDTO,ProductionProcessStepIO>();
+            CreateMap<StepIOInputDTO, ProductionProcessStepIO>();
         }
-        
     }
 }

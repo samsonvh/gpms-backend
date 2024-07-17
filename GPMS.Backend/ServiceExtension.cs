@@ -81,6 +81,7 @@ namespace GPMS.Backend
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
+            services.AddTransient<IValidator<AccountInputDTO>, AccountInputDTOValidator>();
             services.AddTransient<IValidator<ProductInputDTO>,ProductInputDTOValidator>();
             services.AddTransient<IValidator<ProductDefinitionInputDTO>,ProductDefinitionInputDTOValidator>();
             services.AddTransient<IValidator<CategoryInputDTO>,CategoryInputDTOValidator>();

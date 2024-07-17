@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Azure;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
@@ -36,6 +38,31 @@ namespace GPMS.Backend.Controllers
         {
             var account = await _accountService.GetAllAccounts();
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get all accounts sucessfully", Data = account });
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.ACCOUNTS_V1)]
+        [SwaggerOperation(Summary = "Provide account")]
+        [SwaggerResponse((int)HttpStatusCode.Created, "Provide account successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid Data")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Create(AccountInputDTO accountInputDTO)
+        {
+            var createdAccount = await _accountService.Add(accountInputDTO);
+                
+            var responseData = new CreateUpdateResponseDTO<Account>
+            {
+                Id = createdAccount.Id,
+                Code = createdAccount.Code
+            };
+
+            BaseReponse baseReponse = new BaseReponse
+            {
+                StatusCode = 201,
+                Message = "Provide account sucessfully",
+                Data = responseData
+            };
+            return CreatedAtAction(nameof(Create), baseReponse);
         }
     }
 }
