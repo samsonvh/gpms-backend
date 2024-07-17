@@ -11,7 +11,6 @@ namespace GPMS.Backend.Services.Utils.Validators
     {
         public CategoryInputDTOValidator()
         {
-            RuleFor(inputDTO => inputDTO.Name).NotNull().WithMessage("Name is required");
             RuleFor(inputDTO => inputDTO.Name).MaximumLength(100).WithMessage("Name can not longer than 100 characters");
             RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9 ]*$").WithMessage("Name can not contains special character");
         }

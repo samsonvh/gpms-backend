@@ -16,7 +16,6 @@ namespace GPMS.Backend.Services.Exceptions
             this.ErrorMessage = ErrorMessage;
             this.Property = Property;
         }
-
         public string Property { get; set; }
         public string ErrorMessage { get; set; }
     }
