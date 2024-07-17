@@ -32,7 +32,7 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.ACCOUNTS_V1)]
         [SwaggerOperation(Summary = "Get all accounts")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(AccountDTO))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(BaseReponse))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
         public async Task<IActionResult> GetAllAccounts()

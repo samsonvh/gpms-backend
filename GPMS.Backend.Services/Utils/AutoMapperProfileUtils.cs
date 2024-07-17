@@ -21,7 +21,8 @@ namespace GPMS.Backend.Services.Utils
         public AutoMapperProfileUtils()
         {
             //account
-            CreateMap<Account, AccountListingDTO>();
+            CreateMap<Account, AccountListingDTO>()
+                .ForMember(dto => dto.Poition, opt => opt.MapFrom(account => account.Staff.Position));
             CreateMap<AccountInputDTO, Account>();
             CreateMap<Account, AccountDTO>()
                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName));
