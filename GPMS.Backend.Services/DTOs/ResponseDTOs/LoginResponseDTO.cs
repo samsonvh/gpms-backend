@@ -9,7 +9,6 @@ namespace GPMS.Backend.Services.DTOs.ResponseDTOs
 {
     public class LoginResponseDTO
     {
-        public Guid Id { get; set; }
         public string Code { get; set; }
         public string FullName { get; set; }
         public string Department { get; set; }

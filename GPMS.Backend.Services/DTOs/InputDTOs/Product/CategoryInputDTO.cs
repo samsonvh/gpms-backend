@@ -7,6 +7,7 @@ namespace GPMS.Backend.Services.DTOs.Product.InputDTOs.Product
 {
     public class CategoryInputDTO
     {
-        public string Name { get; set; }
+        public Guid? Id { get; set; }
+        public string? Name { get; set; }
     }
 }
