@@ -1,4 +1,5 @@
-﻿using GPMS.Backend.Data.Enums.Statuses.Staffs;
+﻿using GPMS.Backend.Data.Enums.Others;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
@@ -14,5 +15,7 @@ namespace GPMS.Backend.Services.Services
     {
         Task<IEnumerable<StaffListingDTO>> GetAllStaffs();
         Task<ChangeStatusResponseDTO<Staff, StaffStatus>> ChangeStatus(Guid id, StaffStatus newStatus);
+        Task<ChangePositionResponseDTO<Staff, StaffPosition>> ChangePosition(Guid id, StaffPosition newPosition);
+
     }
 }

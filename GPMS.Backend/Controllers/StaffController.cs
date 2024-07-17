@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
+using GPMS.Backend.Data.Enums.Others;
 
 namespace GPMS.Backend.Controllers
 {
@@ -32,12 +33,12 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.STAFFS_V1)]
         [SwaggerOperation(Summary = "Get all staffs")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all staffs successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Staff not found")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAllDepartments()
+        public async Task<IActionResult> GetAllStaffs()
         {
             var staff = await _staffService.GetAllStaffs();
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = staff });
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all staffs sucessfully", Data = staff });
         }
 
         [HttpPatch]
@@ -56,6 +57,24 @@ namespace GPMS.Backend.Controllers
             };
 
             return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of account sucessfully", Data = responseData });
+        }
+
+        [HttpPatch]
+        [Route(APIEndPoint.STAFFS_ASSIGN_POSITION_V1)]
+        [SwaggerOperation(Summary = "Assign position staff")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Assign position staff successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid position")]
+        [Produces("application/json")]
+        public async Task<IActionResult> AssignPosition([FromRoute] Guid id, [FromBody] StaffPosition position)
+        {
+            var staff = await _staffService.ChangePosition(id, position);
+            var responseData = new ChangePositionResponseDTO<Staff, StaffPosition>
+            {
+                Id = staff.Id,
+                Position = staff.Position,
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Assign position staff successfully", Data = responseData });
         }
     }
 }

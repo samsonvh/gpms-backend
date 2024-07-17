@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GPMS.Backend.Data.Configurations.EntityType;
+using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
@@ -24,6 +25,27 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             _staffRepository = staffRepository;
             _mapper = mapper;
+        }
+
+        public async Task<ChangePositionResponseDTO<Staff, StaffPosition>> ChangePosition(Guid id, StaffPosition newPosition)
+        {
+            var staff = await _staffRepository
+                .Search(staff => staff.Id == id)
+                .FirstOrDefaultAsync();
+            
+            if (staff == null)
+            {
+                throw new APIException(404, "Staff not found because it may have been deleted or does not exist.");
+            }
+
+            if (staff.Position == StaffPosition.Manager && staff.Status == StaffStatus.In_production)
+            {
+                throw new APIException(400, "Production Manager already in production so can not change position");
+            }
+            staff.Position = newPosition;
+
+            await _staffRepository.Save();
+            return _mapper.Map<ChangePositionResponseDTO<Staff, StaffPosition>>(staff);
         }
 
         public async Task<ChangeStatusResponseDTO<Staff, StaffStatus>> ChangeStatus(Guid id, StaffStatus newStatus)

@@ -26,6 +26,7 @@ namespace GPMS.Backend
         public const string STAFFS_V1 = API_VERSION_1 + "/staffs";
         public const string STAFFS_ID_V1 = STAFFS_V1 + "/{id}";
         public const string STAFFS_OF_DEPARTMENT_ID_V1 = DEPARTMENTS_ID_V1 + "/staffs";
+        public const string STAFFS_ASSIGN_POSITION_V1 = STAFFS_V1 + "/{id}/position";
 
         //Warehouses
         public const string WAREHOUSES_V1 = API_VERSION_1 + "/warehouses";

@@ -35,6 +35,7 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(staff => staff.Account, opt => opt.Ignore());
             CreateMap<Staff, StaffListingDTO>();
             CreateMap<Staff, ChangeStatusResponseDTO<Staff, StaffStatus>>();
+            CreateMap<Staff, ChangePositionResponseDTO<Staff, StaffPosition>>();
 
             //department
             CreateMap<Department, DepartmentListingDTO>();
