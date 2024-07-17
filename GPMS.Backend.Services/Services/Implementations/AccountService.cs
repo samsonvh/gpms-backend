@@ -52,6 +52,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             await CheckUniqueAccountCode(inputDTO.Code);
             await CheckUniqueAccountEmail(inputDTO.Email);
             await CheckUniqueStaffCode(inputDTO.StaffInputDTO.Code);
+            await CheckValidDepartmentId(inputDTO.StaffInputDTO.DepartmentId);
 
             //create account and staff
             var account = _mapper.Map<Account>(inputDTO);
@@ -120,6 +121,17 @@ namespace GPMS.Backend.Services.Services.Implementations
             if (existingStaff != null)
             {
                 throw new APIException(400, "Staff Code already exists.");
+            }
+        }
+
+        private async Task CheckValidDepartmentId(Guid? departmentId)
+        {
+            var existingDepartment = await _departmentRepository
+                .Search(deparment => deparment.Id == departmentId)
+                .FirstOrDefaultAsync();
+            if (existingDepartment == null)
+            {
+                throw new APIException(400, "Department not found.");
             }
         }
 

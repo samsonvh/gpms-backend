@@ -37,7 +37,6 @@ namespace GPMS.Backend.Services.Utils.Validators
                 .NotEmpty().WithMessage("Full name is required");
 
             RuleFor(dto => dto.StaffInputDTO.Position)
-                .NotEmpty().WithMessage("Position is null")
                 .NotNull().WithMessage("Position is reuiqred");
         }
     }
