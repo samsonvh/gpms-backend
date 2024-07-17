@@ -157,5 +157,45 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return _mapper.Map<AccountDTO>(account);
         }
+
+        public async Task<ChangeStatusResponseDTO<Account, AccountStatus>> ChangeStatus(Guid id, AccountStatus accountStatus)
+        {
+            var account = await _accountRepository
+                .Search(account => account.Id == id)
+                .Include(account => account.Staff)
+                .FirstOrDefaultAsync();
+
+            if (account == null)
+            {
+                throw new APIException(404, "Account not found because it may have been deleted or does not exist.");
+            }
+
+            if (account.Staff.Position == StaffPosition.Manager && account.Staff.Status == StaffStatus.In_production)
+            {
+                throw new APIException(400, "Cannot change status because the Production Manager is currently in production.");
+            }
+
+            account.Status = accountStatus;
+
+            //update staff status
+            account.Staff.Status = ChangeStatusStaffAndAccount(accountStatus);
+
+            await _accountRepository.Save();
+            await _staffRepository.Save();
+            return _mapper.Map<ChangeStatusResponseDTO<Account, AccountStatus>>(account);
+        }
+
+        private StaffStatus ChangeStatusStaffAndAccount(AccountStatus accountStatus)
+        {
+            switch (accountStatus)
+            {
+                case AccountStatus.Active:
+                    return StaffStatus.Active;
+                case AccountStatus.Inactive:
+                    return StaffStatus.Inactive;
+                default:
+                    throw new APIException(400, "Unsupported account status for changing staff status.");
+            }
+        }
     }
 }

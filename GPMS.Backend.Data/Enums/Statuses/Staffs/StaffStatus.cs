@@ -10,5 +10,6 @@ namespace GPMS.Backend.Data.Enums.Statuses.Staffs
     {
         Inactive,
         Active,
+        In_production
     }
 }

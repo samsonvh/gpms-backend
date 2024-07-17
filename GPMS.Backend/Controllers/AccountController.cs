@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Azure;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
@@ -75,6 +76,24 @@ namespace GPMS.Backend.Controllers
                 Data = responseData
             };
             return CreatedAtAction(nameof(Create), baseReponse);
+        }
+
+        [HttpPatch]
+        [Route(APIEndPoint.ACCOUNTS_ID_V1)]
+        [SwaggerOperation(Summary = "Change status of account")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(ChangeStatusResponseDTO<Account, AccountStatus>))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
+        [Produces("application/json")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] AccountStatus status)
+        {
+            var account = await _accountService.ChangeStatus(id, status);
+            var responseData = new ChangeStatusResponseDTO<Account, AccountStatus>
+            {
+                Id = account.Id,
+                Status = account.Status
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of account sucessfully", Data = responseData });
         }
     }
 }
