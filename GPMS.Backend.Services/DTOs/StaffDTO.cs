@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GPMS.Backend.Data.Models.Staffs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,5 +14,6 @@ namespace GPMS.Backend.Services.DTOs
         public string FullName { get; set; }
         public string Position { get; set; }
         public string Status { get; set; }
+        public string DepartmentName { get; set; }
     }
 }
