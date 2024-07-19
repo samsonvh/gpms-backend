@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -40,7 +41,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<MeasurementInputDTO> inputDTOs, Guid? specificationId = null)
         {
-            ValidateMeasurementInputDTOList(inputDTOs);
+            ServiceUtils.ValidateInputDTOList<MeasurementInputDTO,Measurement>(inputDTOs,_measurementValidator);
             foreach (MeasurementInputDTO measurementInputDTO in inputDTOs)
             {
                 Measurement measurement = _mapper.Map<Measurement>(measurementInputDTO);
@@ -54,7 +55,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<MeasurementListingDTO> GetAll()
+        public Task<List<MeasurementListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -67,29 +68,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<MeasurementInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
-        }
-        private void ValidateMeasurementInputDTOList(List<MeasurementInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (MeasurementInputDTO inputDTO in inputDTOs)
-            {
-                FluentValidation.Results.ValidationResult validationResult = _measurementValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Measurement list invalid", errors);
-            }
         }
     }
 }

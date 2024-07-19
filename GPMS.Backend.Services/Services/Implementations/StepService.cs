@@ -12,6 +12,7 @@ using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -37,7 +38,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<Material>> materialCodeList,
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
         {
-            ValidateStepInputDTOList(inputDTOs);
+            ServiceUtils.ValidateInputDTOList<StepInputDTO, ProductionProcessStep>(inputDTOs, _stepValidator);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<StepInputDTO, ProductionProcessStep>
+            (inputDTOs, _stepRepository, "Code", "Code");
             inputDTOs = inputDTOs.OrderBy(stepInputDTO => stepInputDTO.OrderNumber).ToList();
             foreach (StepInputDTO stepInputDTO in inputDTOs)
             {
@@ -45,30 +48,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionProcessStep.ProductionProcessId = processId;
                 _stepRepository.Add(productionProcessStep);
                 await _stepIOService.AddList(stepInputDTO.StepIOs, productionProcessStep.Id,
-                materialCodeList,semiFinsihedProductCodeList);
-            }
-        }
-        private void ValidateStepInputDTOList(List<StepInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (StepInputDTO inputDTO in inputDTOs)
-            {
-                FluentValidation.Results.ValidationResult validationResult = _stepValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Step list invalid", errors);
+                materialCodeList, semiFinsihedProductCodeList);
             }
         }
     }

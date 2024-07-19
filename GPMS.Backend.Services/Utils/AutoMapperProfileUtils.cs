@@ -53,6 +53,8 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             //Material
             CreateMap<MaterialInputDTO, Material>();
+            CreateMap<Material,MaterialDTO>().ReverseMap();
+            CreateMap<Material,MaterialListingDTO>().ReverseMap();
             //Specification
             CreateMap<SpecificationInputDTO, ProductSpecification>()
             .ForMember(specification => specification.Measurements, options => options.Ignore())

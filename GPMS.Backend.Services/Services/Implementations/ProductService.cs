@@ -1,24 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.Products;
-using GPMS.Backend.Data.Models.Products.Specifications;
+using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
-using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
-using GPMS.Backend.Services.Exceptions;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.IdentityModel.Tokens;
+using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -71,7 +63,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<ProductListingDTO> GetAll()
+        public Task<List<ProductListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -86,24 +78,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        private void ValidateProductInputDTO(ProductInputDTO inputDTO)
-        {
-            ValidationResult productValidationResult = _productValidator.Validate(inputDTO);
-            if (!productValidationResult.IsValid)
-            {
-                throw new ValidationException("Product Invalid", productValidationResult.Errors);
-            }
-        }
-        private void ValidateProductDefinitionInputDTO(ProductDefinitionInputDTO inputDTO)
-        {
-            ValidationResult productDefinitionValidationResult = _productDefinitionValidator.Validate(inputDTO);
-            if (!productDefinitionValidationResult.IsValid)
-            {
-                throw new ValidationException("Product Definition Invalid", productDefinitionValidationResult.Errors);
-            }
-        }
-
-        
         private async Task<Guid> HandleAddCategory(string category)
         {
             CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
@@ -122,14 +96,17 @@ namespace GPMS.Backend.Services.Services.Implementations
             Product product = _mapper.Map<Product>(inputDTO);
             product.CategoryId = categoryId;
             product.CreatorId = currentLoginUserDTO.StaffId;
+            product.Status = ProductStatus.Pending;
             _productRepository.Add(product);
             return product;
         }
 
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
-            ValidateProductInputDTO(inputDTO);
-            ValidateProductDefinitionInputDTO(inputDTO.Definition);
+            ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>(inputDTO, _productValidator);
+            ServiceUtils.ValidateInputDTO<ProductDefinitionInputDTO, Product>(inputDTO.Definition, _productDefinitionValidator);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>(
+                inputDTO.Definition, _productRepository, "Code","Code");
             Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
             Product product = HandleAddProduct(inputDTO.Definition, categoryId, currentLoginUserDTO);
             //add semifinish product list
@@ -140,7 +117,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             await _materialService.AddList(inputDTO.Definition.Materials);
             //add specification list
             await _specificationService.AddList(inputDTO.Specifications, product.Id,
-            materialCodeList,inputDTO.Definition.Sizes,inputDTO.Definition.Colors);
+            materialCodeList, inputDTO.Definition.Sizes, inputDTO.Definition.Colors);
             //add process list
             await _processService.AddList(inputDTO.Processes, product.Id, materialCodeList, semiFinishedProductCodeList);
             await _productRepository.Save();
@@ -150,5 +127,6 @@ namespace GPMS.Backend.Services.Services.Implementations
                 Code = product.Code
             };
         }
+
     }
 }

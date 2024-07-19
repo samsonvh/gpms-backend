@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -51,7 +52,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<Material>> materialCodeList, 
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList)
         {
-            ValidateProcessInputDTOList(inputDTOs);
+            ServiceUtils.ValidateInputDTOList<ProcessInputDTO,ProductProductionProcess>(inputDTOs,_processValidator);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<ProcessInputDTO,ProductProductionProcess>
+            (inputDTOs,_processRepository,"Code","Code");
             inputDTOs = inputDTOs.OrderBy(processInputDTO => processInputDTO.OrderNumber).ToList();
             foreach (ProcessInputDTO processInputDTO in inputDTOs)
             {
@@ -68,7 +71,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<ProcessListingDTO> GetAll()
+        public Task<List<ProcessListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -81,29 +84,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<ProcessInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
-        }
-        private void ValidateProcessInputDTOList(List<ProcessInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (ProcessInputDTO inputDTO in inputDTOs)
-            {
-                ValidationResult validationResult = _processValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Process list invalid", errors);
-            }
         }
     }
 }

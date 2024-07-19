@@ -7,6 +7,7 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class MaterialListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public string Code { get; set; }
     }
 }

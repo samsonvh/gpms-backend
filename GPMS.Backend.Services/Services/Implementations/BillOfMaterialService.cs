@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -43,18 +44,20 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task AddList(List<BOMInputDTO> inputDTOs, Guid specificationId, 
+        public async Task AddList(
+        List<BOMInputDTO> inputDTOs, Guid specificationId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ValidateBOMInputDTOList(inputDTOs);
-            ValidateMaterialCodeInBOMWithMaterialCodeList(inputDTOs, materialCodeList);
+            ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>(inputDTOs, _billOfMaterialValidator);
+            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<BOMInputDTO,BillOfMaterial,Material>
+            (inputDTOs, materialCodeList, "MaterialCode");
+            // CheckMaterialCodeInBOMInputDTOListExistIn(inputDTOs, materialCodeList);
             foreach (BOMInputDTO bomInputDTO in inputDTOs)
             {
                 BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(bomInputDTO);
                 billOfMaterial.ProductSpecificationId = specificationId;
                 billOfMaterial.MaterialId = materialCodeList
-                .First(materialCode => materialCode.Code.Equals(bomInputDTO.MaterialCode))
-                .Id;
+                .First(materialCode => materialCode.Code.Equals(bomInputDTO.MaterialCode)).Id;
                 _billOfMaterialRepository.Add(billOfMaterial);
             }
         }
@@ -64,7 +67,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<BOMListingDTO> GetAll()
+        public Task<List<BOMListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -77,49 +80,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<BOMInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
-        }
-        private void ValidateBOMInputDTOList(List<BOMInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (BOMInputDTO inputDTO in inputDTOs)
-            {
-                FluentValidation.Results.ValidationResult validationResult = _billOfMaterialValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Bill of material list invalid", errors);
-            }
-        }
-        private void ValidateMaterialCodeInBOMWithMaterialCodeList(List<BOMInputDTO> inputDTOs,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (BOMInputDTO bOmInputDTO in inputDTOs)
-            {
-                if (materialCodeList.FirstOrDefault(materialCode => materialCode.Code.Equals(bOmInputDTO.MaterialCode)) == null)
-                {
-                    errors.Add(new FormError
-                    {
-                        Property = typeof(BOMInputDTO).GetProperty("MaterialCode").Name,
-                        ErrorMessage = $"Material code: {bOmInputDTO.MaterialCode} of BOM is not valid"
-                    });
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Material code in bill of material list invalid", errors);
-            }
         }
     }
 }
