@@ -48,5 +48,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             (await _categoryRepository.Search(category => category.Name.Equals(name))
                                         .FirstOrDefaultAsync());
         }
+
+        public async Task<List<CategoryDTO>> GetAll()
+        {
+            return _mapper.Map<List<CategoryDTO>>(await _categoryRepository.GetAll().ToListAsync());
+        }
     }
 }

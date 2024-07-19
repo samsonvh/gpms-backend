@@ -11,17 +11,25 @@ namespace GPMS.Backend
         public const string API_VERSION_1 = "/api/v1";
 
         //Authentication
-        public  const string AUTHENTICATION_V1 = API_VERSION_1 + "/authentication";
-        public  const string AUTHENTICATION_CREDENTIALS_V1 = AUTHENTICATION_V1 + "/credentials";
+        public const string AUTHENTICATION_V1 = API_VERSION_1 + "/authentication";
+        public const string AUTHENTICATION_CREDENTIALS_V1 = AUTHENTICATION_V1 + "/credentials";
 
         //Accounts
-        public  const string ACCOUNTS_V1 = API_VERSION_1 + "/accounts";
+        public const string ACCOUNTS_V1 = API_VERSION_1 + "/accounts";
         public const string ACCOUNTS_ID_V1 = ACCOUNTS_V1 + "/{id}";
+
+        //Categories
+        public const string CATEGORY_V1 = API_VERSION_1 + "/categories";
+        public const string CATEGORY_ID_V1 = CATEGORY_V1 + "/{id}";
+
+        //Materials
+        public const string MATERIAL_V1 = API_VERSION_1 + "/materials";
+        public const string MATERIAL_ID_V1 = MATERIAL_V1 + "/{id}";
 
         //Departments 
         public const string DEPARTMENTS_V1 = API_VERSION_1 + "/departments";
         public const string DEPARTMENTS_ID_V1 = DEPARTMENTS_V1 + "/{id}";
-        
+
         //Staffs
         public const string STAFFS_V1 = API_VERSION_1 + "/staffs";
         public const string STAFFS_ID_V1 = STAFFS_V1 + "/{id}";
@@ -35,7 +43,7 @@ namespace GPMS.Backend
         //Products 
         public const string PRODUCTS_V1 = API_VERSION_1 + "/products";
         public const string PRODUCTS_ID_V1 = PRODUCTS_V1 + "/{id}";
-        
+
         //Specifications
         public const string SPECIFICATIONS_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/specifications";
         public const string SPECIFICATION_ID_OF_PRODUCT_ID_v1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";

@@ -5,12 +5,15 @@ using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.Specifications;
+using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -21,6 +24,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IQualityStandardService _qualityStandardService;
         private readonly IMeasurementService _measurementService;
         private readonly IBillOfMaterialService _billOfMaterialService;
+        private readonly IGenericRepository<Warehouse> _warehouseRepository;
         private readonly IValidator<SpecificationInputDTO> _specificationValidator;
         private readonly IMapper _mapper;
 
@@ -30,6 +34,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             IQualityStandardService qualityStandardService,
             IMeasurementService measurementService,
             IBillOfMaterialService billOfMaterialService,
+            IGenericRepository<Warehouse> warehouseRepository,
             IValidator<SpecificationInputDTO> specificationValidator,
             IMapper mapper
             )
@@ -39,6 +44,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _qualityStandardService = qualityStandardService;
             _measurementService = measurementService;
             _billOfMaterialService = billOfMaterialService;
+            _warehouseRepository = warehouseRepository;
             _specificationValidator = specificationValidator;
             _mapper = mapper;
         }
@@ -56,12 +62,14 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList, string sizes, string colors)
         {
-            ValidateSpecificationInputDTOList(inputDTOs);
+            ServiceUtils.ValidateInputDTOList<SpecificationInputDTO,ProductSpecification>(inputDTOs,_specificationValidator);
             ValidateSizeAndColorInSpecification(sizes,colors,inputDTOs);
+            Warehouse existedProductWarehouse = await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse")).FirstOrDefaultAsync();
             foreach (SpecificationInputDTO specificationInputDTO in inputDTOs)
             {
                 ProductSpecification productSpecification = _mapper.Map<ProductSpecification>(specificationInputDTO);
                 productSpecification.ProductId = productId;
+                productSpecification.WarehouseId = existedProductWarehouse.Id;
                 productSpecification.InventoryQuantity = 0;
                 _specificationRepository.Add(productSpecification);
                 await _measurementService.AddList(specificationInputDTO.Measurements, productSpecification.Id);
@@ -75,7 +83,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<SpecificationListingDTO> GetAll()
+        public Task<List<SpecificationListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -88,29 +96,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<SpecificationInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
-        }
-        private void ValidateSpecificationInputDTOList(List<SpecificationInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (SpecificationInputDTO inputDTO in inputDTOs)
-            {
-                FluentValidation.Results.ValidationResult validationResult = _specificationValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Specification list invalid", errors);
-            }
         }
         private void ValidateSizeAndColorInSpecification(string productSizes,
         string productColors, List<SpecificationInputDTO> specificationInputDTOs)

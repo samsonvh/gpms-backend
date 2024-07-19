@@ -9,7 +9,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
     {
         public string Size { get; set; }
         public string Color { get; set; }
-        public Guid WarehouseId { get; set; }   
         public List<MeasurementInputDTO> Measurements { get; set; }
         public List<BOMInputDTO> BOMs { get; set; }
         public List<QualityStandardInputDTO> QualityStandards { get; set; }

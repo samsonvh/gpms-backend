@@ -14,6 +14,8 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -45,8 +47,10 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ValidateQualityStandardInputDTOList(inputDTOs);
-            ValidateMaterialCodeInQualityStandardWithMaterialCodeList(inputDTOs,materialCodeList);
+            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO,QualityStandard>(inputDTOs, _qualityStandardValidator);
+            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
+           (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), 
+           materialCodeList, "MaterialCode");
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
             {
                 QualityStandard qualityStandard = _mapper.Map<QualityStandard>(qualityStandardInputDTO);
@@ -63,7 +67,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<QualityStandardListingDTO> GetAll()
+        public Task<List<QualityStandardListingDTO>> GetAll()
         {
             throw new NotImplementedException();
         }
@@ -76,50 +80,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<QualityStandardInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
-        }
-        private void ValidateQualityStandardInputDTOList(List<QualityStandardInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (QualityStandardInputDTO inputDTO in inputDTOs)
-            {
-                FluentValidation.Results.ValidationResult validationResult = _qualityStandardValidator.Validate(inputDTO);
-                if (!validationResult.IsValid)
-                {
-                    foreach (ValidationFailure validationFailure in validationResult.Errors)
-                    {
-                        errors.Add(new FormError
-                        {
-                            ErrorMessage = validationFailure.ErrorMessage,
-                            Property = validationFailure.PropertyName
-                        });
-                    }
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Quality standard list invalid", errors);
-            }
-        }
-        private void ValidateMaterialCodeInQualityStandardWithMaterialCodeList(List<QualityStandardInputDTO> inputDTOs,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
-            {
-                if (materialCodeList.FirstOrDefault(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode)) == null)
-                {
-                    errors.Add(new FormError
-                    {
-                        Property = typeof(QualityStandardInputDTO).GetProperty("MaterialCode").Name,
-                        ErrorMessage = $"Material code: {qualityStandardInputDTO.MaterialCode} of" +
-                        "quality standard : {qualityStandardInputDTO.Name} is not valid"
-                    });
-                }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Material code in quality standard list invalid", errors);
-            }
         }
     }
 }
