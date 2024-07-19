@@ -4,13 +4,16 @@ WORKDIR /app
 
 # Copy the project file and restore any dependencies (use .csproj for the project name)
 COPY *.csproj ./
+COPY GPMS.Backend/*.csproj GPMS.Backend/
+COPY GPMS.Backend.Data/*.csproj GPMS.Backend.Data/
+COPY GPMS.Backend.Services/*.csproj GPMS.Backend.Services/
 RUN dotnet restore
 
 # Copy the rest of the application code
 COPY . .
 
 # Publish the application
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o out GPMS.Backend/GPMS.Backend.csproj
 
 # Build the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
