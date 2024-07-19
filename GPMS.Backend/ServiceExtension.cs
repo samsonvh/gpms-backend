@@ -12,6 +12,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.Services;
@@ -80,6 +81,10 @@ namespace GPMS.Backend
             services.AddScoped<IProcessService, ProcessService>();
             services.AddScoped<IStepService, StepService>();
             services.AddScoped<IStepIOService, StepIOService>();
+            services.AddScoped<IProductionPlanService, ProductionPlanService>();
+            services.AddScoped<IProductionRequirementService, ProductionRequirementService>();
+            services.AddScoped<IProductionEstimationService, ProductionEstimationService>();
+            services.AddScoped<IProductionSeriesService, ProductionSeriesService>();
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
@@ -96,6 +101,7 @@ namespace GPMS.Backend
             services.AddTransient<IValidator<ProcessInputDTO>,ProcessInputDTOValidator>();
             services.AddTransient<IValidator<StepInputDTO>,StepInputDTOValidator>();
             services.AddTransient<IValidator<StepIOInputDTO>,StepIOInputDTOValidator>();
+            services.AddTransient<IValidator<ProductionPlanInputDTO>, ProductionPlanInputDTOValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
