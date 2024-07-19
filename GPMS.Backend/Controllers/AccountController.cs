@@ -81,10 +81,10 @@ namespace GPMS.Backend.Controllers
         [HttpPatch]
         [Route(APIEndPoint.ACCOUNTS_ID_V1)]
         [SwaggerOperation(Summary = "Change status of account")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(ChangeStatusResponseDTO<Account, AccountStatus>))]
-        [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of account successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Account not found")]
         [Produces("application/json")]
-        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] AccountStatus status)
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
         {
             var account = await _accountService.ChangeStatus(id, status);
             var responseData = new ChangeStatusResponseDTO<Account, AccountStatus>

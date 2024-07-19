@@ -163,7 +163,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<AccountDTO>(account);
         }
 
-        public async Task<ChangeStatusResponseDTO<Account, AccountStatus>> ChangeStatus(Guid id, AccountStatus accountStatus)
+        public async Task<ChangeStatusResponseDTO<Account, AccountStatus>> ChangeStatus(Guid id, string accountStatus)
         {
             var account = await _accountRepository
                 .Search(account => account.Id == id)
@@ -180,10 +180,15 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException(400, "Cannot change status because the Production Manager is currently in production.");
             }
 
-            account.Status = accountStatus;
+            if (!Enum.TryParse(accountStatus, true, out AccountStatus parsedStatus))
+            {
+                throw new APIException(400, "Invalid status value provided.");
+            }
+
+            account.Status = parsedStatus;
 
             //update staff status
-            account.Staff.Status = ChangeStatusStaffAndAccount(accountStatus);
+            account.Staff.Status = ChangeStatusStaffAndAccount(parsedStatus);
 
             await _accountRepository.Save();
             await _staffRepository.Save();
