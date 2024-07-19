@@ -106,9 +106,16 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        public Task<MaterialDTO> Details(Guid id)
+        public async Task<MaterialDTO> Details(Guid id)
         {
-            throw new NotImplementedException();
+            var material = await _materialRepository
+                .Search(material => material.Id == id)
+                .FirstOrDefaultAsync();
+            if(material  == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Material not found");
+            }
+            return _mapper.Map<MaterialDTO>(material);  
         }
 
         public async Task<List<MaterialListingDTO>> GetAll()
