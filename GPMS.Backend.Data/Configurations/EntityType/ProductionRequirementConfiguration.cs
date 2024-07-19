@@ -13,11 +13,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.HasKey(e => e.Id);
             builder.Property(e => e.Id).ValueGeneratedOnAdd();
             builder.Property(e => e.Quantity);
-            builder.Property(e => e.OvertimeQuantity);
-            builder.Property(e => e.Quarter).IsRequired(false);
-            builder.Property(e => e.Month).IsRequired(false);
-            builder.Property(e => e.Batch).IsRequired(false);
-            builder.Property(e => e.Day).IsRequired(false);
 
             builder.HasOne(e => e.ProductSpecification)
                 .WithMany(e => e.ProductionRequirements)
