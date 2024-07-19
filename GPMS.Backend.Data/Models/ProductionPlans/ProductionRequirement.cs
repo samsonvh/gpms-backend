@@ -8,11 +8,6 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }
-        public int OvertimeQuantity { get; set; }
-        public Quarter? Quarter { get; set; }
-        public Month? Month { get; set; }
-        public int? Batch { get; set; }
-        public int? Day { get; set; }
 
         public Guid ProductSpecificationId { get; set; }
         public ProductSpecification ProductSpecification { get; set; }
