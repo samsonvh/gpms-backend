@@ -3,11 +3,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /app
 
 # Copy the project file and restore any dependencies (use .csproj for the project name)
-COPY *.csproj ./
 COPY GPMS.Backend/*.csproj GPMS.Backend/
 COPY GPMS.Backend.Data/*.csproj GPMS.Backend.Data/
 COPY GPMS.Backend.Services/*.csproj GPMS.Backend.Services/
-RUN dotnet restore
+RUN dotnet restore GPMS.Backend/GPMS.Backend.csproj
 
 # Copy the rest of the application code
 COPY . .
