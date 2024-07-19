@@ -48,6 +48,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<List<CreateUpdateResponseDTO<Material>>> AddList(List<MaterialInputDTO> inputDTOs)
         {
             ServiceUtils.ValidateInputDTOList<MaterialInputDTO, Material>(inputDTOs, _materialValidator);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<MaterialInputDTO,Material>
+            (inputDTOs,"Code");
             await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
             List<CreateUpdateResponseDTO<Material>> responses = new List<CreateUpdateResponseDTO<Material>>();
             foreach (MaterialInputDTO materialInputDTO in inputDTOs)
@@ -87,7 +89,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 {
                     errors.Add(new FormError
                     {
-                        Property = materialInputDTO.GetType().GetProperty("Code").Name,
+                        Property = "Code",
                         ErrorMessage = $"{typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated"
                     });
                 }
@@ -96,7 +98,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     errors.Add(new FormError
                     {
                         Property = materialInputDTO.GetType().GetProperty("Code").Name,
-                        ErrorMessage = $"{typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in database"
+                        ErrorMessage = $"{typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system"
                     });
                 }
             }
