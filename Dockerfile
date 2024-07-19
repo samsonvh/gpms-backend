@@ -6,7 +6,7 @@ WORKDIR /app
 COPY GPMS.Backend/*.csproj GPMS.Backend/
 COPY GPMS.Backend.Data/*.csproj GPMS.Backend.Data/
 COPY GPMS.Backend.Services/*.csproj GPMS.Backend.Services/
-RUN dotnet restore GPMS.Backend/GPMS.Backend.csproj
+RUN dotnet restore GPMS.Backend/GPMS.Backend.csproj --disable-parallel
 
 # Copy the rest of the application code
 COPY . .
