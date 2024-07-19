@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation;
@@ -10,6 +11,7 @@ using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -40,6 +42,18 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 Id = category.Id
             };
+        }
+
+        public async Task<CategoryDTO> Details(Guid id)
+        {
+            var category = await _categoryRepository
+                .Search(category => category.Id == id)
+                .FirstOrDefaultAsync();
+            if(category == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Category Not Found");
+            }
+            return _mapper.Map<CategoryDTO>(category);
         }
 
         public async Task<CategoryDTO> DetailsByName(string name)

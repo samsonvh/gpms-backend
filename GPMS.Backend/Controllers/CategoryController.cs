@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
+using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -44,5 +45,16 @@ namespace GPMS.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route(APIEndPoint.CATEGORY_ID_V1)]
+        [SwaggerOperation(Summary = "Get details of category")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of category successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Category not found")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Details([FromRoute] Guid id)
+        {
+            var category = await _categoryService.Details(id);
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of category sucessfully", Data = category });
+        }
     }
 }
