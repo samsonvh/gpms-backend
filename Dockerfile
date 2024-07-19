@@ -23,4 +23,5 @@ COPY --from=build /app/out ./
 EXPOSE 80
 
 # Start the application
+RUN ls -al
 ENTRYPOINT ["dotnet", "GPMS.Backend.dll"]
