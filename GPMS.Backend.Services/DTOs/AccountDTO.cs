@@ -14,8 +14,8 @@ namespace GPMS.Backend.Services.DTOs
         public string Code { get; set; }
         public string FullName { get; set; }
         public string Email { get; set; }
-        public StaffPosition Position { get; set; }
-        public AccountStatus Status { get; set; }
+        public string Position { get; set; }
+        public string Status { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }
