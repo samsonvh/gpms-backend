@@ -11,6 +11,8 @@ using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
+using GPMS.Backend.Services.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GPMS.Backend.Controllers
 {
@@ -38,5 +40,25 @@ namespace GPMS.Backend.Controllers
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = staff });
         }
 
+        [HttpGet]
+        [Route(APIEndPoint.STAFFS_ID_V1)]
+        [SwaggerOperation(Summary = "Get details of staff")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get staff details successfully")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Staff not found")]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden, "Access denied")]
+        [Produces("application/json")]
+        [Authorize(Roles = "Manager, Admin")]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
+            var deparment = await _staffService.Details(id, currentLoginUserDTO);
+            BaseReponse baseReponse = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get details of staff successfully",
+                Data = deparment
+            };
+            return Ok(baseReponse);
+        }
     }
 }

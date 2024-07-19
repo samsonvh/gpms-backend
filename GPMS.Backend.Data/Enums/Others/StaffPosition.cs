@@ -11,5 +11,6 @@ namespace GPMS.Backend.Data.Enums.Others
         FactoryDirector,
         Manager,
         Staff,
+        Admin
     }
 }
