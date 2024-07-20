@@ -2,7 +2,9 @@ using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Enums.Statuses.Products;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
@@ -10,7 +12,10 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -131,6 +136,36 @@ namespace GPMS.Backend.Services.Services.Implementations
                 Id = product.Id,
                 Code = product.Code
             };
+        }
+
+        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>> ChangeStatus(Guid id, string productStatus)
+        {
+            var product = await _productRepository
+                .Search(product => product.Id == id)
+                .FirstOrDefaultAsync();
+            if(product == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
+            }
+
+            if (!Enum.TryParse(productStatus, true, out ProductStatus parsedStatus))
+            {
+                throw new APIException(400, "Invalid status value provided.");
+            }
+
+            if (product.Status != ProductStatus.Pending)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Product status not pending");
+            }
+
+
+            if (product.Status == ProductStatus.Pending)
+            {
+                product.Status = parsedStatus;
+            }
+
+            await _productRepository.Save();
+            return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
         }
 
     }
