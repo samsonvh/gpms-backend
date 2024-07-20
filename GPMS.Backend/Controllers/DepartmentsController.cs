@@ -11,6 +11,10 @@ using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
+using Microsoft.AspNetCore.Authorization;
+using GPMS.Backend.Services.Utils;
+using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 
 namespace GPMS.Backend.Controllers
 {
@@ -36,6 +40,27 @@ namespace GPMS.Backend.Controllers
         {
             var department = await _departmentService.GetAllDepartments();
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = department });
+        }
+
+        [HttpGet]
+        [Route(APIEndPoint.STAFFS_OF_DEPARTMENT_ID_V1)]
+        [SwaggerOperation(Summary = "Get details of deparment")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get department details successfully")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
+        [SwaggerResponse((int)HttpStatusCode.Forbidden, "Access denied")]
+        [Produces("application/json")]
+        [Authorize(Roles = "Manager, Admin")]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
+            var deparment = await _departmentService.Details(id, currentLoginUserDTO);
+            BaseReponse baseReponse = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get details of deparment successfully",
+                Data = deparment
+            };
+            return Ok(baseReponse);
         }
     }
 }

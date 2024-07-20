@@ -49,7 +49,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
             ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>(inputDTOs, _billOfMaterialValidator);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<BOMInputDTO,BillOfMaterial,Material>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<BOMInputDTO,BillOfMaterial,Material>
             (inputDTOs, materialCodeList, "MaterialCode");
             // CheckMaterialCodeInBOMInputDTOListExistIn(inputDTOs, materialCodeList);
             foreach (BOMInputDTO bomInputDTO in inputDTOs)

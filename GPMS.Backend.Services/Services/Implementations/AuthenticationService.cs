@@ -1,6 +1,7 @@
 using System.Net;
 using FluentValidation;
 using FluentValidation.Results;
+using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
@@ -40,6 +41,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Staff In Account Null");
             }
+            if(!existedAccount.Staff.Position.Equals(StaffPosition.Admin) && !existedAccount.Staff.Position.Equals(StaffPosition.FactoryDirector) && existedAccount.Staff.Department == null)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Account is not admin must have deparment");
+            }
             if (existedAccount.Status == AccountStatus.Inactive || existedAccount.Staff.Status == StaffStatus.Inactive)
             {
                 throw new APIException((int)HttpStatusCode.Unauthorized, "Account Is Inactive, Can Not Login");
@@ -52,10 +57,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 Code = existedAccount.Code,
                 FullName = existedAccount.Staff.FullName,
-                Position = existedAccount.Staff.Position,
-                Department = existedAccount.Staff.Department.Name,
+                Position = existedAccount.Staff.Position.ToString(),
+                Department = (existedAccount.Staff.Position.Equals(StaffPosition.Admin) || existedAccount.Staff.Position.Equals(StaffPosition.FactoryDirector)) ? null : existedAccount.Staff.Department.Name,
                 Token = JWTUtils.GenerateJWTToken(existedAccount)
-            };
+            }; 
             return loginResponseDTO;
         }
     }

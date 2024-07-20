@@ -109,16 +109,16 @@ namespace GPMS.Backend.Services.Services.Implementations
                 {
                     errors.Add(new FormError
                     {
-                        Property = typeof(ProductSpecification).GetProperty("Size").Name,
-                        ErrorMessage = $"Size: {specificationInputDTO.Size} of specification is not contained in sizes of product"
+                        Property = "Size",
+                        ErrorMessage = $"Size: {specificationInputDTO.Size} of specification is not existed in sizes of product"
                     });
                 }
                 if (!colors.Contains(specificationInputDTO.Color))
                 {
                     errors.Add(new FormError
                     {
-                        Property = typeof(ProductSpecification).GetProperty("Color").Name,
-                        ErrorMessage = $"Color: {specificationInputDTO.Color} of specification is not contained in colors of product"
+                        Property = "Color",
+                        ErrorMessage = $"Color: {specificationInputDTO.Color} of specification is not existed in colors of product"
                     });
                 }
             }

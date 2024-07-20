@@ -51,6 +51,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             ServiceUtils.ValidateInputDTOList<SemiFinishedProductInputDTO, SemiFinishedProduct>
             (inputDTOs, _semiFinishedProductValidator);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<SemiFinishedProductInputDTO,SemiFinishedProduct>
+            (inputDTOs,"Code");
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<SemiFinishedProductInputDTO, SemiFinishedProduct>
             (inputDTOs,_semiFinishedProductRepository,"Code","Code");
             List<CreateUpdateResponseDTO<SemiFinishedProduct>> responses = new List<CreateUpdateResponseDTO<SemiFinishedProduct>>();
