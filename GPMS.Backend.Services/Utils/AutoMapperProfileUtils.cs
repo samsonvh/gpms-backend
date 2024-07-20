@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -55,6 +56,8 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductDefinitionInputDTO, Product>()
             .ForMember(product => product.Category, options => options.Ignore())
             .ForMember(product => product.SemiFinishedProducts, options => options.Ignore());
+            CreateMap<Product, ChangeStatusResponseDTO<Product, ProductStatus>>();
+
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             //Material

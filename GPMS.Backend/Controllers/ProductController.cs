@@ -4,12 +4,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GPMS.Backend.Data.Enums.Statuses.Products;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
+using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +52,24 @@ namespace GPMS.Backend.Controllers
                 Data = result
             };
             return Ok(baseReponse);
+        }
+
+        [HttpPatch]
+        [Route(APIEndPoint.PRODUCTS_ID_V1)]
+        [SwaggerOperation(Summary = "Change status of product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of product successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Produces("application/json")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
+        {
+            var product = await _productService.ChangeStatus(id, status);
+            var responseData = new ChangeStatusResponseDTO<Product, ProductStatus>
+            {
+                Id = product.Id,
+                Status = product.Status
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of product sucessfully", Data = responseData });
         }
     }
 }
