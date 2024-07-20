@@ -11,5 +11,6 @@ namespace GPMS.Backend.Services.Services
     public interface IDepartmentService
     {
         Task<IEnumerable<DepartmentListingDTO>> GetAllDepartments();
+        Task<DepartmentDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO);
     }
 }

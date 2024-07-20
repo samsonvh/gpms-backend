@@ -21,10 +21,12 @@ namespace GPMS.Backend.Services.Utils
         public AutoMapperProfileUtils()
         {
             //account
-            CreateMap<Account, AccountListingDTO>();
+            CreateMap<Account, AccountListingDTO>()
+                .ForMember(dto => dto.Poition, opt => opt.MapFrom(account => account.Staff.Position));
             CreateMap<AccountInputDTO, Account>();
             CreateMap<Account, AccountDTO>()
-                .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName));
+                .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName))
+                .ForMember(dto => dto.Position, opt => opt.MapFrom(account => account.Staff.Position));
             CreateMap<Account, CreateUpdateResponseDTO<Account>>();
             CreateMap<Account, ChangeStatusResponseDTO<Account, AccountStatus>>();
 
@@ -38,9 +40,13 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<Staff, StaffListingDTO>()
                 .ForMember(staffListingDTO => staffListingDTO.Department, options 
                             => options.MapFrom(staff => staff.Department.Name));
+            CreateMap<Staff, StaffDTO>()
+                .ForMember(dto => dto.DepartmentName, opt => opt.MapFrom(staff => staff.Department.Name));
 
             //department
             CreateMap<Department, DepartmentListingDTO>();
+            CreateMap<Department, DepartmentDTO>()
+                .ForMember(dto => dto.Staffs, opt => opt.MapFrom(deparment => deparment.Staffs));
 
             //category
             CreateMap<CategoryInputDTO, Category>();

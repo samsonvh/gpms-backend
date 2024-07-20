@@ -37,9 +37,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
         {
             ServiceUtils.ValidateInputDTOList<StepIOInputDTO, ProductionProcessStepIO>(inputDTOs, _stepIOValidator);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, Material>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, Material>
             (inputDTOs, materialCodeList, "MaterialCode");
-            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
             (inputDTOs, semiFinsihedProductCodeList, "SemiFinishedProductCode");
             foreach (StepIOInputDTO stepIOInputDTO in inputDTOs)
             {

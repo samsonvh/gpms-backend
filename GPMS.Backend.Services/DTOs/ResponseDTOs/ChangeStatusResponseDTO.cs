@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace GPMS.Backend.Services.DTOs.ResponseDTOs
 {
-    public class ChangeStatusResponseDTO<Model, S> where Model : class where S : Enum
+    public class ChangeStatusResponseDTO<Model, S> where Model : class 
     {
         public Guid Id { get; set; }
-        public S Status { get; set; }
+        public string Status { get; set; }
     }
 }

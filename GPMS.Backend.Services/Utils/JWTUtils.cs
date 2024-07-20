@@ -6,6 +6,7 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
@@ -30,8 +31,11 @@ namespace GPMS.Backend.Services.Utils
                 new Claim(ClaimTypes.NameIdentifier, account.Code.ToString()),
                 new Claim(ClaimTypes.Name, account.Staff.FullName),
                 new Claim(ClaimTypes.Role, account.Staff.Position.ToString()),
-                new Claim("Department", account.Staff.Department.Name.ToString())
             };
+            if(!account.Staff.Position.Equals(StaffPosition.Admin))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, account.Staff.Position.ToString()));
+            }
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(int.Parse(_configuration["JWT:Expires"])),

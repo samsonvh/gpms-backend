@@ -30,14 +30,9 @@ namespace GPMS.Backend
         {
             //Init JWT Util 1 time for using Configuration
             JWTUtils.Initialize(configuration);
-
             //config DBContext
             services.AddDbContext<GPMSDbContext>(options =>
             options.UseSqlServer(configuration["ConnectionStrings:DefaultConnection"]));
-
-            //Add Auto Mapper
-            services.AddAutoMapper(typeof(AutoMapperProfileUtils).Assembly);
-
             //Config Authentication with JWT
             services.AddAuthentication(config =>
             {
@@ -56,12 +51,13 @@ namespace GPMS.Backend
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JWT:Issuer"],
                     ValidAudience = configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey
-                    (
-                        Encoding.UTF8.GetBytes(configuration["JWT:Secret_Key"])
-                    )
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret_Key"]))
                 };
             });
+
+            //Add Auto Mapper
+            services.AddAutoMapper(typeof(AutoMapperProfileUtils).Assembly);
+            
 
             //Add Service 
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));

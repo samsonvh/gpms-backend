@@ -48,7 +48,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
             ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO,QualityStandard>(inputDTOs, _qualityStandardValidator);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOLisExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
            (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), 
            materialCodeList, "MaterialCode");
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
