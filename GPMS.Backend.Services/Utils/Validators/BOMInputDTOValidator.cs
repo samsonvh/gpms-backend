@@ -16,6 +16,7 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.SizeWidth).GreaterThan(0).WithMessage("Size Width must greater than 0");
             RuleFor(inputDTO => inputDTO.Consumption).GreaterThan(0).WithMessage("Consumption must greater than 0");
             RuleFor(inputDTO => inputDTO.Description).MaximumLength(500).WithMessage("Description can not longer than 100 characters");
+            RuleFor(inputDTO => inputDTO.MaterialCode).NotNull().WithMessage("Material code is required");
 
         }
     }

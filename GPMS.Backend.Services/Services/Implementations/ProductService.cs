@@ -103,13 +103,13 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
-            List<ProductDefinitionInputDTO> inputDTOs = new List<ProductDefinitionInputDTO>();
+            List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
             ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>(inputDTO, _productValidator);
             ServiceUtils.ValidateInputDTO<ProductDefinitionInputDTO, Product>
             (inputDTO.Definition, _productDefinitionValidator);
-            inputDTOs.Add(inputDTO.Definition);
+            definitionInputDTOs.Add(inputDTO.Definition);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductDefinitionInputDTO,Product>
-            (inputDTOs,"Code");
+            (definitionInputDTOs,"Code");
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>(
                 inputDTO.Definition, _productRepository, "Code","Code");
             Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
