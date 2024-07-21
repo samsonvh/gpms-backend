@@ -16,8 +16,8 @@ namespace GPMS.Backend.Data.Models.Products.ProductionProcesses
         public bool IsProduct { get; set; }
         public ProductionProcessStepIOType Type { get; set; }
 
-        public Guid SemiFinishedProductId { get; set; }
-        public SemiFinishedProduct SemiFinishedProduct { get; set; }
+        public Guid? SemiFinishedProductId { get; set; }
+        public SemiFinishedProduct? SemiFinishedProduct { get; set; }
         public Guid? MaterialId { get; set; }
         public Material? Material { get; set; }
         public Guid ProductionProcessStepId { get; set; }

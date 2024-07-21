@@ -12,6 +12,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
         public string? Description { get; set; }
         // public List<IFormFile>? Images { get; set; }
         public string ImageURLs { get; set; }
-        public string MaterialCode { get; set; }
+        public string? MaterialCode { get; set; }
     }
 }

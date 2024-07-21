@@ -49,9 +49,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
             ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>(inputDTOs, _billOfMaterialValidator);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<BOMInputDTO,BillOfMaterial,Material>
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO,BillOfMaterial>(inputDTOs,"MaterialCode");
+            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<BOMInputDTO,BillOfMaterial,Material>
             (inputDTOs, materialCodeList, "MaterialCode");
-            // CheckMaterialCodeInBOMInputDTOListExistIn(inputDTOs, materialCodeList);
             foreach (BOMInputDTO bomInputDTO in inputDTOs)
             {
                 BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(bomInputDTO);

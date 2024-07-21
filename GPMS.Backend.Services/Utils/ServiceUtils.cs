@@ -156,20 +156,22 @@ namespace GPMS.Backend.Services.Utils
         where E : class
         {
             List<FormError> errors = new List<FormError>();
+            List<string> duplicatedValueField = new List<string>();
             foreach (I inputDTO in inputDTOs)
             {
-                string fieldValue = inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTOField).ToString();
+                string fieldValue = inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString();
                 int duplicatedCount = 0;
                 foreach (I inputDTOCompare in inputDTOs)
                 {
-                    string compareValue = inputDTOCompare.GetType().GetProperty(inputDTOField).GetValue(inputDTOField).ToString();
+                    string compareValue = inputDTOCompare.GetType().GetProperty(inputDTOField).GetValue(inputDTOCompare).ToString();
                     if (fieldValue.Equals(compareValue))
                     {
                         duplicatedCount++;
                     }
                 }
-                if (duplicatedCount > 1)
+                if (duplicatedCount > 1 && !duplicatedValueField.Contains(fieldValue))
                 {
+                    duplicatedValueField.Add(fieldValue);
                     errors.Add(new FormError
                     {
                         Property = inputDTOField,
@@ -189,6 +191,23 @@ namespace GPMS.Backend.Services.Utils
         where CU : class
         {
             List<FormError> errors = new List<FormError>();
+
+            foreach (I inputDTO in inputDTOs)
+            {
+                string inputDTOCode = inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString();
+                CreateUpdateResponseDTO<CU> foreignEntityCode = foreignEntityCodeList.FirstOrDefault(
+                    foreignEntityCode => foreignEntityCode.Code
+                    .Equals(inputDTOCode));
+                if (foreignEntityCode == null)
+                {
+                    errors.Add(new FormError
+                    {
+                        Property = inputDTOField,
+                        ErrorMessage = $" {typeof(E).Name} with {inputDTOField} : {inputDTOCode} not existed in {typeof(CU).Name} list"
+                    });
+                }
+            }
+
             foreach (CreateUpdateResponseDTO<CU> foreignEntityCode in foreignEntityCodeList)
             {
                 string entityCode = foreignEntityCode.Code;

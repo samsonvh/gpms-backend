@@ -90,7 +90,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     errors.Add(new FormError
                     {
                         Property = "Code",
-                        ErrorMessage = $"{typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated"
+                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated in system"
                     });
                 }
                 else if (!materialInputDTO.IsNew && existedMaterial == null)
@@ -98,7 +98,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     errors.Add(new FormError
                     {
                         Property = materialInputDTO.GetType().GetProperty("Code").Name,
-                        ErrorMessage = $"{typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system"
+                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system"
                     });
                 }
             }
