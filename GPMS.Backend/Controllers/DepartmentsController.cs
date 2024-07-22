@@ -49,11 +49,11 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
         [SwaggerResponse((int)HttpStatusCode.Forbidden, "Access denied")]
         [Produces("application/json")]
-        [Authorize(Roles = "Manager, Admin")]
+        /*[Authorize(Roles = "Manager, Admin")]*/
         public async Task<IActionResult> Details(Guid id)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            var deparment = await _departmentService.Details(id, currentLoginUserDTO);
+            /*CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);*/
+            var deparment = await _departmentService.Details(id);
             BaseReponse baseReponse = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
