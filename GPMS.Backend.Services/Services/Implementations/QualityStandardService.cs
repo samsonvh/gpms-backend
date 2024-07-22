@@ -47,17 +47,22 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO,QualityStandard>(inputDTOs, _qualityStandardValidator);
+            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO, QualityStandard>(inputDTOs, _qualityStandardValidator);
             ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
-           (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), 
+           (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
            materialCodeList, "MaterialCode");
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
             {
                 QualityStandard qualityStandard = _mapper.Map<QualityStandard>(qualityStandardInputDTO);
                 qualityStandard.ProductSpecificationId = specificationId;
-                qualityStandard.MaterialId = materialCodeList
-                .First(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode))
-                .Id;
+                if (!qualityStandardInputDTO.MaterialCode.IsNullOrEmpty())
+                {
+                    CreateUpdateResponseDTO<Material> materialCode = materialCodeList
+                    .FirstOrDefault(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode));
+                    qualityStandard.MaterialId = materialCode.Id;
+                }
+                else qualityStandard.MaterialId = null;
+
                 _qualityStandardRepository.Add(qualityStandard);
             }
         }

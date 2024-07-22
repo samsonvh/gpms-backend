@@ -15,6 +15,6 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
         public ProductionPlan ProductionPlan { get; set; }
 
         public ICollection<ProductionEstimation> ProductionEstimations { get; set; } = new List<ProductionEstimation>();
-        public ICollection<WarehouseRequest> WarehouseRequests { get; set; } = new List<WarehouseRequest>();
+        public ICollection<WarehouseRequestRequirement> WarehouseRequestRequirements { get; set; } = new List<WarehouseRequestRequirement>();
     }
 }
