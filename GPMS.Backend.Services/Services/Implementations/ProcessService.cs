@@ -53,8 +53,10 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList)
         {
             ServiceUtils.ValidateInputDTOList<ProcessInputDTO,ProductProductionProcess>(inputDTOs,_processValidator);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProcessInputDTO,ProductProductionProcess>(inputDTOs,"Code");
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<ProcessInputDTO,ProductProductionProcess>
             (inputDTOs,_processRepository,"Code","Code");
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProcessInputDTO,ProductProductionProcess>(inputDTOs,"OrderNumber");
             inputDTOs = inputDTOs.OrderBy(processInputDTO => processInputDTO.OrderNumber).ToList();
             foreach (ProcessInputDTO processInputDTO in inputDTOs)
             {

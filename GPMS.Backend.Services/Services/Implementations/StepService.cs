@@ -39,8 +39,10 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
         {
             ServiceUtils.ValidateInputDTOList<StepInputDTO, ProductionProcessStep>(inputDTOs, _stepValidator);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepInputDTO,ProductionProcessStep>(inputDTOs,"Code");
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<StepInputDTO, ProductionProcessStep>
             (inputDTOs, _stepRepository, "Code", "Code");
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepInputDTO,ProductionProcessStep>(inputDTOs,"OrderNumber");
             inputDTOs = inputDTOs.OrderBy(stepInputDTO => stepInputDTO.OrderNumber).ToList();
             foreach (StepInputDTO stepInputDTO in inputDTOs)
             {
@@ -51,5 +53,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 materialCodeList, semiFinsihedProductCodeList);
             }
         }
+
+        
     }
 }
