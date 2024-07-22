@@ -16,6 +16,20 @@ var configuration = builder.Configuration;
 Log.Logger = new LoggerConfiguration()
 .ReadFrom.Configuration(configuration)
 .CreateLogger();
+
+//cors
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(MyAllowSpecificOrigins, builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "https://gpms-frontend-samsonvhs-projects.vercel.app/", "https://rpms-web.vercel.app/")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 // Add services to the container.
 builder.Services.ConfigureService(configuration);
 builder.Services.AddControllers();
@@ -37,6 +51,7 @@ if (app.Environment.IsDevelopment())
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 
 app.UseSerilogRequestLogging();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 

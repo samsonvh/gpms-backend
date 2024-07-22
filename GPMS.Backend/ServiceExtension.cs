@@ -101,6 +101,9 @@ namespace GPMS.Backend
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
+
+
+           
         }
     }
 }
