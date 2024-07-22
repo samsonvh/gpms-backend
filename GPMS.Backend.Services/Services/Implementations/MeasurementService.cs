@@ -22,16 +22,19 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Measurement> _measurementRepository;
         private readonly IValidator<MeasurementInputDTO> _measurementValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public MeasurementService(
             IGenericRepository<Measurement> measurementRepository,
             IValidator<MeasurementInputDTO> measurementValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _measurementRepository = measurementRepository;
             _measurementValidator = measurementValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<Measurement>> Add(MeasurementInputDTO inputDTO)
@@ -41,7 +44,8 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<MeasurementInputDTO> inputDTOs, Guid? specificationId = null)
         {
-            ServiceUtils.ValidateInputDTOList<MeasurementInputDTO,Measurement>(inputDTOs,_measurementValidator);
+            ServiceUtils.ValidateInputDTOList<MeasurementInputDTO,Measurement>
+                (inputDTOs,_measurementValidator,_entityListErrorWrapper);
             foreach (MeasurementInputDTO measurementInputDTO in inputDTOs)
             {
                 Measurement measurement = _mapper.Map<Measurement>(measurementInputDTO);

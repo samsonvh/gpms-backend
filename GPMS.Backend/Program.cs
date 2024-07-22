@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using GPMS.Backend;
 using GPMS.Backend.Data;
 using GPMS.Backend.Middlewares;
+using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Services.Utils.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

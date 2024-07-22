@@ -24,15 +24,18 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Material> _materialRepository;
         private readonly IValidator<MaterialInputDTO> _materialValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public MaterialService(
             IGenericRepository<Material> materialRepository,
             IValidator<MaterialInputDTO> materialValidator,
-            IMapper mapper)
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper)
         {
             _materialRepository = materialRepository;
             _materialValidator = materialValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<Material>> Add(MaterialInputDTO inputDTO)
@@ -47,9 +50,10 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task<List<CreateUpdateResponseDTO<Material>>> AddList(List<MaterialInputDTO> inputDTOs)
         {
-            ServiceUtils.ValidateInputDTOList<MaterialInputDTO, Material>(inputDTOs, _materialValidator);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<MaterialInputDTO,Material>
-            (inputDTOs,"Code");
+            ServiceUtils.ValidateInputDTOList<MaterialInputDTO, Material>
+                (inputDTOs, _materialValidator,_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<MaterialInputDTO, Material>
+                (inputDTOs, "Code",_entityListErrorWrapper);
             await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
             List<CreateUpdateResponseDTO<Material>> responses = new List<CreateUpdateResponseDTO<Material>>();
             foreach (MaterialInputDTO materialInputDTO in inputDTOs)
@@ -82,6 +86,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             List<FormError> errors = new List<FormError>();
             foreach (MaterialInputDTO materialInputDTO in inputDTOs)
             {
+                int entityOrder = 1;
                 Material existedMaterial = await _materialRepository
                                             .Search(material => material.Code.Equals(materialInputDTO.Code))
                                             .FirstOrDefaultAsync();
@@ -90,7 +95,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                     errors.Add(new FormError
                     {
                         Property = "Code",
-                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated in system"
+                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated in system",
+                        EntityOrder = entityOrder
                     });
                 }
                 else if (!materialInputDTO.IsNew && existedMaterial == null)
@@ -98,13 +104,20 @@ namespace GPMS.Backend.Services.Services.Implementations
                     errors.Add(new FormError
                     {
                         Property = materialInputDTO.GetType().GetProperty("Code").Name,
-                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system"
+                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system",
+                        EntityOrder = entityOrder
                     });
                 }
+                entityOrder++;
             }
             if (errors.Count > 0)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, $"Code invalid in {typeof(MaterialInputDTO).Name} list", errors);
+                EntityListError entityListError = new EntityListError
+                {
+                    Entity = typeof(Material).Name,
+                    Errors = errors
+                };
+                _entityListErrorWrapper.EntityListErrors.Add(entityListError);
             }
         }
 
@@ -113,11 +126,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             var material = await _materialRepository
                 .Search(material => material.Id == id)
                 .FirstOrDefaultAsync();
-            if(material  == null)
+            if (material == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Material not found");
             }
-            return _mapper.Map<MaterialDTO>(material);  
+            return _mapper.Map<MaterialDTO>(material);
         }
 
         public async Task<List<MaterialListingDTO>> GetAll()

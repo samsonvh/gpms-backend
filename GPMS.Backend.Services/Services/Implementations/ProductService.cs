@@ -1,3 +1,4 @@
+using System.Net;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
@@ -12,7 +13,9 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -29,6 +32,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly ISpecificationService _specificationService;
         private readonly IProcessService _processService;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
+        private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
         public ProductService(
         IGenericRepository<Product> productRepository,
         IGenericRepository<ProductionProcessStepIO> stepIORepository,
@@ -40,7 +45,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMaterialService materialService,
         ISpecificationService specificationService,
         IProcessService processService,
-        IMapper mapper
+        IMapper mapper,
+        EntityListErrorWrapper entityListErrorWrapper,
+        StepIOInputDTOWrapper stepIOInputDTOWrapper
         )
         {
             _productRepository = productRepository;
@@ -54,6 +61,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             _specificationService = specificationService;
             _processService = processService;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
+            _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
         }
 
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
@@ -112,14 +121,15 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
             List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
-            ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>(inputDTO, _productValidator);
+            ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>
+                (inputDTO, _productValidator, _entityListErrorWrapper);
             ServiceUtils.ValidateInputDTO<ProductDefinitionInputDTO, Product>
-            (inputDTO.Definition, _productDefinitionValidator);
+                (inputDTO.Definition, _productDefinitionValidator, _entityListErrorWrapper);
             definitionInputDTOs.Add(inputDTO.Definition);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductDefinitionInputDTO, Product>
-            (definitionInputDTOs, "Code");
-            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>(
-                inputDTO.Definition, _productRepository, "Code", "Code");
+                (definitionInputDTOs, "Code", _entityListErrorWrapper);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>
+                (inputDTO.Definition, _productRepository, "Code", "Code", _entityListErrorWrapper);
             Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
             Product product = HandleAddProduct(inputDTO.Definition, categoryId, currentLoginUserDTO);
             //add semifinish product list
@@ -127,19 +137,24 @@ namespace GPMS.Backend.Services.Services.Implementations
             await _semiFinishedProductService.AddList(inputDTO.Definition.SemiFinishedProducts, product.Id);
             //add material list
             List<CreateUpdateResponseDTO<Material>> materialCodeList =
-            await _materialService.AddList(inputDTO.Definition.Materials);
+                await _materialService.AddList(inputDTO.Definition.Materials);
             //add specification list
             await _specificationService.AddList(inputDTO.Specifications, product.Id,
-            materialCodeList, inputDTO.Definition.Sizes, inputDTO.Definition.Colors);
+                materialCodeList, inputDTO.Definition.Sizes, inputDTO.Definition.Colors);
             //add process list
             await _processService.AddList(inputDTO.Processes, product.Id, materialCodeList, semiFinishedProductCodeList);
-            List<ProductionProcessStepIO> stepIOs = _stepIORepository.GetAll().ToList();
             ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
-            <ProductionProcessStepIO, ProductionProcessStepIO, Material>
-            (stepIOs.Where(stepIO => stepIO.MaterialId.HasValue).ToList(), materialCodeList, "MaterialId", "Id");
+                <StepIOInputDTO, ProductionProcessStepIO, Material>
+                (_stepIOInputDTOWrapper.StepIOInputDTOList.Where(stepIOInputDTO => !stepIOInputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
+                materialCodeList, "MaterialCode", "Code", _entityListErrorWrapper);
             ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
-            <ProductionProcessStepIO, ProductionProcessStepIO, SemiFinishedProduct>
-            (stepIOs.Where(stepIO => stepIO.SemiFinishedProductId.HasValue).ToList(), semiFinishedProductCodeList, "SemiFinishedProductId", "Id");
+                <StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
+                (_stepIOInputDTOWrapper.StepIOInputDTOList.Where(stepIOInputDTO => !stepIOInputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
+                semiFinishedProductCodeList, "SemiFinishedProductCode", "Code", _entityListErrorWrapper);
+            if (_entityListErrorWrapper.EntityListErrors.Count > 0)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Invalid", _entityListErrorWrapper);
+            }
             await _productRepository.Save();
             return new CreateUpdateResponseDTO<Product>
             {

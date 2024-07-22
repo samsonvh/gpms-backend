@@ -18,5 +18,6 @@ namespace GPMS.Backend.Data.Repositories
         void UpdateRange (Entity entities);
         void Delete (Entity entity);
         Task Save ();
+        List<Entity> GetUnAddedEntityList();
     }
 }

@@ -23,30 +23,41 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<ProductionProcessStepIO> _stepIORepository;
         private readonly IValidator<StepIOInputDTO> _stepIOValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
+        private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
 
         public StepIOService(
             IGenericRepository<ProductionProcessStepIO> stepIORepository,
             IValidator<StepIOInputDTO> stepIOValidator,
-            IMapper mapper)
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper,
+            StepIOInputDTOWrapper stepIOInputDTOWrapper)
         {
             _stepIORepository = stepIORepository;
             _stepIOValidator = stepIOValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
+            _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
         }
 
         public async Task AddList(List<StepIOInputDTO> inputDTOs, Guid stepId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList,
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<StepIOInputDTO, ProductionProcessStepIO>(inputDTOs, _stepIOValidator);
+            ServiceUtils.ValidateInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
+                (inputDTOs, _stepIOValidator, _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-            (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), "MaterialCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
+                    "MaterialCode", _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-            (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(), "SemiFinishedProductCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
+                    "SemiFinishedProductCode", _entityListErrorWrapper);
             ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, Material>
-            (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), materialCodeList, "MaterialCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
+                    materialCodeList, "MaterialCode", _entityListErrorWrapper);
             ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
-            (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(), semiFinsihedProductCodeList, "SemiFinishedProductCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
+                    semiFinsihedProductCodeList, "SemiFinishedProductCode", _entityListErrorWrapper);
             CheckContainsOnlyOneOutputAndAtLeastOneInput(inputDTOs);
             foreach (StepIOInputDTO stepIOInputDTO in inputDTOs)
             {
@@ -54,17 +65,18 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionProcessStepIO.ProductionProcessStepId = stepId;
                 if (!stepIOInputDTO.MaterialCode.IsNullOrEmpty())
                 {
-                    productionProcessStepIO.MaterialId = materialCodeList
-                    .First(materialCode => materialCode.Code.Equals(stepIOInputDTO.MaterialCode))
-                    .Id;
+                    CreateUpdateResponseDTO<Material> existedMaterialCode =
+                    materialCodeList.FirstOrDefault(materialCode => materialCode.Code.Equals(stepIOInputDTO.MaterialCode));
+                    if (existedMaterialCode != null) productionProcessStepIO.MaterialId = existedMaterialCode.Id;
                 }
                 else if (!stepIOInputDTO.SemiFinishedProductCode.IsNullOrEmpty())
                 {
-                    productionProcessStepIO.SemiFinishedProductId = semiFinsihedProductCodeList
-                    .First(semiFinishedProductCode => semiFinishedProductCode.Code.Equals(stepIOInputDTO.SemiFinishedProductCode))
-                    .Id;
+                    CreateUpdateResponseDTO<SemiFinishedProduct> existedSemiFinishedProductCode =
+                    semiFinsihedProductCodeList.FirstOrDefault(semiFinishedProductCode => semiFinishedProductCode.Code.Equals(stepIOInputDTO.SemiFinishedProductCode));
+                    if (existedSemiFinishedProductCode != null) productionProcessStepIO.SemiFinishedProductId = existedSemiFinishedProductCode.Id;
                 }
                 _stepIORepository.Add(productionProcessStepIO);
+                _stepIOInputDTOWrapper.StepIOInputDTOList.Add(stepIOInputDTO);
             }
         }
 
@@ -89,7 +101,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid Type in Step Input Output", errors);
+                EntityListError entityListError = new EntityListError
+                {
+                    Entity = typeof(StepInputDTO).Name,
+                    Errors = errors
+                };
+                _entityListErrorWrapper.EntityListErrors.Add(entityListError);
             }
         }
     }
