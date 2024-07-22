@@ -27,6 +27,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Warehouse> _warehouseRepository;
         private readonly IValidator<SpecificationInputDTO> _specificationValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public SpecificationService(
             IGenericRepository<Product> productRepository,
@@ -36,7 +37,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             IBillOfMaterialService billOfMaterialService,
             IGenericRepository<Warehouse> warehouseRepository,
             IValidator<SpecificationInputDTO> specificationValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _productRepository = productRepository;
@@ -47,6 +49,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _warehouseRepository = warehouseRepository;
             _specificationValidator = specificationValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<ProductSpecification>> Add(SpecificationInputDTO inputDTO)
@@ -62,7 +65,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList, string sizes, string colors)
         {
-            ServiceUtils.ValidateInputDTOList<SpecificationInputDTO,ProductSpecification>(inputDTOs,_specificationValidator);
+            ServiceUtils.ValidateInputDTOList<SpecificationInputDTO,ProductSpecification>
+                (inputDTOs,_specificationValidator,_entityListErrorWrapper);
             ValidateSizeAndColorInSpecification(sizes,colors,inputDTOs);
             Warehouse existedProductWarehouse = await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse")).FirstOrDefaultAsync();
             foreach (SpecificationInputDTO specificationInputDTO in inputDTOs)
@@ -124,7 +128,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Size/Color in specification invalid", errors);
+                EntityListError entityListError = new EntityListError
+                {
+                    Entity = typeof(ProductSpecification).Name,
+                    Errors = errors
+                };
+                _entityListErrorWrapper.EntityListErrors.Add(entityListError);
             }
         }
     }

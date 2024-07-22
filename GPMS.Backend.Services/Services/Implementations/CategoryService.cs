@@ -12,6 +12,7 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -21,21 +22,21 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Category> _categoryRepository;
         private readonly IValidator<CategoryInputDTO> _categoryValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
         public CategoryService(IGenericRepository<Category> categoryRepository,
         IValidator<CategoryInputDTO> categoryValidator,
-        IMapper mapper)
+        IMapper mapper,
+        EntityListErrorWrapper entityListErrorWrapper)
         {
             _categoryRepository = categoryRepository;
             _categoryValidator = categoryValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
         public async Task<CreateUpdateResponseDTO<Category>> Add(CategoryInputDTO inputDTO)
         {
-            ValidationResult validationResult = _categoryValidator.Validate(inputDTO);
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException("Category Invalid", validationResult.Errors);
-            }
+            ServiceUtils.ValidateInputDTO<CategoryInputDTO,Category>
+            (inputDTO, _categoryValidator,_entityListErrorWrapper);
             Category category = _mapper.Map<Category>(inputDTO);
             _categoryRepository.Add(category);
             return new CreateUpdateResponseDTO<Category>

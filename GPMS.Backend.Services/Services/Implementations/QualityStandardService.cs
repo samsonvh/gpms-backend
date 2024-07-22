@@ -24,15 +24,18 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<QualityStandard> _qualityStandardRepository;
         private readonly IValidator<QualityStandardInputDTO> _qualityStandardValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
         public QualityStandardService(
             IGenericRepository<QualityStandard> qualityStandardRepository,
             IValidator<QualityStandardInputDTO> qualityStandardValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _qualityStandardRepository = qualityStandardRepository;
             _qualityStandardValidator = qualityStandardValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<QualityStandard>> Add(QualityStandardInputDTO inputDTO)
@@ -47,10 +50,11 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO, QualityStandard>(inputDTOs, _qualityStandardValidator);
+            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO, QualityStandard>
+                (inputDTOs, _qualityStandardValidator, _entityListErrorWrapper);
             ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
-           (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
-           materialCodeList, "MaterialCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
+            materialCodeList, "MaterialCode", _entityListErrorWrapper);
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
             {
                 QualityStandard qualityStandard = _mapper.Map<QualityStandard>(qualityStandardInputDTO);

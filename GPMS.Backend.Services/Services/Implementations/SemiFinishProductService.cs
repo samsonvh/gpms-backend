@@ -24,17 +24,20 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Product> _productRepository;
         private readonly IValidator<SemiFinishedProductInputDTO> _semiFinishedProductValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public SemiFinishProductService(
             IGenericRepository<SemiFinishedProduct> semiFinishedProductRepository,
             IGenericRepository<Product> productRepository,
             IValidator<SemiFinishedProductInputDTO> semiFinishedProductValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _semiFinishedProductRepository = semiFinishedProductRepository;
             _semiFinishedProductValidator = semiFinishedProductValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<SemiFinishedProduct>> Add(SemiFinishedProductInputDTO inputDTO)
@@ -50,12 +53,13 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<List<CreateUpdateResponseDTO<SemiFinishedProduct>>> AddList(List<SemiFinishedProductInputDTO> inputDTOs, Guid productId)
         {
             ServiceUtils.ValidateInputDTOList<SemiFinishedProductInputDTO, SemiFinishedProduct>
-            (inputDTOs, _semiFinishedProductValidator);
+                (inputDTOs, _semiFinishedProductValidator,_entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<SemiFinishedProductInputDTO,SemiFinishedProduct>
-            (inputDTOs,"Code");
+                (inputDTOs,"Code",_entityListErrorWrapper);
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<SemiFinishedProductInputDTO, SemiFinishedProduct>
-            (inputDTOs,_semiFinishedProductRepository,"Code","Code");
-            List<CreateUpdateResponseDTO<SemiFinishedProduct>> responses = new List<CreateUpdateResponseDTO<SemiFinishedProduct>>();
+                (inputDTOs,_semiFinishedProductRepository,"Code","Code",_entityListErrorWrapper);
+            List<CreateUpdateResponseDTO<SemiFinishedProduct>> responses = 
+                new List<CreateUpdateResponseDTO<SemiFinishedProduct>>();
             foreach (SemiFinishedProductInputDTO semiFinishedProductInputDTO in inputDTOs)
             {
                 SemiFinishedProduct semiFinishedProduct = _mapper.Map<SemiFinishedProduct>(semiFinishedProductInputDTO);

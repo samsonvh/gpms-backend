@@ -5,8 +5,10 @@ using System.Threading.Tasks;
 
 namespace GPMS.Backend.Services.Exceptions
 {
-    public class ListError<E> where E : class
+    public class EntityListError
     {
-        // public List<FormError>  { get; set; }
+        public string Entity { get; set; }
+        public List<FormError> Errors { get; set; }
     }
+    
 }
