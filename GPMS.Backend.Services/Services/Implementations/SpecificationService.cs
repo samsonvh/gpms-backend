@@ -100,12 +100,12 @@ namespace GPMS.Backend.Services.Services.Implementations
         private void ValidateSizeAndColorInSpecification(string productSizes,
         string productColors, List<SpecificationInputDTO> specificationInputDTOs)
         {
-            var sizes = productSizes.Split(",");
-            var colors = productColors.Split(",");
+            var sizes = productSizes.Split(",",StringSplitOptions.TrimEntries);
+            var colors = productColors.Split(",",StringSplitOptions.TrimEntries);
             List<FormError> errors = new List<FormError>();
             foreach (SpecificationInputDTO specificationInputDTO in specificationInputDTOs)
             {
-                if (!sizes.Contains(specificationInputDTO.Size))
+                if (!sizes.Contains(specificationInputDTO.Size.Trim()))
                 {
                     errors.Add(new FormError
                     {
@@ -113,7 +113,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                         ErrorMessage = $"Size: {specificationInputDTO.Size} of specification is not existed in sizes of product"
                     });
                 }
-                if (!colors.Contains(specificationInputDTO.Color))
+                if (!colors.Contains(specificationInputDTO.Color.Trim()))
                 {
                     errors.Add(new FormError
                     {

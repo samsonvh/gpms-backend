@@ -51,6 +51,7 @@ namespace GPMS.Backend.Data
         public DbSet<ProductionProcessStepResult> ProductionProcessStepResult { get; set; }
         public DbSet<Warehouse> Warehouse { get; set; }
         public DbSet<WarehouseTicket> WarehouseTicket { get; set; }
+        public DbSet<WarehouseRequestRequirement> WarehouseRequestRequirements { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             //optionsBuilder.UseSqlServer("Server=.\\SQLSERVER_22;Database=GPMS;Trusted_Connection=True;");

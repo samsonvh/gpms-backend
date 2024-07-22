@@ -79,8 +79,6 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(process => process.Steps, options => options.Ignore());
             //Step
             CreateMap<StepInputDTO, ProductionProcessStep>();
-            //Step IO
-            CreateMap<StepIOInputDTO, ProductionProcessStepIO>();
 
             //ProductionPlan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
@@ -99,6 +97,7 @@ namespace GPMS.Backend.Services.Utils
             //Production Series
             CreateMap<ProductionSeriesInputDTO, ProductionSeries>();
             CreateMap<ProductionSeries, ProductionSeriesDTO>();
+            CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
         }
     }
 }

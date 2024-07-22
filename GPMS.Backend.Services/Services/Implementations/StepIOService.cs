@@ -43,9 +43,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), "MaterialCode");
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
             (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(), "SemiFinishedProductCode");
-            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<StepIOInputDTO, ProductionProcessStepIO, Material>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, Material>
             (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), materialCodeList, "MaterialCode");
-            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
+            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
             (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(), semiFinsihedProductCodeList, "SemiFinishedProductCode");
             CheckContainsOnlyOneOutputAndAtLeastOneInput(inputDTOs);
             foreach (StepIOInputDTO stepIOInputDTO in inputDTOs)
