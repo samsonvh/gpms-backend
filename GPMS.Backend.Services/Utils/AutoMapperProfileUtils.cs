@@ -77,7 +77,7 @@ namespace GPMS.Backend.Services.Utils
             //Step
             CreateMap<StepInputDTO, ProductionProcessStep>();
             //Step IO
-            CreateMap<StepIOInputDTO, ProductionProcessStepIO>();
+            CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
         }
     }
 }

@@ -3,10 +3,12 @@ using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
+using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
@@ -17,6 +19,8 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class ProductService : IProductService
     {
         private readonly IGenericRepository<Product> _productRepository;
+        private readonly IGenericRepository<ProductionProcessStepIO> _stepIORepository;
+        private readonly IGenericRepository<Material> _materialRepository;
         private readonly IValidator<ProductInputDTO> _productValidator;
         private readonly IValidator<ProductDefinitionInputDTO> _productDefinitionValidator;
         private readonly ICategoryService _categoryService;
@@ -27,6 +31,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IMapper _mapper;
         public ProductService(
         IGenericRepository<Product> productRepository,
+        IGenericRepository<ProductionProcessStepIO> stepIORepository,
+        IGenericRepository<Material> materialRepository,
         IValidator<ProductInputDTO> productValidator,
         IValidator<ProductDefinitionInputDTO> productDefinitionValidator,
         ICategoryService categoryService,
@@ -38,6 +44,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         )
         {
             _productRepository = productRepository;
+            _stepIORepository = stepIORepository;
+            _materialRepository = materialRepository;
             _productValidator = productValidator;
             _productDefinitionValidator = productDefinitionValidator;
             _categoryService = categoryService;
@@ -108,10 +116,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             ServiceUtils.ValidateInputDTO<ProductDefinitionInputDTO, Product>
             (inputDTO.Definition, _productDefinitionValidator);
             definitionInputDTOs.Add(inputDTO.Definition);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductDefinitionInputDTO,Product>
-            (definitionInputDTOs,"Code");
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductDefinitionInputDTO, Product>
+            (definitionInputDTOs, "Code");
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>(
-                inputDTO.Definition, _productRepository, "Code","Code");
+                inputDTO.Definition, _productRepository, "Code", "Code");
             Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
             Product product = HandleAddProduct(inputDTO.Definition, categoryId, currentLoginUserDTO);
             //add semifinish product list
@@ -125,6 +133,13 @@ namespace GPMS.Backend.Services.Services.Implementations
             materialCodeList, inputDTO.Definition.Sizes, inputDTO.Definition.Colors);
             //add process list
             await _processService.AddList(inputDTO.Processes, product.Id, materialCodeList, semiFinishedProductCodeList);
+            List<ProductionProcessStepIO> stepIOs = _stepIORepository.GetAll().ToList();
+            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
+            <ProductionProcessStepIO, ProductionProcessStepIO, Material>
+            (stepIOs.Where(stepIO => stepIO.MaterialId.HasValue).ToList(), materialCodeList, "MaterialId", "Id");
+            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
+            <ProductionProcessStepIO, ProductionProcessStepIO, SemiFinishedProduct>
+            (stepIOs.Where(stepIO => stepIO.SemiFinishedProductId.HasValue).ToList(), semiFinishedProductCodeList, "SemiFinishedProductId", "Id");
             await _productRepository.Save();
             return new CreateUpdateResponseDTO<Product>
             {

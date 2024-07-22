@@ -131,24 +131,28 @@ namespace GPMS.Backend.Services.Utils
         where E : class
         where CU : class
         {
-            List<FormError> errors = new List<FormError>();
-            foreach (I inputDTO in inputDTOs)
+
+            if (inputDTOs.Count > 0)
             {
-                if (foreignEntityCodeList.FirstOrDefault(
-                    foreignEntityCode => foreignEntityCode.Code
-                    .Equals(inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()))
-                    == null)
+                List<FormError> errors = new List<FormError>();
+                foreach (I inputDTO in inputDTOs)
                 {
-                    errors.Add(new FormError
+                    if (foreignEntityCodeList.FirstOrDefault(
+                        foreignEntityCode => foreignEntityCode.Code
+                        .Equals(inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()))
+                        == null)
                     {
-                        Property = inputDTOField,
-                        ErrorMessage = $"{typeof(E).Name} with {inputDTOField} : {inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO)} not existed in {typeof(CU).Name} list"
-                    });
+                        errors.Add(new FormError
+                        {
+                            Property = inputDTOField,
+                            ErrorMessage = $"{typeof(E).Name} with {inputDTOField} : {inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO)} not existed in {typeof(CU).Name} list"
+                        });
+                    }
                 }
-            }
-            if (errors.Count > 0)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, $"{inputDTOField} in {typeof(E).Name} list not existed in {typeof(CU).Name} list", errors);
+                if (errors.Count > 0)
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, $"{inputDTOField} in {typeof(E).Name} list not existed in {typeof(CU).Name} list", errors);
+                }
             }
         }
         public static void CheckFieldDuplicatedInInputDTOList<I, E>(List<I> inputDTOs, string inputDTOField)
@@ -185,7 +189,7 @@ namespace GPMS.Backend.Services.Utils
             }
         }
         public static void CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<I, E, CU>
-        (List<I> inputDTOs, List<CreateUpdateResponseDTO<CU>> foreignEntityCodeList, string inputDTOField)
+        (List<I> inputDTOs, List<CreateUpdateResponseDTO<CU>> foreignEntityCodeList, string inputDTOField, string foreignEntityCodeField)
         where I : class
         where E : class
         where CU : class
@@ -196,7 +200,7 @@ namespace GPMS.Backend.Services.Utils
             {
                 string inputDTOCode = inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString();
                 CreateUpdateResponseDTO<CU> foreignEntityCode = foreignEntityCodeList.FirstOrDefault(
-                    foreignEntityCode => foreignEntityCode.Code
+                    foreignEntityCode => foreignEntityCode.GetType().GetProperty(foreignEntityCodeField).GetValue(foreignEntityCode)
                     .Equals(inputDTOCode));
                 if (foreignEntityCode == null)
                 {
@@ -210,10 +214,10 @@ namespace GPMS.Backend.Services.Utils
 
             foreach (CreateUpdateResponseDTO<CU> foreignEntityCode in foreignEntityCodeList)
             {
-                string entityCode = foreignEntityCode.Code;
+                string entityCode = foreignEntityCode.GetType().GetProperty(foreignEntityCodeField).GetValue(foreignEntityCode).ToString();
                 I inputDTO = inputDTOs.FirstOrDefault(
                     inputDTO => inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()
-                    .Equals(foreignEntityCode.Code));
+                    .Equals(entityCode));
                 if (inputDTO == null)
                 {
                     errors.Add(new FormError
@@ -228,6 +232,51 @@ namespace GPMS.Backend.Services.Utils
                 throw new APIException((int)HttpStatusCode.BadRequest, $"{typeof(E).Name} list missing {inputDTOField} in {typeof(CU).Name} list", errors);
             }
         }
+
+        // public static void CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<E, CU>
+        // (List<E> entities, List<CreateUpdateResponseDTO<CU>> foreignEntityList, string entityField, 
+        // string foreignEntityField, string inputDTOField)
+        // where E : class
+        // where CU : class
+        // {
+        //     List<FormError> errors = new List<FormError>();
+
+        //     foreach (E entity in entities)
+        //     {
+        //         string entityFieldValue = entity.GetType().GetProperty(entityField).GetValue(entity).ToString();
+        //         CreateUpdateResponseDTO<CU> foreignEntity = foreignEntityList.FirstOrDefault(
+        //             foreignEntity => foreignEntity.GetType().GetProperty(foreignEntityField)
+        //             .GetValue(foreignEntity).Equals(entityFieldValue));
+        //         if (foreignEntity == null)
+        //         {
+        //             errors.Add(new FormError
+        //             {
+        //                 Property = foreignEntityField,
+        //                 ErrorMessage = $" {typeof(E).Name} with {inputDTOField} : {entityFieldValue} not existed in {typeof(CU).Name} list"
+        //             });
+        //         }
+        //     }
+
+        //     foreach (CreateUpdateResponseDTO<CU> foreignEntityCode in foreignEntityCodeList)
+        //     {
+        //         string entityCode = foreignEntityCode.GetType().GetProperty(foreignEntityCodeField).GetValue(foreignEntityCode).ToString();
+        //         I inputDTO = inputDTOs.FirstOrDefault(
+        //             inputDTO => inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()
+        //             .Equals(entityCode));
+        //         if (inputDTO == null)
+        //         {
+        //             errors.Add(new FormError
+        //             {
+        //                 Property = inputDTOField,
+        //                 ErrorMessage = $"{typeof(E).Name} list missing {inputDTOField} : {entityCode} in {typeof(CU).Name} list"
+        //             });
+        //         }
+        //     }
+        //     if (errors.Count > 0)
+        //     {
+        //         throw new APIException((int)HttpStatusCode.BadRequest, $"{typeof(E).Name} list missing {inputDTOField} in {typeof(CU).Name} list", errors);
+        //     }
+        // }
 
     }
 }

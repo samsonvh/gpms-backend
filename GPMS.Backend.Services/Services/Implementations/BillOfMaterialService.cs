@@ -51,7 +51,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>(inputDTOs, _billOfMaterialValidator);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO,BillOfMaterial>(inputDTOs,"MaterialCode");
             ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<BOMInputDTO,BillOfMaterial,Material>
-            (inputDTOs, materialCodeList, "MaterialCode");
+            (inputDTOs, materialCodeList, "MaterialCode","Code");
             foreach (BOMInputDTO bomInputDTO in inputDTOs)
             {
                 BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(bomInputDTO);
