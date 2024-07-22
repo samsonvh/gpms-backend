@@ -67,12 +67,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             var staff = _mapper.Map<Staff>(inputDTO.StaffInputDTO);
             staff.Status = StaffStatus.Active;
 
-            if (inputDTO.StaffInputDTO.Position == StaffPosition.FactoryDirector && inputDTO.StaffInputDTO.DepartmentId != null)
+            if ((inputDTO.StaffInputDTO.Position == StaffPosition.FactoryDirector || inputDTO.StaffInputDTO.Position == StaffPosition.Admin) && inputDTO.StaffInputDTO.DepartmentId != null)
             {
-                throw new APIException(400, "Facotry Director must not in any deparment");
+                throw new APIException(400, "Facotry Director/Admin must not in any deparment");
             }
 
-            if (inputDTO.StaffInputDTO.Position != StaffPosition.FactoryDirector && inputDTO.StaffInputDTO.DepartmentId == null)
+            if (inputDTO.StaffInputDTO.Position != StaffPosition.FactoryDirector && inputDTO.StaffInputDTO.Position != StaffPosition.Admin && inputDTO.StaffInputDTO.DepartmentId == null)
             {
                 throw new APIException(400, "Manager/Staff must in 1 deparment");
             }
