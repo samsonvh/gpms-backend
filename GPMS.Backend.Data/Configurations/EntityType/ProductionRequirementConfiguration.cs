@@ -18,10 +18,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
                 .WithMany(e => e.ProductionRequirements)
                 .HasForeignKey(e => e.ProductSpecificationId)
                 .OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.ProductionPlan)
-                .WithMany(e => e.ProductionRequirements)
-                .HasForeignKey(e => e.ProductionPlanId)
-                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

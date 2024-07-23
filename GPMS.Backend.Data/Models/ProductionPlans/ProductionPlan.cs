@@ -1,5 +1,6 @@
 ﻿using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Types;
+using GPMS.Backend.Data.Models.Requests;
 using GPMS.Backend.Data.Models.Staffs;
 
 namespace GPMS.Backend.Data.Models.ProductionPlans
@@ -26,6 +27,6 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
         public ProductionPlan? ParentProductionPlan { get; set; }
 
         public ICollection<ProductionPlan> ChildProductionPlans { get; set; } = new List<ProductionPlan>();
-        public ICollection<ProductionRequirement> ProductionRequirements { get; set; } = new List<ProductionRequirement>();
+        public ICollection<WarehouseRequestRequirement> WarehouseRequestRequirements { get; set; } = new List<WarehouseRequestRequirement>();
     }
 }
