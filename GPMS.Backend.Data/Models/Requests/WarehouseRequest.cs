@@ -24,8 +24,7 @@ namespace GPMS.Backend.Data.Models.Requests
         public Staff Creator { get; set; }
         public Guid? ReviewerId { get; set; }
         public Staff? Reviewer { get; set; }
-        public Guid ProductionRequirementId { get; set; }
-        public ProductionRequirement ProductionRequirement { get; set; }
+
         public WarehouseTicket? WarehouseTicket { get; set; }
 
         public ICollection<WarehouseRequestRequirement> WarehouseRequestRequirements { get; set; } = new List<WarehouseRequestRequirement>();

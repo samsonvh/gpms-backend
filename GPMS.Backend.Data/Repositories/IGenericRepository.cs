@@ -19,5 +19,6 @@ namespace GPMS.Backend.Data.Repositories
         void Delete (Entity entity);
         Task Save ();
         List<Entity> GetUnAddedEntityList();
+        Entity GetUnAddedEntity();
     }
 }
