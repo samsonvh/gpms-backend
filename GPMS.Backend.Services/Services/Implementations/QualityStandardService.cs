@@ -15,6 +15,7 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -25,17 +26,20 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IValidator<QualityStandardInputDTO> _qualityStandardValidator;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
+        private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
         public QualityStandardService(
             IGenericRepository<QualityStandard> qualityStandardRepository,
             IValidator<QualityStandardInputDTO> qualityStandardValidator,
             IMapper mapper,
-            EntityListErrorWrapper entityListErrorWrapper
+            EntityListErrorWrapper entityListErrorWrapper,
+            QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper
             )
         {
             _qualityStandardRepository = qualityStandardRepository;
             _qualityStandardValidator = qualityStandardValidator;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
+            _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<QualityStandard>> Add(QualityStandardInputDTO inputDTO)
@@ -66,8 +70,16 @@ namespace GPMS.Backend.Services.Services.Implementations
                     qualityStandard.MaterialId = materialCode.Id;
                 }
                 else qualityStandard.MaterialId = null;
-
                 _qualityStandardRepository.Add(qualityStandard);
+                if (qualityStandardInputDTO.Images.Count > 0)
+                {
+                    _qualityStandardImagesTempWrapper
+                    .QualityStandardImagesTemps.Add(new QualityStandardImagesTemp
+                    {
+                        QualityStandardId = qualityStandard.Id,
+                        Files = qualityStandardInputDTO.Images
+                    });
+                }
             }
         }
 

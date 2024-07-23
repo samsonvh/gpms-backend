@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
+using Google.Cloud.Storage.V1;
 using GPMS.Backend.Data;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Data.Repositories.Implementation;
@@ -60,8 +61,18 @@ namespace GPMS.Backend
             //Add Auto Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils).Assembly);
 
+            //Add Error List 
+            services.AddScoped<EntityListErrorWrapper>();
+            var serviceProvider = services.BuildServiceProvider();
+            var entityListErrorWrapperService = serviceProvider.GetRequiredService<EntityListErrorWrapper>();
+            
+            //Add Quality Standard 
+            services.AddScoped<QualityStandardImagesTempWrapper>();
+
 
             //Add Service 
+            services.AddSingleton<IFirebaseStorageService>(service 
+            => new FirebaseStorageService(configuration, entityListErrorWrapperService, StorageClient.Create()));
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IAccountService, AccountService>();
@@ -98,11 +109,11 @@ namespace GPMS.Backend
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
 
-            //Add Error List 
-            services.AddScoped<EntityListErrorWrapper>();
 
             //Add StepIOInputDTO List
             services.AddScoped<StepIOInputDTOWrapper>();
+
+
         }
     }
 }
