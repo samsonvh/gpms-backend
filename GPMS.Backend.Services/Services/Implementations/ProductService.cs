@@ -5,16 +5,19 @@ using FluentValidation.Results;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.ProductionProcesses;
+using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
+using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -22,8 +25,7 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class ProductService : IProductService
     {
         private readonly IGenericRepository<Product> _productRepository;
-        private readonly IGenericRepository<ProductionProcessStepIO> _stepIORepository;
-        private readonly IGenericRepository<Material> _materialRepository;
+        private readonly IGenericRepository<QualityStandard> _qualityStandardRepository;
         private readonly IValidator<ProductInputDTO> _productValidator;
         private readonly IValidator<ProductDefinitionInputDTO> _productDefinitionValidator;
         private readonly ICategoryService _categoryService;
@@ -31,13 +33,14 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IMaterialService _materialService;
         private readonly ISpecificationService _specificationService;
         private readonly IProcessService _processService;
+        private readonly IFirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
+        private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
         public ProductService(
         IGenericRepository<Product> productRepository,
-        IGenericRepository<ProductionProcessStepIO> stepIORepository,
-        IGenericRepository<Material> materialRepository,
+        IGenericRepository<QualityStandard> qualityStandardRepository,
         IValidator<ProductInputDTO> productValidator,
         IValidator<ProductDefinitionInputDTO> productDefinitionValidator,
         ICategoryService categoryService,
@@ -45,14 +48,15 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMaterialService materialService,
         ISpecificationService specificationService,
         IProcessService processService,
+        IFirebaseStorageService firebaseStorageService,
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
-        StepIOInputDTOWrapper stepIOInputDTOWrapper
+        StepIOInputDTOWrapper stepIOInputDTOWrapper,
+        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper
         )
         {
             _productRepository = productRepository;
-            _stepIORepository = stepIORepository;
-            _materialRepository = materialRepository;
+            _qualityStandardRepository = qualityStandardRepository;
             _productValidator = productValidator;
             _productDefinitionValidator = productDefinitionValidator;
             _categoryService = categoryService;
@@ -60,9 +64,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             _materialService = materialService;
             _specificationService = specificationService;
             _processService = processService;
+            _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
+            _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
 
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
@@ -155,6 +161,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Invalid", _entityListErrorWrapper);
             }
+            await HandleUploadProductImage(inputDTO);
+            await HandleUploadQualityStandardImage();
             await _productRepository.Save();
             return new CreateUpdateResponseDTO<Product>
             {
@@ -163,5 +171,50 @@ namespace GPMS.Backend.Services.Services.Implementations
             };
         }
 
+        private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
+        {
+            //upload product image
+            string fileURL = "";
+            Product unAddedProduct = _productRepository.GetUnAddedEntity();
+            foreach (IFormFile file in inputDTO.Definition.Images)
+            {
+                if (file != null)
+                {
+                    string filePath = $"{typeof(Product).Name}/{unAddedProduct.Id}/Images/{file.FileName}";
+                    string url = await _firebaseStorageService.UploadFile(filePath, file);
+                    fileURL += url + ";";
+                }
+            }
+            fileURL.Remove(fileURL.Length - 2);
+            unAddedProduct.ImageURLs = fileURL;
+        }
+        private async Task HandleUploadQualityStandardImage()
+        {
+            //upload qauality standard image
+            string fileURL = "";
+            Product unAddedProduct = _productRepository.GetUnAddedEntity();
+            List<QualityStandard> unAddedQualityStandardList = _qualityStandardRepository.GetUnAddedEntityList();
+            foreach (QualityStandardImagesTemp qualityStandardImagesTemp in _qualityStandardImagesTempWrapper.QualityStandardImagesTemps)
+            {
+                QualityStandard qualityStandardImageAdd = unAddedQualityStandardList
+                .Where(qualityStandard => qualityStandard.Id.Equals(qualityStandardImagesTemp.QualityStandardId))
+                .FirstOrDefault();
+                if (qualityStandardImageAdd != null)
+                {
+                    foreach (IFormFile image in qualityStandardImagesTemp.Images)
+                    {
+                        string filePath =
+                        $"{typeof(Product).Name}/{unAddedProduct.Id}/{typeof(ProductSpecification).Name}/" +
+                        $"{qualityStandardImageAdd.ProductSpecificationId}/{typeof(QualityStandard).Name}/" +
+                        $"{qualityStandardImageAdd.Id}/Images/{image.FileName}";
+                        string url = await _firebaseStorageService.UploadFile(filePath, image);
+                        fileURL += url + ";";
+                    }
+                    fileURL.Remove(fileURL.Length - 2);
+                    qualityStandardImageAdd.ImageURL = fileURL;
+                    fileURL = "";
+                }
+            }
+        }
     }
 }

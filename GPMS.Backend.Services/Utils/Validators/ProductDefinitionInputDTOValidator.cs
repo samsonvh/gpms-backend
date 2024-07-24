@@ -22,6 +22,8 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.Colors).NotNull().WithMessage("Color is required");
             RuleFor(inputDTO => inputDTO.Colors).MaximumLength(100).WithMessage("Color can not longer than 100 characters");
             RuleFor(inputDTO => inputDTO.Description).MaximumLength(500).WithMessage("Description can not longer than 500 characters");
+            
+
             RuleFor(inputDTO => inputDTO.Category).NotNull().WithMessage("Category is required");
             RuleFor(inputDTO => inputDTO.SemiFinishedProducts).NotNull().WithMessage("Semi finished product list is required");
             RuleFor(inputDTO => inputDTO.Materials).NotNull().WithMessage("Material is required");

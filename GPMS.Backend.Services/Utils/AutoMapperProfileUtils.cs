@@ -55,6 +55,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductDefinitionInputDTO, Product>()
             .ForMember(product => product.Category, options => options.Ignore())
             .ForMember(product => product.SemiFinishedProducts, options => options.Ignore());
+
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             //Material
