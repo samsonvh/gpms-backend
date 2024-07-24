@@ -12,6 +12,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.Exceptions;
@@ -78,6 +79,8 @@ namespace GPMS.Backend
             services.AddScoped<IProcessService, ProcessService>();
             services.AddScoped<IStepService, StepService>();
             services.AddScoped<IStepIOService, StepIOService>();
+            services.AddScoped<IWarehouseRequestService, WarehouseRequestService>();
+            services.AddScoped<IWarehouseRequestRequirementService, WarehouseRequestRequirementService>();
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>, LoginInputDTOValidator>();
@@ -94,12 +97,15 @@ namespace GPMS.Backend
             services.AddTransient<IValidator<ProcessInputDTO>, ProcessInputDTOValidator>();
             services.AddTransient<IValidator<StepInputDTO>, StepInputDTOValidator>();
             services.AddTransient<IValidator<StepIOInputDTO>, StepIOInputDTOValidator>();
+            services.AddTransient<IValidator<WarehouseRequestInputDTO>, WarehouseRequestValidator>();
+            services.AddTransient<IValidator<WarehouseRequestRequirementInputDTO>, WarehouseRequestRequirementValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
 
             //Add Error List 
             services.AddScoped<EntityListErrorWrapper>();
+            services.AddScoped<WarehouseRequestRequirementInputDTOWrapper>();
 
             //Add StepIOInputDTO List
             services.AddScoped<StepIOInputDTOWrapper>();

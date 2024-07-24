@@ -13,6 +13,8 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
+using GPMS.Backend.Data.Models.Requests;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -78,6 +80,16 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<StepInputDTO, ProductionProcessStep>();
             //Step IO
             CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
+
+            //WarehouseRequest
+            CreateMap<WarehouseRequestInputDTO, WarehouseRequest>();
+            CreateMap<WarehouseRequest, CreateUpdateResponseDTO<WarehouseRequest>>();
+
+            //WarehouseRequest Requirement
+            CreateMap<WarehouseRequestRequirement, CreateUpdateResponseDTO<WarehouseRequestRequirement>>();
+            CreateMap<WarehouseRequestRequirementInputDTO, WarehouseRequestRequirement>()
+                .ForMember(warehouseRequestRequirement => warehouseRequestRequirement.ProductionRequirementId, opt => opt.MapFrom(dto => dto.ProducitonRequirementId));
+
         }
     }
 }
