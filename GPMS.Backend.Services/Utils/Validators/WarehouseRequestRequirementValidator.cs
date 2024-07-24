@@ -15,6 +15,9 @@ namespace GPMS.Backend.Services.Utils.Validators
         public WarehouseRequestRequirementValidator()
         {
             RuleFor(inputDTO => inputDTO.Quantity).GreaterThan(0).WithMessage(" Quantity is required");
+
+            RuleFor(inputDTO => inputDTO.ProducitonRequirementId).NotNull().WithMessage("Production Requirement list is required");
+
         }
     }
 }
