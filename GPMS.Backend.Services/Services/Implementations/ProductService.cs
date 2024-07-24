@@ -185,12 +185,12 @@ namespace GPMS.Backend.Services.Services.Implementations
                     fileURL += url + ";";
                 }
             }
-            fileURL.Remove(fileURL.Length - 1);
+            fileURL.Remove(fileURL.Length - 2);
             unAddedProduct.ImageURLs = fileURL;
         }
         private async Task HandleUploadQualityStandardImage()
         {
-            //upload product image
+            //upload qauality standard image
             string fileURL = "";
             Product unAddedProduct = _productRepository.GetUnAddedEntity();
             List<QualityStandard> unAddedQualityStandardList = _qualityStandardRepository.GetUnAddedEntityList();
@@ -201,16 +201,16 @@ namespace GPMS.Backend.Services.Services.Implementations
                 .FirstOrDefault();
                 if (qualityStandardImageAdd != null)
                 {
-                    foreach (IFormFile file in qualityStandardImagesTemp.Files)
+                    foreach (IFormFile image in qualityStandardImagesTemp.Images)
                     {
                         string filePath =
                         $"{typeof(Product).Name}/{unAddedProduct.Id}/{typeof(ProductSpecification).Name}/" +
                         $"{qualityStandardImageAdd.ProductSpecificationId}/{typeof(QualityStandard).Name}/" +
-                        $"{qualityStandardImageAdd.Id}/Images/{file.FileName}";
-                        string url = await _firebaseStorageService.UploadFile(filePath, file);
+                        $"{qualityStandardImageAdd.Id}/Images/{image.FileName}";
+                        string url = await _firebaseStorageService.UploadFile(filePath, image);
                         fileURL += url + ";";
                     }
-                    fileURL.Remove(fileURL.Length - 1);
+                    fileURL.Remove(fileURL.Length - 2);
                     qualityStandardImageAdd.ImageURL = fileURL;
                     fileURL = "";
                 }

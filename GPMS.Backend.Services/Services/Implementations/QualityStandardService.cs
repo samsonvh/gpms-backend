@@ -77,7 +77,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     .QualityStandardImagesTemps.Add(new QualityStandardImagesTemp
                     {
                         QualityStandardId = qualityStandard.Id,
-                        Files = qualityStandardInputDTO.Images
+                        Images = qualityStandardInputDTO.Images
                     });
                 }
             }

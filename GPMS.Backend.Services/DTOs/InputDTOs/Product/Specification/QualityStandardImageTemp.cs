@@ -9,6 +9,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
     public class QualityStandardImagesTemp
     {
         public Guid QualityStandardId { get; set; }
-        public List<IFormFile> Files { get; set; }
+        public List<IFormFile> Images { get; set; }
     }
 }

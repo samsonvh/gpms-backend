@@ -23,6 +23,7 @@ using GPMS.Backend.Services.Utils.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace GPMS.Backend
 {
@@ -65,13 +66,13 @@ namespace GPMS.Backend
             services.AddScoped<EntityListErrorWrapper>();
             var serviceProvider = services.BuildServiceProvider();
             var entityListErrorWrapperService = serviceProvider.GetRequiredService<EntityListErrorWrapper>();
-            
+
             //Add Quality Standard 
             services.AddScoped<QualityStandardImagesTempWrapper>();
 
 
             //Add Service 
-            services.AddSingleton<IFirebaseStorageService>(service 
+            services.AddSingleton<IFirebaseStorageService>(service
             => new FirebaseStorageService(configuration, entityListErrorWrapperService, StorageClient.Create()));
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -112,8 +113,6 @@ namespace GPMS.Backend
 
             //Add StepIOInputDTO List
             services.AddScoped<StepIOInputDTOWrapper>();
-
-
         }
     }
 }
