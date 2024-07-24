@@ -11,6 +11,7 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
@@ -35,6 +36,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(BaseReponse))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAccounts()
         {
             var account = await _accountService.GetAllAccounts();
@@ -47,6 +49,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(BaseReponse))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             var account = await _accountService.Details(id);
@@ -59,6 +62,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.Created, "Provide account successfully", typeof(BaseReponse))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid Data")]
         [Produces("application/json")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(AccountInputDTO accountInputDTO)
         {
             var createdAccount = await _accountService.Add(accountInputDTO);

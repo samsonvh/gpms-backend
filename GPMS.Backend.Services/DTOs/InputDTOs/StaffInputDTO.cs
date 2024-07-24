@@ -11,7 +11,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs
 {
     public class StaffInputDTO
     {
-        public string Code { get; set; }
         public string FullName { get; set; }
         public StaffPosition Position { get; set; }
         public Guid? DepartmentId { get; set; }
