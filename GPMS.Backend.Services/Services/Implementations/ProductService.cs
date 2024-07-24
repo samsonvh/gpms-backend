@@ -138,11 +138,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             };
         }
 
-        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>> ChangeStatus(Guid id, string productStatus)
+        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>> 
+        ChangeStatus(Guid id, string productStatus)
         {
-            var product = await _productRepository
-                .Search(product => product.Id == id)
-                .FirstOrDefaultAsync();
+            var product = _productRepository.Details(id);
 
             if (product == null)
             {
@@ -154,15 +153,9 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
             }
 
-            if (product.Status == ProductStatus.Pending &&
-                (parsedStatus == ProductStatus.Approved || parsedStatus == ProductStatus.Declined))
-            {
                 product.Status = parsedStatus;
                 await _productRepository.Save();
                 return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
-            }
-
-            throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status product change.");
         }
     }
 }
