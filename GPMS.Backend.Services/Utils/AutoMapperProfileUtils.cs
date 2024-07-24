@@ -32,7 +32,6 @@ namespace GPMS.Backend.Services.Utils
 
             //staff
             CreateMap<StaffInputDTO, Staff>()
-                .ForMember(staff => staff.Code, opt => opt.MapFrom(dto => dto.Code))
                 .ForMember(staff => staff.FullName, opt => opt.MapFrom(dto => dto.FullName))
                 .ForMember(staff => staff.Position, opt => opt.MapFrom(dto => dto.Position))
                 .ForMember(staff => staff.DepartmentId, opt => opt.MapFrom(dto => dto.DepartmentId))

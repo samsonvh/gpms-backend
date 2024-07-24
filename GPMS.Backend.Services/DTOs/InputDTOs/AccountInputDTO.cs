@@ -12,6 +12,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs
         public string Code { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public StaffInputDTO StaffInputDTO { get; set; }
+        public StaffInputDTO PersonalInfo { get; set; }
     }
 }
