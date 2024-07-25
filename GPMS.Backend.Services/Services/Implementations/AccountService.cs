@@ -51,12 +51,11 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             await CheckUniqueAccountCode(inputDTO.Code);
             await CheckUniqueAccountEmail(inputDTO.Email);
-            await CheckUniqueStaffCode(inputDTO.StaffInputDTO.Code);
-            await CheckValidDepartmentId(inputDTO.StaffInputDTO.DepartmentId);
+            await CheckValidDepartmentId(inputDTO.PersonalInfo.DepartmentId);
 
-            if (inputDTO.StaffInputDTO.Position != StaffPosition.FactoryDirector)
+            if (inputDTO.PersonalInfo.Position != StaffPosition.FactoryDirector)
             {
-                await CheckValidDepartmentId(inputDTO.StaffInputDTO.DepartmentId);
+                await CheckValidDepartmentId(inputDTO.PersonalInfo.DepartmentId);
             }
 
             //create account and staff
@@ -64,15 +63,18 @@ namespace GPMS.Backend.Services.Services.Implementations
             account.Status = AccountStatus.Active;
             account.Password = BCrypt.Net.BCrypt.HashPassword(inputDTO.Password);
 
-            var staff = _mapper.Map<Staff>(inputDTO.StaffInputDTO);
+            var staff = _mapper.Map<Staff>(inputDTO.PersonalInfo);
             staff.Status = StaffStatus.Active;
+            staff.Code = account.Code;
 
-            if ((inputDTO.StaffInputDTO.Position == StaffPosition.FactoryDirector || inputDTO.StaffInputDTO.Position == StaffPosition.Admin) && inputDTO.StaffInputDTO.DepartmentId != null)
+            await CheckUniqueStaffCode(staff.Code);
+
+            if (inputDTO.PersonalInfo.Position == StaffPosition.FactoryDirector && inputDTO.PersonalInfo.DepartmentId != null)
             {
                 throw new APIException(400, "Facotry Director/Admin must not in any deparment");
             }
 
-            if (inputDTO.StaffInputDTO.Position != StaffPosition.FactoryDirector && inputDTO.StaffInputDTO.Position != StaffPosition.Admin && inputDTO.StaffInputDTO.DepartmentId == null)
+            if (inputDTO.PersonalInfo.Position != StaffPosition.FactoryDirector && inputDTO.PersonalInfo.DepartmentId == null)
             {
                 throw new APIException(400, "Manager/Staff must in 1 deparment");
             }
