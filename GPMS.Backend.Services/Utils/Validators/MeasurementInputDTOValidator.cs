@@ -15,10 +15,10 @@ namespace GPMS.Backend.Services.Utils.Validators
         {
             RuleFor(inputDTO => inputDTO.Name).NotNull().WithMessage("Name is required");
             RuleFor(inputDTO => inputDTO.Name).MaximumLength(100).WithMessage("Name can not longer than 100 characters");
-            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9 ]*$").WithMessage("Name can not contains special character");
+            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$").WithMessage("Name can not contains special character");
             RuleFor(inputDTO => inputDTO.Unit).NotNull().WithMessage("Unit is required");
             RuleFor(inputDTO => inputDTO.Unit).MaximumLength(100).WithMessage("Unit can not longer than 100 characters");
-            RuleFor(inputDTO => inputDTO.Unit).Matches(@"^[a-zA-Z0-9 ]*$").WithMessage("Unit can not contains special character");
+            RuleFor(inputDTO => inputDTO.Unit).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$").WithMessage("Unit can not contains special character");
             RuleFor(inputDTO => inputDTO.Measure).GreaterThan(0).WithMessage("Measurement must greater than 0");
         }
     }

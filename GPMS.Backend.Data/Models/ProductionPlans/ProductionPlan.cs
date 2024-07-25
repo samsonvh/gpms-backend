@@ -1,5 +1,6 @@
 ﻿using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Types;
+using GPMS.Backend.Data.Models.Requests;
 using GPMS.Backend.Data.Models.Staffs;
 
 namespace GPMS.Backend.Data.Models.ProductionPlans

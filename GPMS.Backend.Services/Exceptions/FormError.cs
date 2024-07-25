@@ -18,5 +18,6 @@ namespace GPMS.Backend.Services.Exceptions
         }
         public string Property { get; set; }
         public string ErrorMessage { get; set; }
+        public int EntityOrder { get; set; }
     }
 }

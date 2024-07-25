@@ -22,25 +22,33 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IStepIOService _stepIOService;
         private readonly IValidator<StepInputDTO> _stepValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public StepService(
             IGenericRepository<ProductionProcessStep> stepRepository,
             IStepIOService stepIOService,
             IValidator<StepInputDTO> stepValidator,
-            IMapper mapper)
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper)
         {
             _stepRepository = stepRepository;
             _stepIOService = stepIOService;
             _stepValidator = stepValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
         public async Task AddList(List<StepInputDTO> inputDTOs, Guid processId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList,
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<StepInputDTO, ProductionProcessStep>(inputDTOs, _stepValidator);
+            ServiceUtils.ValidateInputDTOList<StepInputDTO, ProductionProcessStep>
+                (inputDTOs, _stepValidator,_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepInputDTO,ProductionProcessStep>
+                (inputDTOs,"Code",_entityListErrorWrapper);
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<StepInputDTO, ProductionProcessStep>
-            (inputDTOs, _stepRepository, "Code", "Code");
+                (inputDTOs, _stepRepository, "Code", "Code",_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepInputDTO,ProductionProcessStep>
+                (inputDTOs,"OrderNumber",_entityListErrorWrapper);
             inputDTOs = inputDTOs.OrderBy(stepInputDTO => stepInputDTO.OrderNumber).ToList();
             foreach (StepInputDTO stepInputDTO in inputDTOs)
             {
@@ -51,5 +59,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 materialCodeList, semiFinsihedProductCodeList);
             }
         }
+
+        
     }
 }

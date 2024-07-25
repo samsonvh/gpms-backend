@@ -23,15 +23,18 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<BillOfMaterial> _billOfMaterialRepository;
         private readonly IValidator<BOMInputDTO> _billOfMaterialValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
         public BillOfMaterialService(
             IGenericRepository<BillOfMaterial> billOfMaterialRepository,
             IValidator<BOMInputDTO> billOfMaterialValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _billOfMaterialRepository = billOfMaterialRepository;
             _billOfMaterialValidator = billOfMaterialValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<BillOfMaterial>> Add(BOMInputDTO inputDTO)
@@ -48,10 +51,12 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<BOMInputDTO> inputDTOs, Guid specificationId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>(inputDTOs, _billOfMaterialValidator);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<BOMInputDTO,BillOfMaterial,Material>
-            (inputDTOs, materialCodeList, "MaterialCode");
-            // CheckMaterialCodeInBOMInputDTOListExistIn(inputDTOs, materialCodeList);
+            ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>
+                (inputDTOs, _billOfMaterialValidator,_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO,BillOfMaterial>
+                (inputDTOs,"MaterialCode",_entityListErrorWrapper);
+            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<BOMInputDTO,BillOfMaterial,Material>
+                (inputDTOs, materialCodeList, "MaterialCode","Code",_entityListErrorWrapper);
             foreach (BOMInputDTO bomInputDTO in inputDTOs)
             {
                 BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(bomInputDTO);

@@ -28,7 +28,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<DepartmentDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<DepartmentDTO> Details(Guid id)
         {
             var department = await _departmentRepository
                 .Search(department => department.Id == id)
@@ -40,11 +40,11 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Department not found");
             }
 
-            var currentStaff = await _staffRepository
+            /*var currentStaff = await _staffRepository
                 .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync();*/
 
-            if (currentStaff == null)
+            /*if (currentStaff == null)
             {
                 throw new APIException((int)HttpStatusCode.Forbidden, "Current staff not found");
             }
@@ -67,7 +67,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             if (currentStaff.Position != StaffPosition.Manager)
             {
                 throw new APIException((int)HttpStatusCode.Forbidden, "Only managers and admins can view department details");
-            }
+            }*/
 
             var departmentDTO = _mapper.Map<DepartmentDTO>(department);
             return departmentDTO;

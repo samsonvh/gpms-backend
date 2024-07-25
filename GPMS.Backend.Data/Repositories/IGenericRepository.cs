@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace GPMS.Backend.Data.Repositories
 {
@@ -17,5 +18,7 @@ namespace GPMS.Backend.Data.Repositories
         void UpdateRange (Entity entities);
         void Delete (Entity entity);
         Task Save ();
+        List<Entity> GetUnAddedEntityList();
+        Entity GetUnAddedEntity();
     }
 }

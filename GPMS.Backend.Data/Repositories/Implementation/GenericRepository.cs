@@ -39,6 +39,22 @@ namespace GPMS.Backend.Data.Repositories.Implementation
             return _dbContext.Set<Entity>();
         }
 
+        public Entity GetUnAddedEntity()
+        {
+            return _dbContext.ChangeTracker.Entries<Entity>()
+                    .Where(entityEntry => entityEntry.State == EntityState.Added)
+                    .Select(entityEntry => entityEntry.Entity)
+                    .FirstOrDefault();
+        }
+
+        public List<Entity> GetUnAddedEntityList()
+        {
+            return _dbContext.ChangeTracker.Entries<Entity>()
+                    .Where(entityEntry => entityEntry.State == EntityState.Added)
+                    .Select(entityEntry => entityEntry.Entity)
+                    .ToList();
+        }
+
         public async Task Save()
         {
             await _dbContext.SaveChangesAsync();

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
+using Google.Cloud.Storage.V1;
 using GPMS.Backend.Data;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Data.Repositories.Implementation;
@@ -12,8 +13,10 @@ using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.Utils;
@@ -21,6 +24,7 @@ using GPMS.Backend.Services.Utils.Validators;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 namespace GPMS.Backend
 {
@@ -28,6 +32,7 @@ namespace GPMS.Backend
     {
         public static void ConfigureService(this IServiceCollection services, IConfiguration configuration)
         {
+
             //Init JWT Util 1 time for using Configuration
             JWTUtils.Initialize(configuration);
             //config DBContext
@@ -57,14 +62,24 @@ namespace GPMS.Backend
 
             //Add Auto Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils).Assembly);
-            
+
+            //Add Error List 
+            services.AddScoped<EntityListErrorWrapper>();
+            var serviceProvider = services.BuildServiceProvider();
+            var entityListErrorWrapperService = serviceProvider.GetRequiredService<EntityListErrorWrapper>();
+
+            //Add Quality Standard 
+            services.AddScoped<QualityStandardImagesTempWrapper>();
+
 
             //Add Service 
+            services.AddSingleton<IFirebaseStorageService>(service
+            => new FirebaseStorageService(configuration, entityListErrorWrapperService, StorageClient.Create()));
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IDepartmentService, DepartmentService>();
-            services.AddScoped<IStaffService, StaffService>();  
+            services.AddScoped<IStaffService, StaffService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ISemiFinishedProductService, SemiFinishProductService>();
@@ -76,9 +91,13 @@ namespace GPMS.Backend
             services.AddScoped<IProcessService, ProcessService>();
             services.AddScoped<IStepService, StepService>();
             services.AddScoped<IStepIOService, StepIOService>();
+            services.AddScoped<IProductionPlanService, ProductionPlanService>();
+            services.AddScoped<IProductionRequirementService, ProductionRequirementService>();
+            services.AddScoped<IProductionEstimationService, ProductionEstimationService>();
+            services.AddScoped<IProductionSeriesService, ProductionSeriesService>();
 
             //Add IValidator
-            services.AddTransient<IValidator<LoginInputDTO>,LoginInputDTOValidator>();
+            services.AddTransient<IValidator<LoginInputDTO>, LoginInputDTOValidator>();
             services.AddTransient<IValidator<AccountInputDTO>, AccountInputDTOValidator>();
             services.AddTransient<IValidator<ProductInputDTO>,ProductInputDTOValidator>();
             services.AddTransient<IValidator<ProductDefinitionInputDTO>,ProductDefinitionInputDTOValidator>();
@@ -92,9 +111,15 @@ namespace GPMS.Backend
             services.AddTransient<IValidator<ProcessInputDTO>,ProcessInputDTOValidator>();
             services.AddTransient<IValidator<StepInputDTO>,StepInputDTOValidator>();
             services.AddTransient<IValidator<StepIOInputDTO>,StepIOInputDTOValidator>();
+            services.AddTransient<IValidator<ProductionPlanInputDTO>, ProductionPlanInputDTOValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
+
+
+            //Add StepIOInputDTO List
+            services.AddScoped<StepIOInputDTOWrapper>();
+           
         }
     }
 }

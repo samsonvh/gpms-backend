@@ -15,6 +15,7 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -24,15 +25,21 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<QualityStandard> _qualityStandardRepository;
         private readonly IValidator<QualityStandardInputDTO> _qualityStandardValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
+        private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
         public QualityStandardService(
             IGenericRepository<QualityStandard> qualityStandardRepository,
             IValidator<QualityStandardInputDTO> qualityStandardValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper,
+            QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper
             )
         {
             _qualityStandardRepository = qualityStandardRepository;
             _qualityStandardValidator = qualityStandardValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
+            _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<QualityStandard>> Add(QualityStandardInputDTO inputDTO)
@@ -47,18 +54,32 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO,QualityStandard>(inputDTOs, _qualityStandardValidator);
+            ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO, QualityStandard>
+                (inputDTOs, _qualityStandardValidator, _entityListErrorWrapper);
             ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
-           (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(), 
-           materialCodeList, "MaterialCode");
+                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
+            materialCodeList, "MaterialCode", _entityListErrorWrapper);
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
             {
                 QualityStandard qualityStandard = _mapper.Map<QualityStandard>(qualityStandardInputDTO);
                 qualityStandard.ProductSpecificationId = specificationId;
-                qualityStandard.MaterialId = materialCodeList
-                .First(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode))
-                .Id;
+                if (!qualityStandardInputDTO.MaterialCode.IsNullOrEmpty())
+                {
+                    CreateUpdateResponseDTO<Material> materialCode = materialCodeList
+                    .FirstOrDefault(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode));
+                    qualityStandard.MaterialId = materialCode.Id;
+                }
+                else qualityStandard.MaterialId = null;
                 _qualityStandardRepository.Add(qualityStandard);
+                if (!qualityStandardInputDTO.Images.IsNullOrEmpty() && qualityStandardInputDTO.Images.Count > 0)
+                {
+                    _qualityStandardImagesTempWrapper
+                    .QualityStandardImagesTemps.Add(new QualityStandardImagesTemp
+                    {
+                        QualityStandardId = qualityStandard.Id,
+                        Images = qualityStandardInputDTO.Images
+                    });
+                }
             }
         }
 

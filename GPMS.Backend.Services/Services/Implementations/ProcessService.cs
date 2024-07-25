@@ -24,18 +24,21 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IStepService _stepService;
         private readonly IValidator<ProcessInputDTO> _processValidator;
         private readonly IMapper _mapper;
+        private readonly EntityListErrorWrapper _entityListErrorWrapper;
 
         public ProcessService(
             IGenericRepository<ProductProductionProcess> processRepository,
             IStepService stepService,
             IValidator<ProcessInputDTO> processValidator,
-            IMapper mapper
+            IMapper mapper,
+            EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _processRepository = processRepository;
             _stepService = stepService;
             _processValidator = processValidator;
             _mapper = mapper;
+            _entityListErrorWrapper = entityListErrorWrapper;
         }
 
         public Task<CreateUpdateResponseDTO<ProductProductionProcess>> Add(ProcessInputDTO inputDTO)
@@ -52,9 +55,14 @@ namespace GPMS.Backend.Services.Services.Implementations
         List<CreateUpdateResponseDTO<Material>> materialCodeList, 
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList)
         {
-            ServiceUtils.ValidateInputDTOList<ProcessInputDTO,ProductProductionProcess>(inputDTOs,_processValidator);
+            ServiceUtils.ValidateInputDTOList<ProcessInputDTO,ProductProductionProcess>
+                (inputDTOs,_processValidator,_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProcessInputDTO,ProductProductionProcess>
+                (inputDTOs,"Code",_entityListErrorWrapper);
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<ProcessInputDTO,ProductProductionProcess>
-            (inputDTOs,_processRepository,"Code","Code");
+                (inputDTOs,_processRepository,"Code","Code",_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProcessInputDTO,ProductProductionProcess>
+                (inputDTOs,"OrderNumber",_entityListErrorWrapper);
             inputDTOs = inputDTOs.OrderBy(processInputDTO => processInputDTO.OrderNumber).ToList();
             foreach (ProcessInputDTO processInputDTO in inputDTOs)
             {

@@ -76,7 +76,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 463, DateTimeKind.Utc).AddTicks(7441));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 861, DateTimeKind.Utc).AddTicks(5167));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -269,7 +269,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 457, DateTimeKind.Utc).AddTicks(9567));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 855, DateTimeKind.Utc).AddTicks(3316));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -411,7 +411,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("SemiFinishedProductId")
+                    b.Property<Guid?>("SemiFinishedProductId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Type")
@@ -600,7 +600,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 451, DateTimeKind.Utc).AddTicks(8220));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 848, DateTimeKind.Utc).AddTicks(6832));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -646,7 +646,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 485, DateTimeKind.Utc).AddTicks(771));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 873, DateTimeKind.Utc).AddTicks(9798));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -659,9 +659,6 @@ namespace GPMS.Backend.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid>("ProductionRequirementId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -676,11 +673,38 @@ namespace GPMS.Backend.Data.Migrations
 
                     b.HasIndex("CreatorId");
 
-                    b.HasIndex("ProductionRequirementId");
-
                     b.HasIndex("ReviewerId");
 
                     b.ToTable("WarehouseRequest");
+                });
+
+            modelBuilder.Entity("GPMS.Backend.Data.Models.Requests.WarehouseRequestRequirement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("ProductionPlanId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ProductionRequirementId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("WarehouseRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductionPlanId");
+
+                    b.HasIndex("ProductionRequirementId");
+
+                    b.HasIndex("WarehouseRequestId");
+
+                    b.ToTable("WarehouseRequestRequirements");
                 });
 
             modelBuilder.Entity("GPMS.Backend.Data.Models.Results.FaultyProduct", b =>
@@ -692,7 +716,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 451, DateTimeKind.Utc).AddTicks(2284));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 848, DateTimeKind.Utc).AddTicks(347));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -730,7 +754,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 456, DateTimeKind.Utc).AddTicks(4550));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 853, DateTimeKind.Utc).AddTicks(7565));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -834,7 +858,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 479, DateTimeKind.Utc).AddTicks(2501));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 869, DateTimeKind.Utc).AddTicks(6723));
 
                     b.Property<Guid>("CreatorId")
                         .HasColumnType("uniqueidentifier");
@@ -884,7 +908,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 450, DateTimeKind.Utc).AddTicks(720));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 846, DateTimeKind.Utc).AddTicks(7413));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -993,7 +1017,7 @@ namespace GPMS.Backend.Data.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(2024, 7, 19, 10, 31, 8, 491, DateTimeKind.Utc).AddTicks(9929));
+                        .HasDefaultValue(new DateTime(2024, 7, 23, 10, 11, 32, 879, DateTimeKind.Utc).AddTicks(225));
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -1077,9 +1101,9 @@ namespace GPMS.Backend.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("GPMS.Backend.Data.Models.ProductionPlans.ProductionPlan", "ProductionPlan")
-                        .WithMany("ProductionRequirements")
+                        .WithMany()
                         .HasForeignKey("ProductionPlanId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("ProductSpecification");
@@ -1283,12 +1307,6 @@ namespace GPMS.Backend.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("GPMS.Backend.Data.Models.ProductionPlans.ProductionRequirement", "ProductionRequirement")
-                        .WithMany("WarehouseRequests")
-                        .HasForeignKey("ProductionRequirementId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("GPMS.Backend.Data.Models.Staffs.Staff", "Reviewer")
                         .WithMany("ReviewedWarehouseRequests")
                         .HasForeignKey("ReviewerId")
@@ -1296,9 +1314,30 @@ namespace GPMS.Backend.Data.Migrations
 
                     b.Navigation("Creator");
 
+                    b.Navigation("Reviewer");
+                });
+
+            modelBuilder.Entity("GPMS.Backend.Data.Models.Requests.WarehouseRequestRequirement", b =>
+                {
+                    b.HasOne("GPMS.Backend.Data.Models.ProductionPlans.ProductionPlan", null)
+                        .WithMany("WarehouseRequestRequirements")
+                        .HasForeignKey("ProductionPlanId");
+
+                    b.HasOne("GPMS.Backend.Data.Models.ProductionPlans.ProductionRequirement", "ProductionRequirement")
+                        .WithMany("WarehouseRequestRequirements")
+                        .HasForeignKey("ProductionRequirementId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("GPMS.Backend.Data.Models.Requests.WarehouseRequest", "WarehouseRequest")
+                        .WithMany("WarehouseRequestRequirements")
+                        .HasForeignKey("WarehouseRequestId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("ProductionRequirement");
 
-                    b.Navigation("Reviewer");
+                    b.Navigation("WarehouseRequest");
                 });
 
             modelBuilder.Entity("GPMS.Backend.Data.Models.Results.FaultyProduct", b =>
@@ -1476,14 +1515,14 @@ namespace GPMS.Backend.Data.Migrations
                 {
                     b.Navigation("ChildProductionPlans");
 
-                    b.Navigation("ProductionRequirements");
+                    b.Navigation("WarehouseRequestRequirements");
                 });
 
             modelBuilder.Entity("GPMS.Backend.Data.Models.ProductionPlans.ProductionRequirement", b =>
                 {
                     b.Navigation("ProductionEstimations");
 
-                    b.Navigation("WarehouseRequests");
+                    b.Navigation("WarehouseRequestRequirements");
                 });
 
             modelBuilder.Entity("GPMS.Backend.Data.Models.ProductionPlans.ProductionSeries", b =>
@@ -1572,6 +1611,8 @@ namespace GPMS.Backend.Data.Migrations
 
             modelBuilder.Entity("GPMS.Backend.Data.Models.Requests.WarehouseRequest", b =>
                 {
+                    b.Navigation("WarehouseRequestRequirements");
+
                     b.Navigation("WarehouseTicket");
                 });
 

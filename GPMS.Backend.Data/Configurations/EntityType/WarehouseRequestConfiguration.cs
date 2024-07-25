@@ -21,7 +21,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
 
             builder.HasOne(e => e.Creator).WithMany(e => e.CreatedWarehouseRequests).HasForeignKey(e => e.CreatorId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(e => e.Reviewer).WithMany(e => e.ReviewedWarehouseRequests).HasForeignKey(e => e.ReviewerId).IsRequired(false).OnDelete(DeleteBehavior.NoAction);
-            builder.HasOne(e => e.ProductionRequirement).WithMany(e => e.WarehouseRequests).HasForeignKey(e => e.ProductionRequirementId).OnDelete(DeleteBehavior.NoAction);
         }
     }
 }
