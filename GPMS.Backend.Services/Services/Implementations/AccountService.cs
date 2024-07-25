@@ -71,7 +71,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             if (inputDTO.PersonalInfo.Position == StaffPosition.FactoryDirector && inputDTO.PersonalInfo.DepartmentId != null)
             {
-                throw new APIException(400, "Facotry Director must not in any deparment");
+                throw new APIException(400, "Facotry Director/Admin must not in any deparment");
             }
 
             if (inputDTO.PersonalInfo.Position != StaffPosition.FactoryDirector && inputDTO.PersonalInfo.DepartmentId == null)

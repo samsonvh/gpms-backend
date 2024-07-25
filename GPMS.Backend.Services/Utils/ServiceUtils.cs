@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper.Internal;
 using FluentValidation;
@@ -312,50 +313,16 @@ namespace GPMS.Backend.Services.Utils
             }
         }
 
-        // public static void CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<E, CU>
-        // (List<E> entities, List<CreateUpdateResponseDTO<CU>> foreignEntityList, string entityField, 
-        // string foreignEntityField, string inputDTOField)
-        // where E : class
-        // where CU : class
-        // {
-        //     List<FormError> errors = new List<FormError>();
-
-        //     foreach (E entity in entities)
-        //     {
-        //         string entityFieldValue = entity.GetType().GetProperty(entityField).GetValue(entity).ToString();
-        //         CreateUpdateResponseDTO<CU> foreignEntity = foreignEntityList.FirstOrDefault(
-        //             foreignEntity => foreignEntity.GetType().GetProperty(foreignEntityField)
-        //             .GetValue(foreignEntity).Equals(entityFieldValue));
-        //         if (foreignEntity == null)
-        //         {
-        //             errors.Add(new FormError
-        //             {
-        //                 Property = foreignEntityField,
-        //                 ErrorMessage = $" {typeof(E).Name} with {inputDTOField} : {entityFieldValue} not existed in {typeof(CU).Name} list"
-        //             });
-        //         }
-        //     }
-
-        //     foreach (CreateUpdateResponseDTO<CU> foreignEntityCode in foreignEntityCodeList)
-        //     {
-        //         string entityCode = foreignEntityCode.GetType().GetProperty(foreignEntityCodeField).GetValue(foreignEntityCode).ToString();
-        //         I inputDTO = inputDTOs.FirstOrDefault(
-        //             inputDTO => inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()
-        //             .Equals(entityCode));
-        //         if (inputDTO == null)
-        //         {
-        //             errors.Add(new FormError
-        //             {
-        //                 Property = inputDTOField,
-        //                 ErrorMessage = $"{typeof(E).Name} list missing {inputDTOField} : {entityCode} in {typeof(CU).Name} list"
-        //             });
-        //         }
-        //     }
-        //     if (errors.Count > 0)
-        //     {
-        //         throw new APIException((int)HttpStatusCode.BadRequest, $"{typeof(E).Name} list missing {inputDTOField} in {typeof(CU).Name} list", errors);
-        //     }
-        // }
-
+        public static void testProperty<I>
+        (I abc)
+        where I : class
+        {
+            PropertyInfo[] propertyInfors = abc.GetType().GetProperties();
+            foreach (PropertyInfo propertyInfo in propertyInfors)
+            {
+                var a = propertyInfo.GetType().Name;
+                propertyInfo.GetValue(abc);
+            }
+        }
     }
 }

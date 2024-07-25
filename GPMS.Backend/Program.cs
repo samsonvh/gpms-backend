@@ -28,6 +28,7 @@ Log.Logger = new LoggerConfiguration()
 .ReadFrom.Configuration(configuration)
 .CreateLogger();
 
+//cors
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -62,6 +63,7 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseSerilogRequestLogging();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 

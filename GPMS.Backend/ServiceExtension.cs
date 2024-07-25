@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.Exceptions;
@@ -90,22 +91,27 @@ namespace GPMS.Backend
             services.AddScoped<IProcessService, ProcessService>();
             services.AddScoped<IStepService, StepService>();
             services.AddScoped<IStepIOService, StepIOService>();
+            services.AddScoped<IProductionPlanService, ProductionPlanService>();
+            services.AddScoped<IProductionRequirementService, ProductionRequirementService>();
+            services.AddScoped<IProductionEstimationService, ProductionEstimationService>();
+            services.AddScoped<IProductionSeriesService, ProductionSeriesService>();
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>, LoginInputDTOValidator>();
             services.AddTransient<IValidator<AccountInputDTO>, AccountInputDTOValidator>();
-            services.AddTransient<IValidator<ProductInputDTO>, ProductInputDTOValidator>();
-            services.AddTransient<IValidator<ProductDefinitionInputDTO>, ProductDefinitionInputDTOValidator>();
-            services.AddTransient<IValidator<CategoryInputDTO>, CategoryInputDTOValidator>();
-            services.AddTransient<IValidator<SemiFinishedProductInputDTO>, SemiFinishedProductInputDTOValidator>();
-            services.AddTransient<IValidator<MaterialInputDTO>, MaterialInputDTOValidator>();
-            services.AddTransient<IValidator<SpecificationInputDTO>, SpecificationInputDTOValidator>();
-            services.AddTransient<IValidator<MeasurementInputDTO>, MeasurementInputDTOValidator>();
-            services.AddTransient<IValidator<BOMInputDTO>, BOMInputDTOValidator>();
-            services.AddTransient<IValidator<QualityStandardInputDTO>, QualityStandardInputDTOValidator>();
-            services.AddTransient<IValidator<ProcessInputDTO>, ProcessInputDTOValidator>();
-            services.AddTransient<IValidator<StepInputDTO>, StepInputDTOValidator>();
-            services.AddTransient<IValidator<StepIOInputDTO>, StepIOInputDTOValidator>();
+            services.AddTransient<IValidator<ProductInputDTO>,ProductInputDTOValidator>();
+            services.AddTransient<IValidator<ProductDefinitionInputDTO>,ProductDefinitionInputDTOValidator>();
+            services.AddTransient<IValidator<CategoryInputDTO>,CategoryInputDTOValidator>();
+            services.AddTransient<IValidator<SemiFinishedProductInputDTO>,SemiFinishedProductInputDTOValidator>();
+            services.AddTransient<IValidator<MaterialInputDTO>,MaterialInputDTOValidator>();
+            services.AddTransient<IValidator<SpecificationInputDTO>,SpecificationInputDTOValidator>();
+            services.AddTransient<IValidator<MeasurementInputDTO>,MeasurementInputDTOValidator>();
+            services.AddTransient<IValidator<BOMInputDTO>,BOMInputDTOValidator>();
+            services.AddTransient<IValidator<QualityStandardInputDTO>,QualityStandardInputDTOValidator>();
+            services.AddTransient<IValidator<ProcessInputDTO>,ProcessInputDTOValidator>();
+            services.AddTransient<IValidator<StepInputDTO>,StepInputDTOValidator>();
+            services.AddTransient<IValidator<StepIOInputDTO>,StepIOInputDTOValidator>();
+            services.AddTransient<IValidator<ProductionPlanInputDTO>, ProductionPlanInputDTOValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
@@ -113,6 +119,7 @@ namespace GPMS.Backend
 
             //Add StepIOInputDTO List
             services.AddScoped<StepIOInputDTOWrapper>();
+           
         }
     }
 }

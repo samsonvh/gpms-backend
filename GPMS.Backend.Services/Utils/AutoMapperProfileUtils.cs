@@ -13,6 +13,8 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Data.Models.ProductionPlans;
+using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -65,6 +67,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<SpecificationInputDTO, ProductSpecification>()
             .ForMember(specification => specification.Measurements, options => options.Ignore())
             .ForMember(specification => specification.QualityStandards, options => options.Ignore());
+            CreateMap<ProductSpecification, SpecificationDTO>();
             //Measurement
             CreateMap<MeasurementInputDTO, Measurement>();
             //Bill Of Material
@@ -76,7 +79,24 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(process => process.Steps, options => options.Ignore());
             //Step
             CreateMap<StepInputDTO, ProductionProcessStep>();
-            //Step IO
+
+            //ProductionPlan
+            CreateMap<ProductionPlanInputDTO, ProductionPlan>();
+            CreateMap<ProductionPlan, ProductionPlanDTO>()
+                .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements));;
+
+            //Produciton Requirement
+            CreateMap<ProductionRequirementInputDTO, ProductionRequirement>();
+            CreateMap<ProductionRequirement, ProductionRequirementDTO>()
+                .ForMember(dest => dest.ProductSpecificationDTO, opt => opt.MapFrom(src => src.ProductSpecification))
+                .ForMember(dest => dest.ProductionEstimationDTOs, opt => opt.MapFrom(src => src.ProductionEstimations));
+            //Production Estimation
+            CreateMap<ProductionEstimation, ProductionEstimationDTO>()
+                .ForMember(dest => dest.ProductionSeriesDTOs, opt => opt.MapFrom(src => src.ProductionSeries));
+
+            //Production Series
+            CreateMap<ProductionSeriesInputDTO, ProductionSeries>();
+            CreateMap<ProductionSeries, ProductionSeriesDTO>();
             CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
         }
     }
