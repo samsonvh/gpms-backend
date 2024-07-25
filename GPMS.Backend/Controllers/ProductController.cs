@@ -1,17 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 using AutoMapper;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs;
-using GPMS.Backend.Services.DTOs.InputDTOs.Product;
-using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
-using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
-using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
@@ -20,9 +12,6 @@ using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace GPMS.Backend.Controllers
@@ -59,6 +48,24 @@ namespace GPMS.Backend.Controllers
                 Data = result
             };
             return Ok(baseReponse);
+        }
+
+        [HttpPatch]
+        [Route(APIEndPoint.PRODUCTS_ID_V1)]
+        [SwaggerOperation(Summary = "Change status of product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of product successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Produces("application/json")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
+        {
+            var product = await _productService.ChangeStatus(id, status);
+            var responseData = new ChangeStatusResponseDTO<Product, ProductStatus>
+            {
+                Id = product.Id,
+                Status = product.Status
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of product sucessfully", Data = responseData });
         }
         [HttpGet]
         [Route(APIEndPoint.PRODUCTS_V1)]
