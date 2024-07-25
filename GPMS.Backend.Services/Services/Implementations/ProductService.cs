@@ -70,30 +70,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
-
-        private async Task<Guid> HandleAddCategory(string category)
-        {
-            CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
-            if (existedCategoryDTO == null)
-            {
-                CreateUpdateResponseDTO<Category> categoryCreateResponse = await _categoryService.Add(new CategoryInputDTO
-                {
-                    Name = category
-                });
-                return categoryCreateResponse.Id;
-            }
-            else return existedCategoryDTO.Id;
-        }
-        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId, CurrentLoginUserDTO currentLoginUserDTO)
-        {
-            Product product = _mapper.Map<Product>(inputDTO);
-            product.CategoryId = categoryId;
-            product.CreatorId = currentLoginUserDTO.StaffId;
-            product.Status = ProductStatus.Pending;
-            _productRepository.Add(product);
-            return product;
-        }
-
+        #region Add Product
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
             List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
@@ -141,24 +118,27 @@ namespace GPMS.Backend.Services.Services.Implementations
             };
         }
 
-        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>> 
-        ChangeStatus(Guid id, string productStatus)
+        private async Task<Guid> HandleAddCategory(string category)
         {
-            var product = _productRepository.Details(id);
-
-            if (product == null)
+            CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
+            if (existedCategoryDTO == null)
             {
-                throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
+                CreateUpdateResponseDTO<Category> categoryCreateResponse = await _categoryService.Add(new CategoryInputDTO
+                {
+                    Name = category
+                });
+                return categoryCreateResponse.Id;
             }
-
-            if (!Enum.TryParse(productStatus, true, out ProductStatus parsedStatus))
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
-            }
-
-                product.Status = parsedStatus;
-                await _productRepository.Save();
-                return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
+            else return existedCategoryDTO.Id;
+        }
+        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId, CurrentLoginUserDTO currentLoginUserDTO)
+        {
+            Product product = _mapper.Map<Product>(inputDTO);
+            product.CategoryId = categoryId;
+            product.CreatorId = currentLoginUserDTO.StaffId;
+            product.Status = ProductStatus.Pending;
+            _productRepository.Add(product);
+            return product;
         }
         private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
         {
@@ -205,6 +185,67 @@ namespace GPMS.Backend.Services.Services.Implementations
                 }
             }
         }
+
+        #endregion Add Product
+
+        #region Change Product Status
+
+        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>>
+        ChangeStatus(Guid id, string productStatus)
+        {
+            var product = _productRepository.Details(id);
+
+            if (product == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
+            }
+            product.Status = ValidateProductStatus(productStatus, product);
+            await _productRepository.Save();
+            return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
+        }
+
+        private ProductStatus ValidateProductStatus(string productStatus, Product product)
+        {
+            if (!Enum.TryParse(productStatus, true, out ProductStatus parsedStatus))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
+            }
+            if (product.Status.Equals(ProductStatus.Pending) && parsedStatus.Equals(ProductStatus.InProduction))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Pending to InProduction");
+            }
+            if (product.Status.Equals(ProductStatus.Approved))
+            {
+                if (parsedStatus.Equals(ProductStatus.Declined))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Approved to Declined");
+                }
+                if (parsedStatus.Equals(ProductStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Approved to Pending");
+                }
+            }
+            if (product.Status.Equals(ProductStatus.InProduction))
+            {
+                if (parsedStatus.Equals(ProductStatus.Declined))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from InProduction to Declined");
+                }
+                if (parsedStatus.Equals(ProductStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from InProduction to Pending");
+                }
+            }
+            if (product.Status.Equals(ProductStatus.Declined))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product is already Declined");
+            }
+            return parsedStatus;
+        }
+
+        #endregion Change Product Status
+
+        #region Get All Product
 
         public async Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductPageRequest productPageRequest)
         {
@@ -287,6 +328,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return query;
         }
+        #endregion Get All Product
 
     }
 }
