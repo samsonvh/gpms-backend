@@ -1,11 +1,16 @@
 ﻿using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Types;
-using GPMS.Backend.Data.Models.Requests;
+using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Staffs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace GPMS.Backend.Data.Models.ProductionPlans
+namespace GPMS.Backend.Services.DTOs
 {
-    public class ProductionPlan
+    public class ProductionPlanDTO
     {
         public Guid Id { get; set; }
         public string Code { get; set; }
@@ -20,13 +25,9 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
         public ProductionPlanStatus Status { get; set; }
 
         public Guid CreatorId { get; set; }
-        public Staff Creator { get; set; }
         public Guid? ReviewerId { get; set; }
-        public Staff? Reviewer { get; set; }
         public Guid? ParentProductionPlanId { get; set; }
-        public ProductionPlan? ParentProductionPlan { get; set; }
 
-        public ICollection<ProductionPlan> ChildProductionPlans { get; set; } = new List<ProductionPlan>();
-        public ICollection<ProductionRequirement> ProductionRequirements { get; set; } = new List<ProductionRequirement>();
+        public List<ProductionRequirementDTO> ProductionRequirementDTOs { get; set; }
     }
 }
