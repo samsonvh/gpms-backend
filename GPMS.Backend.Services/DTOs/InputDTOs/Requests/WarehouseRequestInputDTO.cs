@@ -9,7 +9,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Requests
 {
     public class WarehouseRequestInputDTO
     {
-        public Guid CreatorId { get; set; }
         public string Name { get; set; }
         public string? Description { get; set; }
         public List<WarehouseRequestRequirementInputDTO> WarehouseRequestRequirementInputDTOs { get; set; }

@@ -77,16 +77,14 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, " Invalid", _entityListErrorWrapper);
+                throw new APIException((int)HttpStatusCode.BadRequest, " Invalid input data", _entityListErrorWrapper);
             }
             return responses;
         }
 
-
         private void ValidateRequirements(List<WarehouseRequestRequirementInputDTO> inputDTOs)
         {
             var productionRequirementErrors = new List<FormError>();
-
             var warehouseRequestRequirementErrors = new List<FormError>();
 
             var alreadyReportedErrors = new HashSet<Guid>();
@@ -100,14 +98,16 @@ namespace GPMS.Backend.Services.Services.Implementations
 
                 if (productionRequirement == null)
                 {
-                    productionRequirementErrors.Add(new FormError
+                    if (!alreadyReportedErrors.Contains(inputDTO.ProducitonRequirementId))
                     {
-                        Property = nameof(WarehouseRequestRequirementInputDTO.ProducitonRequirementId),
-                        ErrorMessage = $"ProductionRequirement with Id: {inputDTO.ProducitonRequirementId} not found.",
-                        EntityOrder = inputDTOs.IndexOf(inputDTO) + 1
-                    });
-                    alreadyReportedErrors.Add(inputDTO.ProducitonRequirementId);
-
+                        productionRequirementErrors.Add(new FormError
+                        {
+                            Property = nameof(WarehouseRequestRequirementInputDTO.ProducitonRequirementId),
+                            ErrorMessage = $"ProductionRequirement with Id: {inputDTO.ProducitonRequirementId} not found.",
+                            EntityOrder = inputDTOs.IndexOf(inputDTO) + 1
+                        });
+                        alreadyReportedErrors.Add(inputDTO.ProducitonRequirementId);
+                    }
                     continue;
                 }
 
@@ -134,88 +134,24 @@ namespace GPMS.Backend.Services.Services.Implementations
                 }
             }
 
-            if (productionRequirementErrors.Count > 0)
-            {
-                _entityListErrorWrapper.EntityListErrors.Add(new EntityListError
-                {
-                    Entity = "ProductionRequirement",
-                    Errors = productionRequirementErrors
-                });
-            }
-
             if (warehouseRequestRequirementErrors.Count > 0)
             {
                 _entityListErrorWrapper.EntityListErrors.Add(new EntityListError
                 {
                     Entity = "WarehouseRequestRequirement",
-                    Errors = warehouseRequestRequirementErrors
+                    Errors = warehouseRequestRequirementErrors.OrderBy(e => e.EntityOrder).ToList()
+                });
+            }
+
+            if (productionRequirementErrors.Count > 0)
+            {
+                _entityListErrorWrapper.EntityListErrors.Add(new EntityListError
+                {
+                    Entity = "ProductionRequirement",
+                    Errors = productionRequirementErrors.OrderBy(e => e.EntityOrder).ToList()
                 });
             }
         }
 
-        /*private void ValidateRequirements(List<WarehouseRequestRequirementInputDTO> inputDTOs)
-        {
-            var productionRequirementErrors = new List<FormError>();
-            var warehouseRequestRequirementErrors = new List<FormError>();
-
-            var quantityTracker = new Dictionary<Guid, int>();
-
-            // Check each inputDTO
-            foreach (var inputDTO in inputDTOs)
-            {
-                var productionRequirement = _productionRequirementRepository
-                    .Details(inputDTO.ProducitonRequirementId);
-
-                // Check if ProductionRequirement exists
-                if (productionRequirement == null)
-                {
-                    productionRequirementErrors.Add(new FormError
-                    {
-                        Property = nameof(WarehouseRequestRequirementInputDTO.ProducitonRequirementId),
-                        ErrorMessage = $"ProductionRequirement with Id: {inputDTO.ProducitonRequirementId} not found.",
-                        EntityOrder = inputDTOs.IndexOf(inputDTO) + 1
-                    });
-                }
-                else
-                {
-                    // Update the quantity tracker
-                    if (!quantityTracker.ContainsKey(inputDTO.ProducitonRequirementId))
-                    {
-                        quantityTracker[inputDTO.ProducitonRequirementId] = 0;
-                    }
-                    quantityTracker[inputDTO.ProducitonRequirementId] += inputDTO.Quantity;
-
-                    // Check if the quantity exceeds the available quantity
-                    if (quantityTracker[inputDTO.ProducitonRequirementId] > productionRequirement.Quantity)
-                    {
-                        warehouseRequestRequirementErrors.Add(new FormError
-                        {
-                            Property = nameof(WarehouseRequestRequirementInputDTO.Quantity),
-                            ErrorMessage = $"Quantity for ProductionRequirement with Id: {inputDTO.ProducitonRequirementId} exceeds available quantity.",
-                            EntityOrder = inputDTOs.IndexOf(inputDTO) + 1
-                        });
-                    }
-                }
-            }
-
-            // Add errors to response
-            if (productionRequirementErrors.Count > 0)
-            {
-                _entityListErrorWrapper.EntityListErrors.Add(new EntityListError
-                {
-                    Entity = "ProductionRequirement",
-                    Errors = productionRequirementErrors
-                });
-            }
-
-            if (warehouseRequestRequirementErrors.Count > 0)
-            {
-                _entityListErrorWrapper.EntityListErrors.Add(new EntityListError
-                {
-                    Entity = "WarehouseRequestRequirement",
-                    Errors = warehouseRequestRequirementErrors
-                });
-            }
-        }*/
     }
 }

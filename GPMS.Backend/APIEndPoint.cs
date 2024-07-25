@@ -86,7 +86,7 @@ namespace GPMS.Backend
         public const string FAULTY_PRODUCT_ID_OF_INSPECTION_REQUEST_RESULT_ID_V1 = FAULTY_PRODUCTS_OF_INSPECTION_REQUEST_RESULT_ID_V1 + "/{faultyProductId}";
         //Warehouse Requests
         public const string WAREHOUSE_REQUESTS_OF_REQUIREMENT_ID_V1 = API_VERSION_1 + "/warehouse-requests";
-        public const string WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1 = WAREHOUSE_REQUESTS_OF_REQUIREMENT_ID_V1 + "/warehouseRequestId";
+        public const string WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1 =  WAREHOUSE_REQUESTS_OF_REQUIREMENT_ID_V1 + "/{id}";
 
         #endregion Production Plans
     }

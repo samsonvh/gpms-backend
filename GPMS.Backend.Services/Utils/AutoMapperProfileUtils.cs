@@ -15,6 +15,8 @@ using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
 using GPMS.Backend.Data.Models.Requests;
+using GPMS.Backend.Data.Enums.Statuses.Requests;
+using GPMS.Backend.Data.Models.Warehouses;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -84,11 +86,19 @@ namespace GPMS.Backend.Services.Utils
             //WarehouseRequest
             CreateMap<WarehouseRequestInputDTO, WarehouseRequest>();
             CreateMap<WarehouseRequest, CreateUpdateResponseDTO<WarehouseRequest>>();
+            CreateMap<WarehouseRequest, WarehouseRequestDTO>()
+                .ForMember(warehouseRequestDto => warehouseRequestDto.WarehouseTicket, options => options.MapFrom(warehouseRequest => warehouseRequest.WarehouseTicket));
 
             //WarehouseRequest Requirement
             CreateMap<WarehouseRequestRequirement, CreateUpdateResponseDTO<WarehouseRequestRequirement>>();
             CreateMap<WarehouseRequestRequirementInputDTO, WarehouseRequestRequirement>()
                 .ForMember(warehouseRequestRequirement => warehouseRequestRequirement.ProductionRequirementId, opt => opt.MapFrom(dto => dto.ProducitonRequirementId));
+            CreateMap<WarehouseRequest, ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>>();
+
+            //warehouseTicket
+            CreateMap<WarehouseTicket, WarehouseTicketDTO>()
+                .ForMember(warehouseTicketDto => warehouseTicketDto.ProductSpeccificationId,
+                                opt => opt.MapFrom(warehouseTicket => warehouseTicket.ProductSpecificationId));
 
         }
     }
