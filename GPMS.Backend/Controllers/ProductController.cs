@@ -10,10 +10,12 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
@@ -58,5 +60,24 @@ namespace GPMS.Backend.Controllers
             };
             return Ok(baseReponse);
         }
+        [HttpGet]
+        [Route(APIEndPoint.PRODUCTS_V1)]
+        [SwaggerOperation(Summary = "Get all product",Description = "Factory director, Production manager can get all product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<ProductListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllProducts([FromQuery]ProductPageRequest productPageRequest)
+        {
+            DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productPageRequest);
+
+            BaseReponse response = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get all product",
+                Data = pageResponse
+            };
+            return Ok(response);
+        }
+
     }
 }

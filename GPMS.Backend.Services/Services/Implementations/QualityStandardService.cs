@@ -71,7 +71,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 }
                 else qualityStandard.MaterialId = null;
                 _qualityStandardRepository.Add(qualityStandard);
-                if (qualityStandardInputDTO.Images.Count > 0)
+                if (!qualityStandardInputDTO.Images.IsNullOrEmpty() && qualityStandardInputDTO.Images.Count > 0)
                 {
                     _qualityStandardImagesTempWrapper
                     .QualityStandardImagesTemps.Add(new QualityStandardImagesTemp

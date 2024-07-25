@@ -7,12 +7,13 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface IProductService 
-    : IBaseService<ProductInputDTO,CreateUpdateResponseDTO<Product>,ProductListingDTO,ProductDTO>
     {
         Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
+        Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductPageRequest productPageRequest);
     }
 }

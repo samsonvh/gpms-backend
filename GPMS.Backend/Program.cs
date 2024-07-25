@@ -16,7 +16,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 //Set up GOOGLE_APPLICATION_CREDENTIALS variable for firebase
-Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"./gpms-9bf3e-firebase-adminsdk-jpnwj-c022608574.json");
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"./gpms-9bf3e-firebase-adminsdk-jpnwj-832ffffcce.json");
 //Initialize Firebase SDK 
 FirebaseApp.Create(new AppOptions()
 {
