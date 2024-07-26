@@ -313,16 +313,5 @@ namespace GPMS.Backend.Services.Utils
             }
         }
 
-        public static void testProperty<I>
-        (I abc)
-        where I : class
-        {
-            PropertyInfo[] propertyInfors = abc.GetType().GetProperties();
-            foreach (PropertyInfo propertyInfo in propertyInfors)
-            {
-                var a = propertyInfo.GetType().Name;
-                propertyInfo.GetValue(abc);
-            }
-        }
     }
 }

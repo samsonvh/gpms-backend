@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 
@@ -27,7 +28,7 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(dto => dto.Poition, opt => opt.MapFrom(account => account.Staff.Position));
             CreateMap<AccountInputDTO, Account>();
             CreateMap<Account, AccountDTO>()
-                .ForMember(dto => dto.FullName, opt => opt.MapFrom(account =>  account.Staff.FullName))
+                .ForMember(dto => dto.FullName, opt => opt.MapFrom(account => account.Staff.FullName))
                 .ForMember(dto => dto.Position, opt => opt.MapFrom(account => account.Staff.Position));
             CreateMap<Account, CreateUpdateResponseDTO<Account>>();
             CreateMap<Account, ChangeStatusResponseDTO<Account, AccountStatus>>();
@@ -39,7 +40,7 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(staff => staff.DepartmentId, opt => opt.MapFrom(dto => dto.DepartmentId))
                 .ForMember(staff => staff.Account, opt => opt.Ignore());
             CreateMap<Staff, StaffListingDTO>()
-                .ForMember(staffListingDTO => staffListingDTO.Department, options 
+                .ForMember(staffListingDTO => staffListingDTO.Department, options
                             => options.MapFrom(staff => staff.Department.Name));
             CreateMap<Staff, StaffDTO>()
                 .ForMember(dto => dto.DepartmentName, opt => opt.MapFrom(staff => staff.Department.Name));
@@ -61,13 +62,20 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productDTO => productDTO.SemiFinishedProducts, opt => opt.MapFrom(product => product.SemiFinishedProducts))
                 .ForMember(productDTO => productDTO.Processes, opt => opt.MapFrom(product => product.ProductionProcesses))
                 .ForMember(productDTO => productDTO.Specifications, opt => opt.MapFrom(product => product.Specifications));
+
+            CreateMap<Product, ChangeStatusResponseDTO<Product, ProductStatus>>();
+            CreateMap<Product, ProductListingDTO>()
+            .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore())
+            .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
+            .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
+
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             CreateMap<SemiFinishedProduct, SemiFinishedProductDTO>();
             //Material
             CreateMap<MaterialInputDTO, Material>();
-            CreateMap<Material,MaterialDTO>().ReverseMap();
-            CreateMap<Material,MaterialListingDTO>().ReverseMap();
+            CreateMap<Material, MaterialDTO>().ReverseMap();
+            CreateMap<Material, MaterialListingDTO>().ReverseMap();
             //Specification
             CreateMap<SpecificationInputDTO, ProductSpecification>()
             .ForMember(specification => specification.Measurements, options => options.Ignore())
@@ -95,13 +103,13 @@ namespace GPMS.Backend.Services.Utils
             //Step
             CreateMap<StepInputDTO, Data.Models.Products.ProductionProcesses.ProductionProcessStep>();
             CreateMap<ProductionProcessStep, ProductionProcessStepDTO>()
-                .ForMember(productionProcessStepDTO => productionProcessStepDTO.ProductionProcessStepIOs, opt => 
+                .ForMember(productionProcessStepDTO => productionProcessStepDTO.ProductionProcessStepIOs, opt =>
                                 opt.MapFrom(productionProcessstep => productionProcessstep.ProductionProcessStepIOs));
 
             //ProductionPlan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
-                .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements));;
+                .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements)); ;
 
             CreateMap<ProductionProcessStepIO, ProductionProcessStepIODTO>();
 

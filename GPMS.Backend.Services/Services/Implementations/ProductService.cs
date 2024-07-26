@@ -1,12 +1,10 @@
 using System.Net;
 using AutoMapper;
 using FluentValidation;
-using FluentValidation.Results;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Products.Specifications;
-using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
@@ -17,6 +15,8 @@ using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
+using GPMS.Backend.Services.PageRequests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -71,6 +71,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
+
 
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
         {
@@ -154,29 +155,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        private async Task<Guid> HandleAddCategory(string category)
-        {
-            CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
-            if (existedCategoryDTO == null)
-            {
-                CreateUpdateResponseDTO<Category> categoryCreateResponse = await _categoryService.Add(new CategoryInputDTO
-                {
-                    Name = category
-                });
-                return categoryCreateResponse.Id;
-            }
-            else return existedCategoryDTO.Id;
-        }
-        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId, CurrentLoginUserDTO currentLoginUserDTO)
-        {
-            Product product = _mapper.Map<Product>(inputDTO);
-            product.CategoryId = categoryId;
-            product.CreatorId = currentLoginUserDTO.StaffId;
-            product.Status = ProductStatus.Pending;
-            _productRepository.Add(product);
-            return product;
-        }
 
+
+        #region Add Product
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
             List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
@@ -224,6 +205,28 @@ namespace GPMS.Backend.Services.Services.Implementations
             };
         }
 
+        private async Task<Guid> HandleAddCategory(string category)
+        {
+            CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
+            if (existedCategoryDTO == null)
+            {
+                CreateUpdateResponseDTO<Category> categoryCreateResponse = await _categoryService.Add(new CategoryInputDTO
+                {
+                    Name = category
+                });
+                return categoryCreateResponse.Id;
+            }
+            else return existedCategoryDTO.Id;
+        }
+        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId, CurrentLoginUserDTO currentLoginUserDTO)
+        {
+            Product product = _mapper.Map<Product>(inputDTO);
+            product.CategoryId = categoryId;
+            product.CreatorId = currentLoginUserDTO.StaffId;
+            product.Status = ProductStatus.Pending;
+            _productRepository.Add(product);
+            return product;
+        }
         private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
         {
             //upload product image
@@ -238,7 +241,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     fileURL += url + ";";
                 }
             }
-            fileURL.Remove(fileURL.Length - 2);
+            fileURL = fileURL.Remove(fileURL.Length - 1);
             unAddedProduct.ImageURLs = fileURL;
         }
         private async Task HandleUploadQualityStandardImage()
@@ -263,11 +266,156 @@ namespace GPMS.Backend.Services.Services.Implementations
                         string url = await _firebaseStorageService.UploadFile(filePath, image);
                         fileURL += url + ";";
                     }
-                    fileURL.Remove(fileURL.Length - 2);
+                    fileURL = fileURL.Remove(fileURL.Length - 1);
                     qualityStandardImageAdd.ImageURL = fileURL;
                     fileURL = "";
                 }
             }
         }
+
+        #endregion Add Product
+
+        #region Change Product Status
+
+        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>>
+        ChangeStatus(Guid id, string productStatus)
+        {
+            var product = _productRepository.Details(id);
+
+            if (product == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
+            }
+            product.Status = ValidateProductStatus(productStatus, product);
+            await _productRepository.Save();
+            return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
+        }
+
+        private ProductStatus ValidateProductStatus(string productStatus, Product product)
+        {
+            if (!Enum.TryParse(productStatus, true, out ProductStatus parsedStatus))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
+            }
+            if (product.Status.Equals(ProductStatus.Pending) && parsedStatus.Equals(ProductStatus.InProduction))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Pending to InProduction");
+            }
+            if (product.Status.Equals(ProductStatus.Approved))
+            {
+                if (parsedStatus.Equals(ProductStatus.Declined))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Approved to Declined");
+                }
+                if (parsedStatus.Equals(ProductStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from Approved to Pending");
+                }
+            }
+            if (product.Status.Equals(ProductStatus.InProduction))
+            {
+                if (parsedStatus.Equals(ProductStatus.Declined))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from InProduction to Declined");
+                }
+                if (parsedStatus.Equals(ProductStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product from InProduction to Pending");
+                }
+            }
+            if (product.Status.Equals(ProductStatus.Declined))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of product is already Declined");
+            }
+            return parsedStatus;
+        }
+
+        #endregion Change Product Status
+
+        #region Get All Product
+
+        public async Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductPageRequest productPageRequest)
+        {
+            IQueryable<Product> query = _productRepository.GetAll();
+            query = Filter(query, productPageRequest);
+            query = query.SortByAndPaging(productPageRequest);
+            List<Product> productList = await query.ToListAsync();
+            productList = FilterColorAndSize(productList, productPageRequest);
+            int totalItem = productList.Count;
+            productList = productList.PagingEntityList(productPageRequest);
+            List<ProductListingDTO> productListingDTOs = new List<ProductListingDTO>();
+            foreach (Product product in productList)
+            {
+                ProductListingDTO productListingDTO = _mapper.Map<ProductListingDTO>(product);
+                string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
+                string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
+                string[] colorArr = product.Colors.Split(",", StringSplitOptions.TrimEntries);
+                productListingDTO.ImageURLs.AddRange(imageArr);
+                productListingDTO.Sizes.AddRange(sizeArr);
+                productListingDTO.Colors.AddRange(colorArr);
+                productListingDTOs.Add(productListingDTO);
+            }
+
+            int pageCount = totalItem / productPageRequest.PageSize;
+            if (totalItem % productPageRequest.PageSize > 0)
+            {
+                pageCount += 1;
+            }
+            DefaultPageResponseListingDTO<ProductListingDTO> defaultPageResponseListingDTO =
+            new DefaultPageResponseListingDTO<ProductListingDTO>
+            {
+                Data = productListingDTOs,
+                PageCount = pageCount,
+                PageIndex = productPageRequest.PageIndex,
+                PageSize = productPageRequest.PageSize,
+                TotalItem = totalItem
+            };
+            return defaultPageResponseListingDTO;
+        }
+
+        private List<Product> FilterColorAndSize(List<Product> productList, ProductPageRequest productPageRequest)
+        {
+            if (!productPageRequest.Size.IsNullOrEmpty())
+            {
+                productList = productList
+                .Where(product => product.Sizes.Split(",", StringSplitOptions.TrimEntries)
+                                                .Select(size => size.ToLower())
+                                                .Contains(productPageRequest.Size.ToLower()))
+                                                .ToList();
+            }
+            if (!productPageRequest.Color.IsNullOrEmpty())
+            {
+                productList = productList
+                .Where(product => product.Colors.Split(",", StringSplitOptions.TrimEntries)
+                                                .Select(color => color.ToLower())
+                                                .Contains(productPageRequest.Color.ToLower()))
+                                                .ToList();
+            }
+            return productList;
+        }
+
+        private IQueryable<Product> Filter(IQueryable<Product> query, ProductPageRequest productPageRequest)
+        {
+            if (!productPageRequest.Code.IsNullOrEmpty())
+            {
+                query = query
+                .Where(product => product.Code.ToLower().Contains(productPageRequest.Code.ToLower()));
+            }
+            if (!productPageRequest.Name.IsNullOrEmpty())
+            {
+                query = query
+                .Where(product => product.Name.ToLower().Contains(productPageRequest.Name.ToLower()));
+            }
+
+            if (!productPageRequest.Status.IsNullOrEmpty()
+                    && Enum.TryParse<ProductStatus>(productPageRequest.Status, true, out ProductStatus parsedProductStatus))
+            {
+                query = query
+                .Where(product => product.Status.Equals(parsedProductStatus));
+            }
+            return query;
+        }
+        #endregion Get All Product
+
     }
 }
