@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
@@ -57,6 +58,18 @@ namespace GPMS.Backend.Controllers
                 Data = result
             };
             return Ok(baseReponse);
+        }
+
+        [HttpGet]
+        [Route(APIEndPoint.PRODUCTS_ID_V1)]
+        [SwaggerOperation(Summary = "Get details product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get Details Product Successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Product not found", typeof(BaseReponse))]
+        [Produces("application/json")]
+        public async Task<IActionResult> Details([FromRoute] Guid id)
+        {
+            var product = await _productService.Details(id);
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of product sucessfully", Data = product });
         }
     }
 }
