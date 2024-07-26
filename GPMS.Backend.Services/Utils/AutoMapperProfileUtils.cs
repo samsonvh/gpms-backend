@@ -90,6 +90,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
                 .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements));;
+            CreateMap<ProductionPlan, ProductionPlanListingDTO>();
 
             //Produciton Requirement
             CreateMap<ProductionRequirementInputDTO, ProductionRequirement>();

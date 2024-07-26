@@ -10,6 +10,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Services
 {
@@ -17,5 +18,7 @@ namespace GPMS.Backend.Services.Services
                                     CreateUpdateResponseDTO<ProductionPlan>, ProductionPlanListingDTO, ProductionPlanDTO> 
     {
         Task<CreateUpdateResponseDTO<ProductionPlan>> Add(ProductionPlanInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
+        Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest);
+
     }
 }

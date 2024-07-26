@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using GPMS.Backend.Services.Services.Implementations;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Controllers
 {
@@ -62,6 +64,25 @@ namespace GPMS.Backend.Controllers
         {
             var productionPlan = await _productionPlanService.Details(id);
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of production plan sucessfully", Data = productionPlan });
+        }
+
+        [HttpGet]
+        [Route(APIEndPoint.PRODUCTION_PLANS_V1)]
+        [SwaggerOperation(Summary = "Get all production plan", Description = "Factory director, Production manager can get all production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all production plan successfully", typeof(List<ProductionPlanListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllProductionPlans([FromQuery] ProductionPlanPageRequest productionPlanPageRequest)
+        {
+            DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = await _productionPlanService.GetAll(productionPlanPageRequest);
+
+            BaseReponse response = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get all production plan sucessfully",
+                Data = pageResponse
+            };
+            return Ok(response);
         }
     }
 }
