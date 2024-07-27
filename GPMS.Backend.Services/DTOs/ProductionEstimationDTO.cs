@@ -17,6 +17,6 @@ namespace GPMS.Backend.Services.DTOs
         public Month? Month { get; set; }
         public int? Batch { get; set; }
         public int? DayNumber { get; set; }
-        public List<ProductionSeriesDTO> ProductionSeriesDTOs { get; set; }
+        public List<ProductionSeriesDTO> ProductionSeries { get; set; }
     }
 }

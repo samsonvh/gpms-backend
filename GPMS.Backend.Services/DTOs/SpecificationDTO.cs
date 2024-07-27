@@ -11,5 +11,6 @@ namespace GPMS.Backend.Services.DTOs
         public string Size { get; set; }
         public string Color { get; set; }
         public int InventoryQuantity { get; set; }
+        public ProductDTO Product { get; set; }
     }
 }

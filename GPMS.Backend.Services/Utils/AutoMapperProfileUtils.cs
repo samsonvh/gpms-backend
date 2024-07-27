@@ -62,7 +62,7 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
-
+            CreateMap<Product, ProductDTO>();
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             //Material
@@ -73,7 +73,8 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<SpecificationInputDTO, ProductSpecification>()
             .ForMember(specification => specification.Measurements, options => options.Ignore())
             .ForMember(specification => specification.QualityStandards, options => options.Ignore());
-            CreateMap<ProductSpecification, SpecificationDTO>();
+            CreateMap<ProductSpecification, SpecificationDTO>()
+                .ForMember(dto => dto.Product, opt => opt.MapFrom(src => src.Product));
             //Measurement
             CreateMap<MeasurementInputDTO, Measurement>();
             //Bill Of Material
@@ -89,16 +90,19 @@ namespace GPMS.Backend.Services.Utils
             //ProductionPlan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
-                .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements));;
+                .ForMember(productionPlanDTO => productionPlanDTO.ChildProductionPlans, opt => opt.MapFrom(src => src.ChildProductionPlans))
+                .ForMember(productionPlanDTO => productionPlanDTO.ParentProductionPlan, opt => opt.MapFrom(src => src.ParentProductionPlan))
+                .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(src => src.ProductionRequirements))
+                ;
+            CreateMap<ProductionPlan, ChildProductionPlanDTO>();
 
+            CreateMap<ProductionPlan, ParentProductionPlanDTO>();
             //Produciton Requirement
             CreateMap<ProductionRequirementInputDTO, ProductionRequirement>();
-            CreateMap<ProductionRequirement, ProductionRequirementDTO>()
-                .ForMember(dest => dest.ProductSpecificationDTO, opt => opt.MapFrom(src => src.ProductSpecification))
-                .ForMember(dest => dest.ProductionEstimationDTOs, opt => opt.MapFrom(src => src.ProductionEstimations));
+            CreateMap<ProductionRequirement, ProductionRequirementDTO>();
             //Production Estimation
-            CreateMap<ProductionEstimation, ProductionEstimationDTO>()
-                .ForMember(dest => dest.ProductionSeriesDTOs, opt => opt.MapFrom(src => src.ProductionSeries));
+            CreateMap<ProductionEstimation, ProductionEstimationDTO>();
+            CreateMap<ProductionEstimationInputDTO, ProductionEstimation>();
 
             //Production Series
             CreateMap<ProductionSeriesInputDTO, ProductionSeries>();

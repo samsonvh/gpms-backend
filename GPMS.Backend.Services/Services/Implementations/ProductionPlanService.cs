@@ -4,6 +4,7 @@ using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
@@ -126,11 +127,14 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             var productionPlan = await _productionPlanRepository
                 .Search(productionPlan => productionPlan.Id == id)
+                .Include(productionPlan => productionPlan.ParentProductionPlan)
+                .Include(productionPlan => productionPlan.ChildProductionPlans)
                 .Include(productionPlan => productionPlan.ProductionRequirements)
                     .ThenInclude(productionRequirement => productionRequirement.ProductSpecification) 
+                        .ThenInclude(productSpecification => productSpecification.Product)
                 .Include(productionPlan => productionPlan.ProductionRequirements)
                     .ThenInclude(productionRequirement => productionRequirement.ProductionEstimations)
-               .ThenInclude(productionEstimation => productionEstimation.ProductionSeries) 
+                        .ThenInclude(productionEstimation => productionEstimation.ProductionSeries)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync();
 
@@ -138,7 +142,44 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.NotFound, $"Production Plan with ID: {id} not found");
             }
-            return _mapper.Map<ProductionPlanDTO>(productionPlan);
+
+            return MapToProductionPlanDTO(productionPlan);
+        }
+
+        private ProductionPlanDTO MapToProductionPlanDTO(ProductionPlan productionPlan)
+        {
+            var productionPlanDto = _mapper.Map<ProductionPlanDTO>(productionPlan);
+
+            if (productionPlan.Type == ProductionPlanType.Batch)
+            {
+                productionPlanDto.ChildProductionPlans = null;
+            }
+            else
+            {
+                productionPlanDto.ChildProductionPlans = productionPlan.ChildProductionPlans
+                    .Select(child => _mapper.Map<ChildProductionPlanDTO>(child))
+                    .ToList();
+            }
+
+            if (productionPlan.ParentProductionPlan != null)
+            {
+                productionPlanDto.ParentProductionPlan = _mapper.Map<ParentProductionPlanDTO>(productionPlan.ParentProductionPlan);
+            }
+
+            productionPlanDto.ProductionRequirements = productionPlan.ProductionRequirements
+                .Select(requirement =>
+                {
+                    var requirementDto = _mapper.Map<ProductionRequirementDTO>(requirement);
+                    requirementDto.ProductSpecification.Product = new ProductDTO
+                    {
+                        Id = requirement.ProductSpecification.Product.Id,
+                        Code = requirement.ProductSpecification.Product.Code,
+                        Name = requirement.ProductSpecification.Product.Name
+                    };
+                    return requirementDto;
+                }).ToList();
+
+            return productionPlanDto;
         }
     }
 }
