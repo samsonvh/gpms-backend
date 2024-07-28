@@ -202,7 +202,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
             }
-            product.Status = ValidateProductStatus(productStatus, product);
+            ProductStatus parsedStatus = ValidateProductStatus(productStatus, product);
+            if (parsedStatus.Equals(ProductStatus.Approved) && product.Status.Equals(ProductStatus.Pending))
+                product.ReviewerId = _currentLoginUser.StaffId;
+            product.Status = parsedStatus;
             await _productRepository.Save();
             return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
         }
