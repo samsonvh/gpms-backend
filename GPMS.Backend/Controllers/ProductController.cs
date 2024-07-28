@@ -61,6 +61,7 @@ namespace GPMS.Backend.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
         {
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
             var product = await _productService.ChangeStatus(id, status);
             var responseData = new ChangeStatusResponseDTO<Product, ProductStatus>
             {
