@@ -16,7 +16,7 @@ namespace GPMS.Backend.Services.Services
 {
     public interface IProductService 
     {
-        Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
+        Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO);
         Task<ChangeStatusResponseDTO<Product, ProductStatus>> ChangeStatus(Guid id, string productStatus);
         Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductPageRequest productPageRequest);
     }

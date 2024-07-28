@@ -112,12 +112,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(Material).Name,
-                    Errors = errors
-                };
-                _entityListErrorWrapper.EntityListErrors.Add(entityListError);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors,_entityListErrorWrapper);
             }
         }
 

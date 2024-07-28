@@ -10,10 +10,11 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan
     {
         public int Quantity { get; set; }
         public int OverTimeQuantity { get; set; }
-        public int? Quarter { get; set; }
-        public int? Month { get; set; }
+        public string? Quarter { get; set; }
+        public string? Month { get; set; }
         public int? Batch { get; set; }
-        public int? Day { get; set; }
-        public List<ProductionSeriesInputDTO> ProductionSeriesInputDTOs { get; set; }
+        public int? DayNumber {  get; set; }
+        public List<ProductionSeriesInputDTO>? ProductionSeries { get; set; }
+        = new List<ProductionSeriesInputDTO>();
     }
 }
