@@ -18,6 +18,9 @@ namespace GPMS.Backend.Services.DTOs
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; }
         public CategoryDTO Category { get; set; }
+        public string CreatorName { get; set; }
+        public string ReviewerName { get; set; }
+
         public List<SemiFinishedProductDTO> SemiFinishedProducts { get; set; }
         public List<SpecificationDTO> Specifications { get; set; }
         public List<ProcessDTO> Processes { get; set; }

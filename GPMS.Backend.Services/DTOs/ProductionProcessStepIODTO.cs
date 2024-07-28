@@ -14,5 +14,9 @@ namespace GPMS.Backend.Services.DTOs
         public float? Consumption { get; set; }
         public bool IsProduct { get; set; }
         public string Type { get; set; }
+        public string SemiFinishedProductCode { get; set; }
+        public string SemiFinishedProductName { get; set; }
+        public string MaterialCode { get; set; }
+        public string MaterialName { get; set; }
     }
 }

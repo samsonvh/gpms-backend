@@ -20,6 +20,7 @@ using GPMS.Backend.Services.PageRequests;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using GPMS.Backend.Data.Models.Staffs;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -39,6 +40,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
         private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
+        private readonly IGenericRepository<Staff> _staffRepository;
         public ProductService(
         IGenericRepository<Product> productRepository,
         IGenericRepository<QualityStandard> qualityStandardRepository,
@@ -53,7 +55,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
         StepIOInputDTOWrapper stepIOInputDTOWrapper,
-        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper
+        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper, 
+        IGenericRepository<Staff> staffRepository
         )
         {
             _productRepository = productRepository;
@@ -70,6 +73,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
+            _staffRepository = staffRepository;
         }
 
 
@@ -99,6 +103,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 .Include(product => product.ProductionProcesses)
                     .ThenInclude(productionProcess => productionProcess.Steps)
                         .ThenInclude(step => step.ProductionProcessStepIOs)
+                .Include(product => product.Creator)
+                .Include(product => product.Reviewer)
                 .FirstOrDefaultAsync();
 
             if (product == null)
@@ -117,6 +123,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 ImageURLs = !string.IsNullOrEmpty(product.ImageURLs) ? product.ImageURLs.Split(';').Select(imageURL => imageURL.Trim()).ToList() : new List<string>(),
                 CreatedDate = product.CreatedDate,
                 Status = product.Status.ToString(),
+                CreatorName = product.Creator.FullName,
+                ReviewerName = product.Reviewer?.FullName,
                 Category = _mapper.Map<CategoryDTO>(product.Category),
                 SemiFinishedProducts = _mapper.Map<List<SemiFinishedProductDTO>>(product.SemiFinishedProducts),
 

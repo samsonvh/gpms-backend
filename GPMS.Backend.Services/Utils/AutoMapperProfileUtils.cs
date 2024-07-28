@@ -106,6 +106,12 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionProcessStepDTO => productionProcessStepDTO.ProductionProcessStepIOs, opt =>
                                 opt.MapFrom(productionProcessstep => productionProcessstep.ProductionProcessStepIOs));
 
+            CreateMap<ProductionProcessStepIO, ProductionProcessStepIODTO>()
+                .ForMember(productionProcessStepIODTO => productionProcessStepIODTO.SemiFinishedProductCode,
+                                opt => opt.MapFrom(productionProcessStepIO => productionProcessStepIO.SemiFinishedProduct.Code))
+                .ForMember(productionProcessStepIODTO => productionProcessStepIODTO.SemiFinishedProductName,
+                                opt => opt.MapFrom(productionProcessStepIO => productionProcessStepIO.SemiFinishedProduct.Name));
+
             //ProductionPlan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
