@@ -90,10 +90,11 @@ namespace GPMS.Backend.Services.Utils
             //ProductionPlan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
-                .ForMember(productionPlanDTO => productionPlanDTO.ChildProductionPlans, opt => opt.MapFrom(src => src.ChildProductionPlans))
-                .ForMember(productionPlanDTO => productionPlanDTO.ParentProductionPlan, opt => opt.MapFrom(src => src.ParentProductionPlan))
-                .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(src => src.ProductionRequirements))
-                ;
+                .ForMember(productionPlanDTO => productionPlanDTO.ChildProductionPlans, opt => opt.MapFrom(productionPlan => productionPlan.ChildProductionPlans))
+                .ForMember(productionPlanDTO => productionPlanDTO.ParentProductionPlan, opt => opt.MapFrom(productionPlan => productionPlan.ParentProductionPlan))
+                .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(productionPlan => productionPlan.ProductionRequirements))
+                .ForMember(productionPlanDTO => productionPlanDTO.CreatorName, opt => opt.MapFrom(productionPlan => productionPlan.Creator.FullName))
+                .ForMember(productionPlanDTO => productionPlanDTO.ReviewerName, opt => opt.MapFrom(productionPlan => productionPlan.Reviewer.FullName));
             CreateMap<ProductionPlan, ChildProductionPlanDTO>();
 
             CreateMap<ProductionPlan, ParentProductionPlanDTO>();

@@ -16,6 +16,6 @@ namespace GPMS.Backend.Services.DTOs
         public string Colors { get; set; }
         public string ImageURLs { get; set; }
         public DateTime CreatedDate { get; set; }
-        public ProductStatus Status { get; set; }
+        public string Status { get; set; }
     }
 }

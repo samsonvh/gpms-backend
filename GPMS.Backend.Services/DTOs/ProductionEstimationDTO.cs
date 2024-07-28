@@ -13,8 +13,8 @@ namespace GPMS.Backend.Services.DTOs
         public Guid Id { get; set; }
         public int Quantity { get; set; }
         public int OvertimeQuantity { get; set; }
-        public Quarter? Quarter { get; set; }
-        public Month? Month { get; set; }
+        public string? Quarter { get; set; }
+        public string? Month { get; set; }
         public int? Batch { get; set; }
         public int? DayNumber { get; set; }
         public List<ProductionSeriesDTO> ProductionSeries { get; set; }

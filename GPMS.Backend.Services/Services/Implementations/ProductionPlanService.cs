@@ -135,6 +135,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 .Include(productionPlan => productionPlan.ProductionRequirements)
                     .ThenInclude(productionRequirement => productionRequirement.ProductionEstimations)
                         .ThenInclude(productionEstimation => productionEstimation.ProductionSeries)
+                .Include(productionPlan => productionPlan.Creator)
+                .Include(productionPlan => productionPlan.Reviewer)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync();
 
@@ -174,7 +176,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                     {
                         Id = requirement.ProductSpecification.Product.Id,
                         Code = requirement.ProductSpecification.Product.Code,
-                        Name = requirement.ProductSpecification.Product.Name
+                        Name = requirement.ProductSpecification.Product.Name,
+                        Status = requirement.ProductSpecification.Product.Status.ToString()
                     };
                     return requirementDto;
                 }).ToList();

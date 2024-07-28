@@ -24,8 +24,8 @@ namespace GPMS.Backend.Services.DTOs
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; }
 
-        public Guid CreatorId { get; set; }
-        public Guid? ReviewerId { get; set; }
+        public string CreatorName { get; set; }
+        public string? ReviewerName { get; set; }
         public ParentProductionPlanDTO? ParentProductionPlan { get; set; }
         public List<ChildProductionPlanDTO>? ChildProductionPlans { get; set; } = new List<ChildProductionPlanDTO>();
 
