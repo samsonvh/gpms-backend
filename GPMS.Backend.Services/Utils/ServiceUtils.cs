@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper.Internal;
 using FluentValidation;
 using FluentValidation.Results;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
@@ -39,26 +41,17 @@ namespace GPMS.Backend.Services.Utils
 
                 }
             }
-            if (errors.Count > 0)
-            {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
-            }
+            CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
         }
         public static void ValidateInputDTOList<I, E>(List<I> inputDTOs, IValidator<I> validator,
         EntityListErrorWrapper entityListErrorWrapper)
         where I : class
         where E : class
         {
+            int entityOrder = 1;
             List<FormError> errors = new List<FormError>();
             foreach (I inputDTO in inputDTOs)
             {
-                int entityOrder = 1;
                 ValidationResult validationResult = validator.Validate(inputDTO);
                 if (!validationResult.IsValid)
                 {
@@ -75,15 +68,7 @@ namespace GPMS.Backend.Services.Utils
                 entityOrder++;
             }
 
-            if (errors.Count > 0)
-            {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
-            }
+            CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
         }
 
         public static async Task CheckFieldDuplicatedWithInputDTOAndDatabase<I, E>(
@@ -110,12 +95,7 @@ namespace GPMS.Backend.Services.Utils
                     EntityOrder = 1
                 };
                 List<FormError> errors = [error];
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
+                CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
             }
         }
 
@@ -125,10 +105,11 @@ namespace GPMS.Backend.Services.Utils
         where E : class
         where I : class
         {
+            int entityOrder = 1;
             List<FormError> errors = new List<FormError>();
             foreach (I inputDTO in inputDTOs)
             {
-                int entityOrder = 1;
+
                 string inputDTOFieldValue = inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString();
                 var parameter = Expression.Parameter(typeof(E), "entity");//tao tham so entity dai dien cho kieu product
                 var property = Expression.Property(parameter, entityField); //lay field cua product
@@ -151,15 +132,7 @@ namespace GPMS.Backend.Services.Utils
                 }
                 entityOrder++;
             }
-            if (errors.Count > 0)
-            {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
-            }
+            CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
         }
 
         public static void CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<I, E, CU>
@@ -172,10 +145,10 @@ namespace GPMS.Backend.Services.Utils
 
             if (inputDTOs.Count > 0)
             {
+                int entityOrder = 1;
                 List<FormError> errors = new List<FormError>();
                 foreach (I inputDTO in inputDTOs)
                 {
-                    int entityOrder = 1;
                     if (foreignEntityCodeList.FirstOrDefault
                         (foreignEntityCode => foreignEntityCode.Code
                         .Equals(inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()))
@@ -190,15 +163,7 @@ namespace GPMS.Backend.Services.Utils
                     }
                     entityOrder++;
                 }
-                if (errors.Count > 0)
-                {
-                    EntityListError entityListError = new EntityListError
-                    {
-                        Entity = typeof(E).Name,
-                        Errors = errors
-                    };
-                    entityListErrorWrapper.EntityListErrors.Add(entityListError);
-                }
+                CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
             }
         }
         public static void CheckFieldDuplicatedInInputDTOList<I, E>(List<I> inputDTOs,
@@ -208,9 +173,10 @@ namespace GPMS.Backend.Services.Utils
         {
             List<FormError> errors = new List<FormError>();
             List<string> duplicatedValueField = new List<string>();
+            int entityOrder = 1;
             foreach (I inputDTO in inputDTOs)
             {
-                int entityOrder = 1;
+
                 string fieldValue = inputDTO.GetType().GetProperty(inputDTOField)
                                             .GetValue(inputDTO).ToString();
                 int duplicatedCount = 0;
@@ -237,15 +203,7 @@ namespace GPMS.Backend.Services.Utils
                 }
                 entityOrder++;
             }
-            if (errors.Count > 0)
-            {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
-            }
+            CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
         }
         public static void CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<I, E, CU>
         (List<I> inputDTOs, List<CreateUpdateResponseDTO<CU>> foreignEntityCodeList,
@@ -255,10 +213,10 @@ namespace GPMS.Backend.Services.Utils
         where CU : class
         {
             List<FormError> errors = new List<FormError>();
-
+            int entityOrder = 1;
             foreach (I inputDTO in inputDTOs)
             {
-                int entityOrder = 1;
+
                 string inputDTOCode = inputDTO.GetType().GetProperty(inputDTOField)
                                                 .GetValue(inputDTO).ToString();
                 CreateUpdateResponseDTO<CU> foreignEntityCode = foreignEntityCodeList.FirstOrDefault
@@ -282,9 +240,10 @@ namespace GPMS.Backend.Services.Utils
                                                     .GetProperty(foreignEntityCodeField)
                                                     .GetValue(foreignEntityCode)
                                                     .ToString();
+                int missingEntityOrder = 1;
                 foreach (I inputDTOMissing in inputDTOs)
                 {
-                    int entityOrder = 1;
+
                     string inputDTOMissingFieldValue = inputDTOMissing.GetType()
                                                                     .GetProperty(inputDTOField)
                                                                     .GetValue(inputDTOMissing)
@@ -295,67 +254,45 @@ namespace GPMS.Backend.Services.Utils
                         {
                             Property = inputDTOField,
                             ErrorMessage = $"{typeof(E).Name} list missing {inputDTOField} : {entityCode} in {typeof(CU).Name} list",
-                            EntityOrder = entityOrder
+                            EntityOrder = missingEntityOrder
                         });
                     }
-                    entityOrder++;
+                    missingEntityOrder++;
                 }
             }
-            if (errors.Count > 0)
-            {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(E).Name,
-                    Errors = errors
-                };
-                entityListErrorWrapper.EntityListErrors.Add(entityListError);
-            }
+            CheckErrorWithEntityExistAndAddErrorList<E>(errors, entityListErrorWrapper);
         }
 
-        // public static void CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<E, CU>
-        // (List<E> entities, List<CreateUpdateResponseDTO<CU>> foreignEntityList, string entityField, 
-        // string foreignEntityField, string inputDTOField)
-        // where E : class
-        // where CU : class
-        // {
-        //     List<FormError> errors = new List<FormError>();
+        public static void CheckErrorWithEntityExistAndAddErrorList<E>
+        (List<FormError> errors, EntityListErrorWrapper entityListErrorWrapper)
+        where E : class
+        {
+            if (errors.Count > 0)
+            {
+                EntityListError? entityListErrorWithEntityExisted =
+                    entityListErrorWrapper.EntityListErrors
+                                            .FirstOrDefault(entityListError => entityListError.Entity.Equals(typeof(E).Name));
+                if (entityListErrorWithEntityExisted == null)
+                {
+                    entityListErrorWithEntityExisted = new EntityListError
+                    {
+                        Entity = typeof(E).Name,
+                        Errors = errors
+                    };
+                    entityListErrorWrapper.EntityListErrors.Add(entityListErrorWithEntityExisted);
+                }
+                else
+                {
+                    entityListErrorWrapper.EntityListErrors.FirstOrDefault(entityListError => entityListError.Entity.Equals(typeof(E).Name)).Errors.AddRange(errors);
+                }
+                entityListErrorWrapper.EntityListErrors.FirstOrDefault(entityListError => entityListError.Entity.Equals(typeof(E).Name))
+                       .Errors
+                       .OrderBy(error => error.EntityOrder)
+                       .ThenBy(error => error.Property)
+                       .ToList();
+            }
 
-        //     foreach (E entity in entities)
-        //     {
-        //         string entityFieldValue = entity.GetType().GetProperty(entityField).GetValue(entity).ToString();
-        //         CreateUpdateResponseDTO<CU> foreignEntity = foreignEntityList.FirstOrDefault(
-        //             foreignEntity => foreignEntity.GetType().GetProperty(foreignEntityField)
-        //             .GetValue(foreignEntity).Equals(entityFieldValue));
-        //         if (foreignEntity == null)
-        //         {
-        //             errors.Add(new FormError
-        //             {
-        //                 Property = foreignEntityField,
-        //                 ErrorMessage = $" {typeof(E).Name} with {inputDTOField} : {entityFieldValue} not existed in {typeof(CU).Name} list"
-        //             });
-        //         }
-        //     }
-
-        //     foreach (CreateUpdateResponseDTO<CU> foreignEntityCode in foreignEntityCodeList)
-        //     {
-        //         string entityCode = foreignEntityCode.GetType().GetProperty(foreignEntityCodeField).GetValue(foreignEntityCode).ToString();
-        //         I inputDTO = inputDTOs.FirstOrDefault(
-        //             inputDTO => inputDTO.GetType().GetProperty(inputDTOField).GetValue(inputDTO).ToString()
-        //             .Equals(entityCode));
-        //         if (inputDTO == null)
-        //         {
-        //             errors.Add(new FormError
-        //             {
-        //                 Property = inputDTOField,
-        //                 ErrorMessage = $"{typeof(E).Name} list missing {inputDTOField} : {entityCode} in {typeof(CU).Name} list"
-        //             });
-        //         }
-        //     }
-        //     if (errors.Count > 0)
-        //     {
-        //         throw new APIException((int)HttpStatusCode.BadRequest, $"{typeof(E).Name} list missing {inputDTOField} in {typeof(CU).Name} list", errors);
-        //     }
-        // }
+        }
 
     }
 }

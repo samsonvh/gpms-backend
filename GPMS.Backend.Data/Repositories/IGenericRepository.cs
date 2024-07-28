@@ -20,5 +20,6 @@ namespace GPMS.Backend.Data.Repositories
         Task Save ();
         List<Entity> GetUnAddedEntityList();
         Entity GetUnAddedEntity();
+        Entity GetUnAddedEntityById(Guid id);
     }
 }

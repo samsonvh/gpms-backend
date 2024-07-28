@@ -27,6 +27,6 @@ namespace GPMS.Backend.Data.Models.ProductionPlans
         public ProductionPlan? ParentProductionPlan { get; set; }
 
         public ICollection<ProductionPlan> ChildProductionPlans { get; set; } = new List<ProductionPlan>();
-        public ICollection<WarehouseRequestRequirement> WarehouseRequestRequirements { get; set; } = new List<WarehouseRequestRequirement>();
+        public ICollection<ProductionRequirement> ProductionRequirements { get; set; } = new List<ProductionRequirement>();
     }
 }

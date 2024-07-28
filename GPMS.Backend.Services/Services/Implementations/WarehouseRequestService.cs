@@ -39,7 +39,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<WarehouseTicket> _warehouseTicketRepository;
         private readonly IGenericRepository<ProductSpecification> _productSpecificationRepository;
         private readonly IGenericRepository<Staff> _staffRepository;
-
+        private readonly CurrentLoginUserDTO _currentLoginUser;
         public WarehouseRequestService(IGenericRepository<WarehouseRequest> warehouseRequestRepository,
                                         IGenericRepository<ProductionRequirement> productionRequirementRepository,
                                         IMapper mapper,
@@ -48,7 +48,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                                         IValidator<WarehouseRequestInputDTO> warehouseRequestValidator,
                                         IGenericRepository<WarehouseTicket> warehouseTicketRepository,
                                         IGenericRepository<ProductSpecification> productSpecificationRepository,
-                                        IGenericRepository<Staff> staffRepository)
+                                        IGenericRepository<Staff> staffRepository,
+                                        CurrentLoginUserDTO currentLoginUser)
         {
             _warehouseRequestRepository = warehouseRequestRepository;
             _productionRequirementRepository = productionRequirementRepository;
@@ -59,15 +60,16 @@ namespace GPMS.Backend.Services.Services.Implementations
             _warehouseTicketRepository = warehouseTicketRepository;
             _productSpecificationRepository = productSpecificationRepository;
             _staffRepository = staffRepository;
+            _currentLoginUser = currentLoginUser;
         }
 
-        public async Task<CreateUpdateResponseDTO<WarehouseRequest>> Add(WarehouseRequestInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<CreateUpdateResponseDTO<WarehouseRequest>> Add(WarehouseRequestInputDTO inputDTO)
         {
             ServiceUtils.ValidateInputDTO<WarehouseRequestInputDTO, WarehouseRequest>
                      (inputDTO, _warehouseRequestValidator, _entityListErrorWrapper);
 
             var warehouseRequest = _mapper.Map<WarehouseRequest>(inputDTO);
-            warehouseRequest.CreatorId = currentLoginUserDTO.StaffId;
+            warehouseRequest.CreatorId = _currentLoginUser.StaffId;
             warehouseRequest.Status = WarehouseRequestStatus.Pending;
 
             _warehouseRequestRepository.Add(warehouseRequest);
@@ -83,10 +85,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<CreateUpdateResponseDTO<WarehouseRequest>>(warehouseRequest);
         }
 
-        public async Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO)
         {
             var staff = await _staffRepository
-                .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
+                .Search(staff => staff.Id == _currentLoginUser.StaffId)
                 .Include(staff => staff.Department)
                 .FirstOrDefaultAsync(); 
 
@@ -130,7 +132,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 await ApprovedWarehouseRequest(warehouseRequest);
             }
 
-            warehouseRequest.ReviewerId = currentLoginUserDTO.StaffId;
+            warehouseRequest.ReviewerId = _currentLoginUser.StaffId;
 
             await _warehouseRequestRepository.Save();
 
@@ -226,10 +228,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             await _warehouseTicketRepository.Save();
         }
 
-        public async Task<WarehouseRequestDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<WarehouseRequestDTO> Details(Guid id)
         {
             var staff = await _staffRepository
-                .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
+                .Search(staff => staff.Id == _currentLoginUser.StaffId)
                 .Include(staff => staff.Department)
                 .FirstOrDefaultAsync();
 
@@ -254,7 +256,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Warehouse request not found");
             }
 
-            warehouseRequest.ReviewerId = currentLoginUserDTO.StaffId;
+            warehouseRequest.ReviewerId = _currentLoginUser.StaffId;
 
             return _mapper.Map<WarehouseRequestDTO>(warehouseRequest);
         }

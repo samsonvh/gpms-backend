@@ -1,5 +1,7 @@
 using System.Text;
+using FirebaseAdmin;
 using FluentValidation.AspNetCore;
+using Google.Apis.Auth.OAuth2;
 using GPMS.Backend;
 using GPMS.Backend.Data;
 using GPMS.Backend.Middlewares;
@@ -13,11 +15,20 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+//Set up GOOGLE_APPLICATION_CREDENTIALS variable for firebase
+Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", @"./gpms-9bf3e-firebase-adminsdk-jpnwj-832ffffcce.json");
+//Initialize Firebase SDK 
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.GetApplicationDefault(),
+    ProjectId = configuration["project_id"],
+});
 //Add Serilog 
 Log.Logger = new LoggerConfiguration()
 .ReadFrom.Configuration(configuration)
 .CreateLogger();
 
+//cors
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddCors(options =>
@@ -52,6 +63,7 @@ app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseSerilogRequestLogging();
+app.UseCors(MyAllowSpecificOrigins);
 
 app.UseAuthentication();
 

@@ -47,6 +47,15 @@ namespace GPMS.Backend.Data.Repositories.Implementation
                     .FirstOrDefault();
         }
 
+        public Entity GetUnAddedEntityById(Guid id)
+        {
+            return _dbContext.ChangeTracker.Entries<Entity>()
+                    .Where(entityEntry => entityEntry.State == EntityState.Added 
+                        && entityEntry.Entity.GetType().GetProperty("Id").GetValue(entityEntry.Entity).Equals(id))
+                    .Select(entityEntry => entityEntry.Entity)
+                    .FirstOrDefault();
+        }
+
         public List<Entity> GetUnAddedEntityList()
         {
             return _dbContext.ChangeTracker.Entries<Entity>()

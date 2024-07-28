@@ -12,6 +12,6 @@ jobs:
         uses: appleboy/jenkins-action@master
         with:
           url: ${{secrets.JENKINS_TRIGGER_URL}}
-          user: "root"
+          user: "admin"
           token: ${{secrets.TRIGGER_API_TOKEN}}
-          job: "gpms-backend-dev-pipeline"
+          job: "GPMS_Backend_Dev"

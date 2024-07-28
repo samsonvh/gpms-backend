@@ -27,11 +27,13 @@ namespace GPMS.Backend.Controllers
     {
         private readonly IWarehouseRequestService _warehouseRequestService;
         private readonly ILogger<WarehouseRequestController> _logger;
+        private readonly CurrentLoginUserDTO _currentLoginUser;
 
-        public WarehouseRequestController(IWarehouseRequestService warehouseRequestService, ILogger<WarehouseRequestController> logger)
+        public WarehouseRequestController(IWarehouseRequestService warehouseRequestService, ILogger<WarehouseRequestController> logger, CurrentLoginUserDTO currentLoginUser)
         {
             _warehouseRequestService = warehouseRequestService;
             _logger = logger;
+            _currentLoginUser = currentLoginUser;
         }
 
         [HttpPost]
@@ -43,8 +45,8 @@ namespace GPMS.Backend.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Create(WarehouseRequestInputDTO warehouseRequestInputDTO)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            var createdWarehouseRequest = await _warehouseRequestService.Add(warehouseRequestInputDTO,currentLoginUserDTO);
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
+            var createdWarehouseRequest = await _warehouseRequestService.Add(warehouseRequestInputDTO);
 
             var responseData = new CreateUpdateResponseDTO<WarehouseRequest>
             {
@@ -69,8 +71,8 @@ namespace GPMS.Backend.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] ChangeStatusInputDTO status)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            var warehouseRequest = await _warehouseRequestService.ChangeStatus(id, status, currentLoginUserDTO);
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
+            var warehouseRequest = await _warehouseRequestService.ChangeStatus(id, status);
             var responseData = new ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>
             {
                 Id = warehouseRequest.Id,
@@ -88,8 +90,8 @@ namespace GPMS.Backend.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            var warehouseRequest = await _warehouseRequestService.Details(id, currentLoginUserDTO);
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
+            var warehouseRequest = await _warehouseRequestService.Details(id);
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of warehouse request sucessfully", Data = warehouseRequest });
         }
     }
