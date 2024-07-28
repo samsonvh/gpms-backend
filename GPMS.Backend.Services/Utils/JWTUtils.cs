@@ -32,7 +32,7 @@ namespace GPMS.Backend.Services.Utils
                 new Claim(ClaimTypes.Name, account.Staff.FullName),
                 new Claim(ClaimTypes.Role, account.Staff.Position.ToString()),
             };
-            if(!account.Staff.Position.Equals(StaffPosition.Admin))
+            if (!account.Staff.Position.Equals(StaffPosition.Admin))
             {
                 claims.Add(new Claim(ClaimTypes.Role, account.Staff.Position.ToString()));
             }
@@ -49,7 +49,7 @@ namespace GPMS.Backend.Services.Utils
             return new JwtSecurityTokenHandler().WriteToken(jwtToken);
         }
 
-        public static CurrentLoginUserDTO DecryptAccessToken(string accessToken)
+        public static void DecryptAccessToken(this CurrentLoginUserDTO currentLoginUserDTO, string accessToken)
         {
             string accessTokenPrefix = "Bearer ";
             if (accessToken.Contains(accessTokenPrefix))
@@ -71,14 +71,11 @@ namespace GPMS.Backend.Services.Utils
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Failed to decrypt/validate access token");
             }
-            return new CurrentLoginUserDTO 
-            {
-                StaffId = Guid.Parse(claimsPrincipal.FindFirstValue("StaffId")),
-                Code = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier),
-                Department = claimsPrincipal.FindFirstValue("Department"),
-                FullName = claimsPrincipal.FindFirstValue(ClaimTypes.Name),
-                Position = claimsPrincipal.FindFirstValue(ClaimTypes.Role)
-            };
+            currentLoginUserDTO.StaffId = Guid.Parse(claimsPrincipal.FindFirstValue("StaffId"));
+            currentLoginUserDTO.Code = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
+            currentLoginUserDTO.Department = claimsPrincipal.FindFirstValue("Department");
+            currentLoginUserDTO.FullName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
+            currentLoginUserDTO.Position = claimsPrincipal.FindFirstValue(ClaimTypes.Role);
         }
     }
 }
