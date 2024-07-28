@@ -16,8 +16,8 @@ namespace GPMS.Backend.Services.Services
 {
     public interface IWarehouseRequestService
     {
-        Task<WarehouseRequestDTO> Details(Guid id);
+        Task<WarehouseRequestDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO); 
         Task<CreateUpdateResponseDTO<WarehouseRequest>> Add(WarehouseRequestInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
-        Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO);
+        Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
     }
 }

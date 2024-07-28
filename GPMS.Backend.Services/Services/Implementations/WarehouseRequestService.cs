@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Requests;
 using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Enums.Types;
@@ -37,6 +38,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IValidator<WarehouseRequestInputDTO> _warehouseRequestValidator;
         private readonly IGenericRepository<WarehouseTicket> _warehouseTicketRepository;
         private readonly IGenericRepository<ProductSpecification> _productSpecificationRepository;
+        private readonly IGenericRepository<Staff> _staffRepository;
 
         public WarehouseRequestService(IGenericRepository<WarehouseRequest> warehouseRequestRepository,
                                         IGenericRepository<ProductionRequirement> productionRequirementRepository,
@@ -45,7 +47,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                                         EntityListErrorWrapper entityListErrorWrapper,
                                         IValidator<WarehouseRequestInputDTO> warehouseRequestValidator,
                                         IGenericRepository<WarehouseTicket> warehouseTicketRepository,
-                                        IGenericRepository<ProductSpecification> productSpecificationRepository)
+                                        IGenericRepository<ProductSpecification> productSpecificationRepository,
+                                        IGenericRepository<Staff> staffRepository)
         {
             _warehouseRequestRepository = warehouseRequestRepository;
             _productionRequirementRepository = productionRequirementRepository;
@@ -55,6 +58,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _warehouseRequestValidator = warehouseRequestValidator;
             _warehouseTicketRepository = warehouseTicketRepository;
             _productSpecificationRepository = productSpecificationRepository;
+            _staffRepository = staffRepository;
         }
 
         public async Task<CreateUpdateResponseDTO<WarehouseRequest>> Add(WarehouseRequestInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
@@ -79,8 +83,33 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<CreateUpdateResponseDTO<WarehouseRequest>>(warehouseRequest);
         }
 
-        public async Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO)
+        public async Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
         {
+            var staff = await _staffRepository
+                .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
+                .Include(staff => staff.Department)
+                .FirstOrDefaultAsync(); 
+
+            if (staff == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Staff not found.");
+
+            }
+
+            if(staff.Position.Equals(StaffPosition.Admin) || 
+                staff.Position.Equals(StaffPosition.FactoryDirector) || staff.Position.Equals(StaffPosition.Staff))
+            {
+                throw new APIException((int)HttpStatusCode.Forbidden, "Admmin/Factory Director/Staff can change status of warehouse request.");
+            }
+
+            if(staff.Position.Equals(StaffPosition.Manager))
+            {
+                if(staff.Department.Name != "Warehouse Department")
+                {
+                    throw new APIException((int)HttpStatusCode.Forbidden, "Only warehouse manager can change warehouse request.");
+                }
+            }
+
             var warehouseRequest = await GetWarehouseRequestWithRequirements(id);
 
             ValidateWarehouseRequest(warehouseRequest, inputDTO.Status);
@@ -100,6 +129,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 await ApprovedWarehouseRequest(warehouseRequest);
             }
+
+            warehouseRequest.ReviewerId = currentLoginUserDTO.StaffId;
 
             await _warehouseRequestRepository.Save();
 
@@ -121,17 +152,40 @@ namespace GPMS.Backend.Services.Services.Implementations
             return warehouseRequest;
         }
 
-        private void ValidateWarehouseRequest(WarehouseRequest warehouseRequest, string warehouseRequestStatus)
+        private WarehouseRequestStatus ValidateWarehouseRequest(WarehouseRequest warehouseRequest, string warehouseRequestStatus)
         {
-            if (warehouseRequest.Status != WarehouseRequestStatus.Pending)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Status of warehouse request is not pending");
-            }
-
-            if (!Enum.TryParse(warehouseRequestStatus, true, out WarehouseRequestStatus _))
+            if (!Enum.TryParse(warehouseRequestStatus, true, out WarehouseRequestStatus parsedStatus))
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
             }
+
+            if(warehouseRequest.Status.Equals(WarehouseRequestStatus.Approved))
+            {
+                if(parsedStatus.Equals(WarehouseRequestStatus.Declined))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of warehouse request from Approved to Declined");
+                }
+
+                if(parsedStatus.Equals (WarehouseRequestStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of warehouse request from Approved to Pending");
+                }
+            }
+
+            if(warehouseRequest.Status.Equals(WarehouseRequestStatus.Declined))
+            {
+                if(parsedStatus.Equals(WarehouseRequestStatus.Approved))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of warehouse request from Declined to Approved");
+                }
+                
+                if(parsedStatus.Equals(WarehouseRequestStatus.Pending))
+                {
+                    throw new APIException((int)HttpStatusCode.BadRequest, "Can not change status of warehouse rerquest from Declined to Pending");
+                }
+            }
+
+            return parsedStatus;
         }
 
         private async Task ApprovedWarehouseRequest(WarehouseRequest warehouseRequest)
@@ -172,17 +226,35 @@ namespace GPMS.Backend.Services.Services.Implementations
             await _warehouseTicketRepository.Save();
         }
 
-        public async Task<WarehouseRequestDTO> Details(Guid id)
+        public async Task<WarehouseRequestDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO)
         {
+            var staff = await _staffRepository
+                .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
+                .Include(staff => staff.Department)
+                .FirstOrDefaultAsync();
+
+            if (staff == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Staff not found.");
+            }
+
+            if (!(staff.Position == StaffPosition.Manager && staff.Department.Name.Equals("Warehouse Department", StringComparison.OrdinalIgnoreCase)) &&
+                !(staff.Position == StaffPosition.Manager && staff.Department.Name.Equals("Production Department", StringComparison.OrdinalIgnoreCase)))
+            {
+                throw new APIException((int)HttpStatusCode.Forbidden, "Only warehouse manager and production manager can access warehouse request details.");
+            }
+
             var warehouseRequest = await _warehouseRequestRepository
                 .Search(warehouseRequest => warehouseRequest.Id == id)
                 .Include(warehouseRequest => warehouseRequest.WarehouseTicket)
                 .FirstOrDefaultAsync();
 
-            if(warehouseRequest == null)
+            if (warehouseRequest == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Warehouse request not found");
             }
+
+            warehouseRequest.ReviewerId = currentLoginUserDTO.StaffId;
 
             return _mapper.Map<WarehouseRequestDTO>(warehouseRequest);
         }

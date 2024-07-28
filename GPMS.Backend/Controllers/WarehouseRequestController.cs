@@ -65,11 +65,12 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1)]
         [SwaggerOperation(Summary = "Approve/Decline warehouse request")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of warehouse request successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Warehouse request not found")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] ChangeStatusInputDTO status)
         {
-            var warehouseRequest = await _warehouseRequestService.ChangeStatus(id, status);
+            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
+            var warehouseRequest = await _warehouseRequestService.ChangeStatus(id, status, currentLoginUserDTO);
             var responseData = new ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>
             {
                 Id = warehouseRequest.Id,
@@ -83,12 +84,12 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1)]
         [SwaggerOperation(Summary = "Get details of warehouse request")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get details of warehouse request successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Warehouse request not found")]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Warehouse request not found")]
         [Produces("application/json")]
-        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
-            var warehouseRequest = await _warehouseRequestService.Details(id);
+            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
+            var warehouseRequest = await _warehouseRequestService.Details(id, currentLoginUserDTO);
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of warehouse request sucessfully", Data = warehouseRequest });
         }
     }
