@@ -19,7 +19,7 @@ namespace GPMS.Backend.Services.Utils.Validators
                 .WithMessage("Parent Production Plan Id must null when Production Plan Type is Year");
 
             RuleFor(inputDTO => inputDTO.ParentProductionPlanId).NotNull().NotEmpty()
-                .When(inputDTO => !inputDTO.Type.Equals(ProductionPlanType.Year.ToString()))
+                .When(inputDTO => !inputDTO.Type.ToLower().Equals(ProductionPlanType.Year.ToString().ToLower()))
                 .WithMessage("Parent Production Plan Id is required when Production Plan Type is not Year");
 
             RuleFor(inputDTO => inputDTO.Code).NotNull().NotEmpty()
