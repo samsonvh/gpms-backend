@@ -10,6 +10,7 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan
     {
         public Guid ProductionSpecificationId { get; set; }
         public int Quantity { get; set; }
-        public List<ProductionEstimationInputDTO> ProductionEstimationInputDTOs { get; set; }
+        public List<ProductionEstimationInputDTO> ProductionEstimations { get; set; }
+        = new List<ProductionEstimationInputDTO>();
     }
 }

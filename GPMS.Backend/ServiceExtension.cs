@@ -21,6 +21,7 @@ using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Services.Utils.Validators;
+using GPMS.Backend.Services.Utils.Validators.ProductionPlan;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -68,6 +69,9 @@ namespace GPMS.Backend
             var serviceProvider = services.BuildServiceProvider();
             var entityListErrorWrapperService = serviceProvider.GetRequiredService<EntityListErrorWrapper>();
 
+            //Add current login user
+            services.AddScoped<CurrentLoginUserDTO>();
+
             //Add Quality Standard 
             services.AddScoped<QualityStandardImagesTempWrapper>();
 
@@ -112,6 +116,9 @@ namespace GPMS.Backend
             services.AddTransient<IValidator<StepInputDTO>,StepInputDTOValidator>();
             services.AddTransient<IValidator<StepIOInputDTO>,StepIOInputDTOValidator>();
             services.AddTransient<IValidator<ProductionPlanInputDTO>, ProductionPlanInputDTOValidator>();
+            services.AddTransient<IValidator<ProductionRequirementInputDTO>, ProductionRequirementInputDTOValidator>();
+            services.AddTransient<IValidator<ProductionEstimationInputDTO>, ProductionEstimationValidator>();
+            services.AddTransient<IValidator<ProductionSeriesInputDTO>, ProductionSeriesValidator>();
 
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));

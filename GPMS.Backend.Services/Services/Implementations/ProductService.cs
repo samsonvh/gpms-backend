@@ -39,6 +39,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
         private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
+        private readonly CurrentLoginUserDTO _currentLoginUser;
         public ProductService(
         IGenericRepository<Product> productRepository,
         IGenericRepository<QualityStandard> qualityStandardRepository,
@@ -53,7 +54,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
         StepIOInputDTOWrapper stepIOInputDTOWrapper,
-        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper
+        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper,
+        CurrentLoginUserDTO currentLoginUser
         )
         {
             _productRepository = productRepository;
@@ -70,13 +72,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
+            _currentLoginUser = currentLoginUser;
         }
 
 
-        public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task AddList(List<ProductInputDTO> inputDTOs, Guid? parentId)
         {
@@ -158,7 +157,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
 
         #region Add Product
-        public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
         {
             List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
             ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>
@@ -171,7 +170,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>
                 (inputDTO.Definition, _productRepository, "Code", "Code", _entityListErrorWrapper);
             Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
-            Product product = HandleAddProduct(inputDTO.Definition, categoryId, currentLoginUserDTO);
+            Product product = HandleAddProduct(inputDTO.Definition, categoryId);
             //add semifinish product list
             List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList =
             await _semiFinishedProductService.AddList(inputDTO.Definition.SemiFinishedProducts, product.Id);
@@ -193,7 +192,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 semiFinishedProductCodeList, "SemiFinishedProductCode", "Code", _entityListErrorWrapper);
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Invalid", _entityListErrorWrapper);
+                throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Failed", _entityListErrorWrapper);
             }
             await HandleUploadProductImage(inputDTO);
             await HandleUploadQualityStandardImage();
@@ -218,11 +217,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             else return existedCategoryDTO.Id;
         }
-        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId, CurrentLoginUserDTO currentLoginUserDTO)
+        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId)
         {
             Product product = _mapper.Map<Product>(inputDTO);
             product.CategoryId = categoryId;
-            product.CreatorId = currentLoginUserDTO.StaffId;
+            product.CreatorId = _currentLoginUser.StaffId;
             product.Status = ProductStatus.Pending;
             _productRepository.Add(product);
             return product;
@@ -286,7 +285,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
             }
-            product.Status = ValidateProductStatus(productStatus, product);
+            ProductStatus parsedStatus = ValidateProductStatus(productStatus, product);
+            if (parsedStatus.Equals(ProductStatus.Approved) && product.Status.Equals(ProductStatus.Pending))
+                product.ReviewerId = _currentLoginUser.StaffId;
+            product.Status = parsedStatus;
             await _productRepository.Save();
             return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
         }
