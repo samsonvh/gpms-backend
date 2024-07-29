@@ -20,14 +20,18 @@ namespace GPMS.Backend.Services.Services.Implementations
     {
         private readonly IGenericRepository<Staff> _staffRepository;
         private readonly IMapper _mapper;
+        private readonly CurrentLoginUserDTO _currentLoginUser;
 
-        public StaffService(IGenericRepository<Staff> staffRepository, IMapper mapper)
+        public StaffService(IGenericRepository<Staff> staffRepository,
+        IMapper mapper,
+        CurrentLoginUserDTO currentLoginUser)
         {
             _staffRepository = staffRepository;
             _mapper = mapper;
+            _currentLoginUser = currentLoginUser;
         }
 
-        public async Task<StaffDTO> Details(Guid id, CurrentLoginUserDTO currentLoginUserDTO)
+        public async Task<StaffDTO> Details(Guid id)
         {
             var staff = await _staffRepository
                 .Search(staff => staff.Id == id)
@@ -39,22 +43,22 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Staff not found");
             }
 
-            if (currentLoginUserDTO.Position == StaffPosition.FactoryDirector.ToString())
+            if (_currentLoginUser.Position == StaffPosition.FactoryDirector.ToString())
             {
                 throw new APIException((int)HttpStatusCode.Forbidden, "Factory directors are not allowed to view staff details");
             }
 
-            if (currentLoginUserDTO.Position == StaffPosition.Admin.ToString())
+            if (_currentLoginUser.Position == StaffPosition.Admin.ToString())
             {
                 return _mapper.Map<StaffDTO>(staff);
             }
 
-            if (currentLoginUserDTO.Position == StaffPosition.Manager.ToString() && currentLoginUserDTO.Department != staff.Department.Name)
+            if (_currentLoginUser.Position == StaffPosition.Manager.ToString() && _currentLoginUser.Department != staff.Department.Name)
             {
                 throw new APIException((int)HttpStatusCode.Forbidden, "Managers can only view staff in their own department");
             }
 
-            if (currentLoginUserDTO.Position != StaffPosition.Manager.ToString())
+            if (_currentLoginUser.Position != StaffPosition.Manager.ToString())
             {
                 throw new APIException((int)HttpStatusCode.Forbidden, "Only managers and admins can view staff details");
             }
