@@ -83,7 +83,7 @@ namespace GPMS.Backend.Controllers
             }
             else if (childProductionPlanList.Count > 0)
             {
-                result = await _productionPlanService.AddChildProductionPlanList(yearProductionPlanList);
+                result = await _productionPlanService.AddChildProductionPlanList(childProductionPlanList);
             }
             else 
             {

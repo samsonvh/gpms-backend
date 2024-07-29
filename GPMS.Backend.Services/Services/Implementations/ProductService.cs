@@ -266,12 +266,24 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (Product product in productList)
             {
                 ProductListingDTO productListingDTO = _mapper.Map<ProductListingDTO>(product);
-                string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
-                string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
-                string[] colorArr = product.Colors.Split(",", StringSplitOptions.TrimEntries);
-                productListingDTO.ImageURLs.AddRange(imageArr);
-                productListingDTO.Sizes.AddRange(sizeArr);
-                productListingDTO.Colors.AddRange(colorArr);
+                if (!product.ImageURLs.IsNullOrEmpty())
+                {
+                    string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
+                    productListingDTO.ImageURLs.AddRange(imageArr);
+                }
+                else productListingDTO.ImageURLs = null;
+                if (!product.Sizes.IsNullOrEmpty())
+                {
+                    string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
+                    productListingDTO.Sizes.AddRange(sizeArr);
+                }
+                else productListingDTO.Sizes = null;
+                if (!product.Colors.IsNullOrEmpty())
+                {
+                    string[] colorArr = product.Colors.Split(",", StringSplitOptions.TrimEntries);
+                    productListingDTO.Colors.AddRange(colorArr);
+                }
+                else productListingDTO.Colors = null;
                 productListingDTOs.Add(productListingDTO);
             }
 
