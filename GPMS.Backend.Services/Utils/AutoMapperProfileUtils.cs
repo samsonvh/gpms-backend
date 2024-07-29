@@ -112,24 +112,38 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionProcessStepIODTO => productionProcessStepIODTO.SemiFinishedProductName,
                                 opt => opt.MapFrom(productionProcessStepIO => productionProcessStepIO.SemiFinishedProduct.Name));
 
-            //ProductionPlan
-            CreateMap<ProductionPlanInputDTO, ProductionPlan>();
+            //Production Plan
+            CreateMap<ProductionPlanInputDTO, ProductionPlan>()
+            .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
+            .ForMember(productionPlan => productionPlan.ProductionRequirements, options => options.Ignore());
             CreateMap<ProductionPlan, ProductionPlanDTO>()
-                .ForMember(dest => dest.ProductionRequirementDTOs, opt => opt.MapFrom(src => src.ProductionRequirements)); ;
-
+                .ForMember(productionPlanDTO => productionPlanDTO.CreatorName, opt => opt.MapFrom(productionPlan => productionPlan.Creator.FullName))
+                .ForMember(productionPlanDTO => productionPlanDTO.ReviewerName, opt => opt.MapFrom(productionPlan => productionPlan.Reviewer.FullName))
+                .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(productionPlan => productionPlan.ProductionRequirements))
+                .ForMember(productionPlanDTO => productionPlanDTO.ParentProductionPlan, opt => opt.Ignore())
+            .ForMember(productionPlanDTO => productionPlanDTO.ChildProductionPlans, opt => opt.Ignore());
+            //take 
             CreateMap<ProductionProcessStepIO, ProductionProcessStepIODTO>();
 
             //Produciton Requirement
-            CreateMap<ProductionRequirementInputDTO, ProductionRequirement>();
+            //CreateMap<ProductionRequirementInputDTO, ProductionRequirement>()
+            //    .ForMember(productionRequirement => productionRequirement.ProductionEstimations, options => options.Ignore());
             CreateMap<ProductionRequirement, ProductionRequirementDTO>()
-                .ForMember(dest => dest.ProductSpecificationDTO, opt => opt.MapFrom(src => src.ProductSpecification))
-                .ForMember(dest => dest.ProductionEstimationDTOs, opt => opt.MapFrom(src => src.ProductionEstimations));
+                //take
+                .ForMember(dest => dest.ProductSpecification, opt => opt.MapFrom(src => src.ProductSpecification))
+                .ForMember(dest => dest.ProductionEstimations, opt => opt.Ignore());
+
             //Production Estimation
             CreateMap<ProductionEstimation, ProductionEstimationDTO>()
-                .ForMember(dest => dest.ProductionSeriesDTOs, opt => opt.MapFrom(src => src.ProductionSeries));
-
+                /*.ForMember(dest => dest.ProductionSeries, opt => opt.Ignore())*/;
+            CreateMap<ProductionEstimationInputDTO, ProductionEstimation>()
+                .ForMember(productionEstimation => productionEstimation.ProductionSeries, options => options.Ignore())
+                .ForMember(productionEstimation => productionEstimation.Quarter, options => options.Ignore())
+                .ForMember(productionEstimation => productionEstimation.Month, options => options.Ignore());
             //Production Series
-            CreateMap<ProductionSeriesInputDTO, ProductionSeries>();
+            CreateMap<ProductionSeriesInputDTO, ProductionSeries>()
+                .ForMember(productionSeries => productionSeries.CurrentProcess, options => options.Ignore())
+                .ForMember(productionSeries => productionSeries.FaultyQuantity, options => options.Ignore());
             CreateMap<ProductionSeries, ProductionSeriesDTO>();
             CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
         }

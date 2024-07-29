@@ -20,14 +20,14 @@ namespace GPMS.Backend.Services.DTOs
         public DateTime DueDate { get; set; }
         public DateTime? ActualStartingDate { get; set; }
         public DateTime? CompletionDate { get; set; }
-        public ProductionPlanType Type { get; set; }
+        public string Type { get; set; }
         public DateTime CreatedDate { get; set; }
-        public ProductionPlanStatus Status { get; set; }
+        public string Status { get; set; }
 
-        public Guid CreatorId { get; set; }
-        public Guid? ReviewerId { get; set; }
-        public Guid? ParentProductionPlanId { get; set; }
-
-        public List<ProductionRequirementDTO> ProductionRequirementDTOs { get; set; }
+        public string CreatorName { get; set; }
+        public string? ReviewerName { get; set; }
+        public ProductionPlanDTO? ParentProductionPlan { get; set; }
+        public List<ProductionPlanDTO> ChildProductionPlans { get; set; }
+        public List<ProductionRequirementDTO> ProductionRequirements { get; set; }
     }
 }

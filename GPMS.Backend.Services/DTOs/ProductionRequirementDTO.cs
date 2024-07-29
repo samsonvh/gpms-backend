@@ -14,8 +14,8 @@ namespace GPMS.Backend.Services.DTOs
         public Guid Id { get; set; }
         public int Quantity { get; set; }
 
-        public SpecificationDTO ProductSpecificationDTO { get; set; }
-        public List<ProductionEstimationDTO> ProductionEstimationDTOs { get; set; } = new List<ProductionEstimationDTO>();
+        public SpecificationDTO ProductSpecification { get; set; }
+        public List<ProductionEstimationDTO> ProductionEstimations { get; set; } = new List<ProductionEstimationDTO>();
 
     }
 }

@@ -9,8 +9,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan
     public class ProductionSeriesInputDTO
     {
         public string Code { get; set; }
-        public string Quantity { get; set; }
-        public int? FaultyQuantity { get; set; }
-        public string? CurrentProcess { get; set; }
+        public int Quantity { get; set; }
     }
 }

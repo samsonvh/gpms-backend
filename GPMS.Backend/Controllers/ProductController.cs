@@ -23,13 +23,16 @@ namespace GPMS.Backend.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IProductService _productService;
         private readonly IMapper _mapper;
+        private readonly CurrentLoginUserDTO _currentLoginUser;
 
         public ProductController(ILogger<ProductController> logger, 
-        IProductService productService, IMapper mapper)
+        IProductService productService, IMapper mapper,
+        CurrentLoginUserDTO currentLoginUser)
         {
             _logger = logger;
             _productService = productService;
             _mapper = mapper;
+            _currentLoginUser = currentLoginUser;
         }
         [HttpPost]
         [Route(APIEndPoint.PRODUCTS_V1)]
@@ -40,8 +43,8 @@ namespace GPMS.Backend.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> DefineProduct([FromForm] ProductInputDTO productInputDTO)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            CreateUpdateResponseDTO<Product> result = await _productService.Add(productInputDTO, currentLoginUserDTO);
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
+            CreateUpdateResponseDTO<Product> result = await _productService.Add(productInputDTO);
             BaseReponse baseReponse = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
@@ -71,6 +74,7 @@ namespace GPMS.Backend.Controllers
         [Authorize("Factory Director")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
         {
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
             var product = await _productService.ChangeStatus(id, status);
             var responseData = new ChangeStatusResponseDTO<Product, ProductStatus>
             {

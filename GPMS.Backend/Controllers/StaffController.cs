@@ -21,11 +21,15 @@ namespace GPMS.Backend.Controllers
     {
         private readonly IStaffService _staffService;
         private readonly ILogger<StaffController> _logger;
+        private readonly CurrentLoginUserDTO _currentLoginUser;
 
-        public StaffController(IStaffService staffService, ILogger<StaffController> logger)
+        public StaffController(IStaffService staffService,
+        ILogger<StaffController> logger,
+        CurrentLoginUserDTO currentLoginUser)
         {
             _staffService = staffService;
             _logger = logger;
+            _currentLoginUser = currentLoginUser;
         }
 
         [HttpGet]
@@ -50,8 +54,8 @@ namespace GPMS.Backend.Controllers
         [Authorize(Roles = "Manager, Admin")]
         public async Task<IActionResult> Details(Guid id)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            var deparment = await _staffService.Details(id, currentLoginUserDTO);
+            _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
+            var deparment = await _staffService.Details(id);
             BaseReponse baseReponse = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,

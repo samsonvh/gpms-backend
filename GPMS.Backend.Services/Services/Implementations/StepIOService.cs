@@ -101,12 +101,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                EntityListError entityListError = new EntityListError
-                {
-                    Entity = typeof(StepInputDTO).Name,
-                    Errors = errors
-                };
-                _entityListErrorWrapper.EntityListErrors.Add(entityListError);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors,_entityListErrorWrapper);
             }
         }
     }
