@@ -49,11 +49,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public async Task AddList
-        (List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId)
+        (List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId, Guid productionPlanId)
         {
             ServiceUtils.ValidateInputDTOList<ProductionEstimationInputDTO, ProductionEstimation>
                 (inputDTOs, _productionEstimationValidator, _entityListErrorWrapper);
-            ProductionPlan productionPlan = _productionPlanRepository.GetUnAddedEntity();
+            ProductionPlan productionPlan = _productionPlanRepository.GetUnAddedEntityById(productionPlanId);
             ProductionRequirement productionRequirement = _productionRequirementRepository.GetUnAddedEntityById(productionRequirementId);
             CheckEstimationQuantityWithRequirementEntity(inputDTOs, productionRequirement);
             foreach (ProductionEstimationInputDTO inputDTO in inputDTOs)

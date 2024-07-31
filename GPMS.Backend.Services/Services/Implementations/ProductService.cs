@@ -18,7 +18,9 @@ using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 using GPMS.Backend.Services.PageRequests;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using GPMS.Backend.Data.Models.Staffs;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -38,7 +40,9 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
         private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
+        private readonly IGenericRepository<Staff> _staffRepository;
         private readonly CurrentLoginUserDTO _currentLoginUser;
+
         public ProductService(
         IGenericRepository<Product> productRepository,
         IGenericRepository<QualityStandard> qualityStandardRepository,
@@ -53,7 +57,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
         StepIOInputDTOWrapper stepIOInputDTOWrapper,
-        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper,
+        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper, 
+        IGenericRepository<Staff> staffRepository,
         CurrentLoginUserDTO currentLoginUser
         )
         {
@@ -71,8 +76,95 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
+            _staffRepository = staffRepository;
             _currentLoginUser = currentLoginUser;
         }
+
+
+
+        public Task AddList(List<ProductInputDTO> inputDTOs, Guid? parentId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ProductDTO> Details(Guid id)
+        {
+            var product = await _productRepository
+                .Search(product => product.Id == id)
+                .Include(product => product.Category)
+                .Include(product => product.SemiFinishedProducts)
+                .Include(product => product.Specifications)
+                    .ThenInclude(specifications => specifications.Measurements)
+                .Include(product => product.Specifications)
+                    .ThenInclude(specifications => specifications.BillOfMaterials)
+                        .ThenInclude(bom => bom.Material)
+                .Include(product => product.Specifications)
+                    .ThenInclude(specifications => specifications.QualityStandards)
+                .Include(product => product.ProductionProcesses)
+                    .ThenInclude(productionProcess => productionProcess.Steps)
+                        .ThenInclude(step => step.ProductionProcessStepIOs)
+                .Include(product => product.Creator)
+                .Include(product => product.Reviewer)
+                .FirstOrDefaultAsync();
+
+            if (product == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
+            }
+
+            var productDTO = new ProductDTO
+            {
+                Id = product.Id,
+                Code = product.Code,
+                Name = product.Name,
+                Description = product.Description,
+                Sizes = !string.IsNullOrEmpty(product.Sizes) ? product.Sizes.Split(',').Select(size => size.Trim()).ToList() : new List<string>(),
+                Colors = !string.IsNullOrEmpty(product.Colors) ? product.Colors.Split(',').Select(color => color.Trim()).ToList() : new List<string>(),
+                ImageURLs = !string.IsNullOrEmpty(product.ImageURLs) ? product.ImageURLs.Split(';').Select(imageURL => imageURL.Trim()).ToList() : new List<string>(),
+                CreatedDate = product.CreatedDate,
+                Status = product.Status.ToString(),
+                CreatorName = product.Creator.FullName,
+                ReviewerName = product.Reviewer?.FullName,
+                Category = _mapper.Map<CategoryDTO>(product.Category),
+                SemiFinishedProducts = _mapper.Map<List<SemiFinishedProductDTO>>(product.SemiFinishedProducts),
+
+                Specifications = _mapper.Map<List<SpecificationDTO>>(product.Specifications),
+                
+                Processes = _mapper.Map<List<ProcessDTO>>(product.ProductionProcesses)
+            };
+            foreach (ProductSpecification specification in product.Specifications) 
+            {
+                foreach (QualityStandard qualityStandard in specification.QualityStandards)
+                {
+                    if (!qualityStandard.ImageURL.IsNullOrEmpty())
+                    {
+                        QualityStandardDTO qualityStandardDTO = productDTO.Specifications
+                        .FirstOrDefault(specificationDTO => specificationDTO.Id.Equals(specification.Id))
+                        .QualityStandards.FirstOrDefault(qualityStandardDTO => qualityStandardDTO.Id.Equals(qualityStandard.Id));
+                        qualityStandardDTO.ImageURL.AddRange(qualityStandard.ImageURL.Split(";", StringSplitOptions.TrimEntries));
+                    }
+                }
+            }
+            return productDTO;
+        }
+
+        public Task<List<ProductListingDTO>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+            
+        public Task<CreateUpdateResponseDTO<Product>> Update(ProductInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateList(List<ProductInputDTO> inputDTOs)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
         #region Add Product
         public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
         {
@@ -266,12 +358,24 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (Product product in productList)
             {
                 ProductListingDTO productListingDTO = _mapper.Map<ProductListingDTO>(product);
-                string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
-                string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
-                string[] colorArr = product.Colors.Split(",", StringSplitOptions.TrimEntries);
-                productListingDTO.ImageURLs.AddRange(imageArr);
-                productListingDTO.Sizes.AddRange(sizeArr);
-                productListingDTO.Colors.AddRange(colorArr);
+                if (!product.ImageURLs.IsNullOrEmpty())
+                {
+                    string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
+                    productListingDTO.ImageURLs.AddRange(imageArr);
+                }
+                else productListingDTO.ImageURLs = null;
+                if (!product.Sizes.IsNullOrEmpty())
+                {
+                    string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
+                    productListingDTO.Sizes.AddRange(sizeArr);
+                }
+                else productListingDTO.Sizes = null;
+                if (!product.Colors.IsNullOrEmpty())
+                {
+                    string[] colorArr = product.Colors.Split(",", StringSplitOptions.TrimEntries);
+                    productListingDTO.Colors.AddRange(colorArr);
+                }
+                else productListingDTO.Colors = null;
                 productListingDTOs.Add(productListingDTO);
             }
 

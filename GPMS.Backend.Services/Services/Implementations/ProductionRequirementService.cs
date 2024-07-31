@@ -59,7 +59,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionRequirement.ProductSpecificationId = inputDTO.ProductionSpecificationId;
 
                 _productionRequirementRepository.Add(productionRequirement);
-                await _productionEstimationService.AddList(inputDTO.ProductionEstimations, productionRequirement.Id);
+                await _productionEstimationService.AddList(inputDTO.ProductionEstimations, productionRequirement.Id, productionPlanId);
             }
 
         }

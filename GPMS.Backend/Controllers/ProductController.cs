@@ -2,6 +2,7 @@ using System.Net;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using AutoMapper;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
@@ -53,12 +54,24 @@ namespace GPMS.Backend.Controllers
             return Ok(baseReponse);
         }
 
+        [HttpGet]
+        [Route(APIEndPoint.PRODUCTS_ID_V1)]
+        [SwaggerOperation(Summary = "Get details product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get Details Product Successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Product not found", typeof(BaseReponse))]
+        [Produces("application/json")]
+        public async Task<IActionResult> Details([FromRoute] Guid id)
+        {
+            var product = await _productService.Details(id);
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of product sucessfully", Data = product });
+        }
         [HttpPatch]
         [Route(APIEndPoint.PRODUCTS_ID_V1)]
         [SwaggerOperation(Summary = "Change status of product")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of product successfully", typeof(BaseReponse))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
+        [Authorize("Factory Director")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
