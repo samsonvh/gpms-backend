@@ -48,17 +48,40 @@ namespace GPMS.Backend.Services.Services.Implementations
             _productionSeriesService = productionSeriesService;
         }
 
-        public async Task AddList
+        public async Task AddEstimationListForAnnualProductionPlan
         (List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId, Guid productionPlanId)
         {
             ServiceUtils.ValidateInputDTOList<ProductionEstimationInputDTO, ProductionEstimation>
                 (inputDTOs, _productionEstimationValidator, _entityListErrorWrapper);
             ProductionPlan productionPlan = _productionPlanRepository.GetUnAddedEntityById(productionPlanId);
             ProductionRequirement productionRequirement = _productionRequirementRepository.GetUnAddedEntityById(productionRequirementId);
-            CheckEstimationQuantityWithRequirementEntity(inputDTOs, productionRequirement);
+            CheckTotalEstimationQuantityWithRequirementEntity(inputDTOs, productionRequirement);
+            ValidateTimeInEstimationInputDTO(inputDTOs, productionPlan);
             foreach (ProductionEstimationInputDTO inputDTO in inputDTOs)
             {
-                ValidateTimeInEstimationInputDTO(inputDTO, inputDTOs.IndexOf(inputDTO) + 1, productionPlan);
+                CheckSeriesExistInEstimation(inputDTO, inputDTOs.IndexOf(inputDTO) + 1, productionPlan);
+                ProductionEstimation productionEstimation = _mapper.Map<ProductionEstimation>(inputDTO);
+                productionEstimation.ProductionRequirementId = productionRequirementId;
+                _productionEstimationRepository.Add(productionEstimation);
+                if (productionPlan.Type.Equals(ProductionPlanType.Batch))
+                {
+                    await _productionSeriesService.AddList(inputDTO.ProductionSeries, productionEstimation.Id);
+                }
+            }
+        }
+
+        public async Task AddEstimationListForChildProductionPlan
+            (List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId, Guid productionPlanId)
+        {
+            ServiceUtils.ValidateInputDTOList<ProductionEstimationInputDTO, ProductionEstimation>
+                (inputDTOs, _productionEstimationValidator, _entityListErrorWrapper);
+            ProductionPlan productionPlan = _productionPlanRepository.GetUnAddedEntityById(productionPlanId);
+            ProductionRequirement productionRequirement = _productionRequirementRepository.GetUnAddedEntityById(productionRequirementId);
+            // CheckTotalEstimationWithProductionPlanTime(inputDTOs,productionPlan);
+            CheckTotalEstimationQuantityWithRequirementEntity(inputDTOs, productionRequirement);
+            ValidateTimeInEstimationInputDTO(inputDTOs, productionPlan);
+            foreach (ProductionEstimationInputDTO inputDTO in inputDTOs)
+            {
                 CheckSeriesExistInEstimation(inputDTO, inputDTOs.IndexOf(inputDTO) + 1, productionPlan);
                 ProductionEstimation productionEstimation = _mapper.Map<ProductionEstimation>(inputDTO);
                 productionEstimation.ProductionRequirementId = productionRequirementId;
@@ -84,7 +107,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 });
             }
             else if (!productionPlan.Type.Equals(ProductionPlanType.Batch)
-                    &&  inputDTO.ProductionSeries.Count > 0)
+                    && inputDTO.ProductionSeries.Count > 0)
             {
                 errors.Add(new FormError
                 {
@@ -99,7 +122,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        private void CheckEstimationQuantityWithRequirementEntity(
+        private void CheckTotalEstimationQuantityWithRequirementEntity(
             List<ProductionEstimationInputDTO> inputDTOs, ProductionRequirement productionRequirement)
         {
             List<FormError> errors = new List<FormError>();
@@ -122,164 +145,201 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        private void ValidateTimeInEstimationInputDTO(
-            ProductionEstimationInputDTO inputDTO, int entityOrder, ProductionPlan productionPlan)
+        private void ValidateTimeInEstimationInputDTO
+        (List<ProductionEstimationInputDTO> inputDTOs, ProductionPlan productionPlan)
         {
-
             ProductionPlanType productionPlanType = productionPlan.Type;
             List<FormError> errors = new List<FormError>();
-            //Production Plan Type is Year
-            if (productionPlanType.Equals(ProductionPlanType.Year))
+            foreach (ProductionEstimationInputDTO inputDTO in inputDTOs)
             {
-                if (!inputDTO.Quarter.IsNullOrEmpty())
+                int entityOrder = inputDTOs.IndexOf(inputDTO) + 1;
+                //Production Plan Type is Year
+                if (productionPlanType.Equals(ProductionPlanType.Year))
                 {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
-                        Property = "Quarter"
-                    });
-                }
-                if (inputDTO.Month.IsNullOrEmpty())
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Month can not be null when Production Plan Type is {productionPlanType}",
-                        Property = "Month"
-                    });
-                }
-                if (!inputDTO.Month.IsNullOrEmpty() && !Enum.TryParse(typeof(Month), inputDTO.Month, true, out _))
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Invalid Month",
-                        Property = "Month"
-                    });
-                }
-                if (inputDTO.Batch.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Batch must null when Production Plan Type is {productionPlanType}",
-                        Property = "Batch"
-                    });
-                }
-                if (inputDTO.DayNumber.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"DayNumber must null when Production Plan Type is {productionPlanType}",
-                        Property = "DayNumber"
-                    });
-                }
-            }
-            //Production Plan Type is Month
-            else if (productionPlanType.Equals(ProductionPlanType.Month))
-            {
-                if (!inputDTO.Quarter.IsNullOrEmpty())
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
-                        Property = "Quarter"
-                    });
-                }
-                if (!inputDTO.Month.IsNullOrEmpty())
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Month must null when Production Plan Type is {productionPlanType}",
-                        Property = "Month"
-                    });
-                }
-                if (!inputDTO.Batch.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Batch can not be null when Production Plan Type is {productionPlanType}",
-                        Property = "Batch"
-                    });
-                }
-                if (inputDTO.Batch.HasValue && inputDTO.Batch <= 0)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = "Batch must greater than 0",
-                        Property = "Batch"
-                    });
-                }
-                if (inputDTO.DayNumber.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"DayNumber must null when Production Plan Type is {productionPlanType}",
-                        Property = "DayNumber"
-                    });
-                }
-            }
-            //Production Plan Type is Batch
-            else if (productionPlanType.Equals(ProductionPlanType.Batch))
-            {
-                if (!inputDTO.Quarter.IsNullOrEmpty())
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
-                        Property = "Quarter"
-                    });
-                }
-                if (!inputDTO.Month.IsNullOrEmpty())
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Month must null when Production Plan Type is {productionPlanType}",
-                        Property = "Month"
-                    });
-                }
-                if (inputDTO.Batch.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"Batch must null when Production Plan Type is {productionPlanType}",
-                        Property = "Batch"
-                    });
-                }
-                if (!inputDTO.DayNumber.HasValue)
-                {
-                    errors.Add(new FormError
-                    {
-                        EntityOrder = entityOrder,
-                        ErrorMessage = $"DayNumber can not be null when Production Plan Type is {productionPlanType}",
-                        Property = "DayNumber"
-                    });
-                }
-                else
-                {
-                    //lát khi viết tới add production plan child thì chỉnh tiếp chỗ này 
-                    if (inputDTO.DayNumber > 0)
+                    if (!inputDTO.Quarter.IsNullOrEmpty())
                     {
                         errors.Add(new FormError
                         {
                             EntityOrder = entityOrder,
-                            ErrorMessage = "DayNumber must greater than 0",
+                            ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
+                            Property = "Quarter"
+                        });
+                    }
+                    if (inputDTO.Month.IsNullOrEmpty())
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Month can not be null when Production Plan Type is {productionPlanType}",
+                            Property = "Month"
+                        });
+                    }
+                    else
+                    {
+                        if (!inputDTO.Month.IsNullOrEmpty() && !Enum.TryParse(typeof(Month), inputDTO.Month, true, out _))
+                        {
+                            errors.Add(new FormError
+                            {
+                                EntityOrder = entityOrder,
+                                ErrorMessage = $"Invalid Month",
+                                Property = "Month"
+                            });
+                        }
+                    }
+                    if (inputDTO.Batch.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Batch must null when Production Plan Type is {productionPlanType}",
+                            Property = "Batch"
+                        });
+                    }
+                    if (inputDTO.DayNumber.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"DayNumber must null when Production Plan Type is {productionPlanType}",
                             Property = "DayNumber"
                         });
                     }
                 }
+                //Production Plan Type is Month
+                else if (productionPlanType.Equals(ProductionPlanType.Month))
+                {
+                    if (!inputDTO.Quarter.IsNullOrEmpty())
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
+                            Property = "Quarter"
+                        });
+                    }
+                    if (!inputDTO.Month.IsNullOrEmpty())
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Month must null when Production Plan Type is {productionPlanType}",
+                            Property = "Month"
+                        });
+                    }
+                    if (!inputDTO.Batch.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Batch can not be null when Production Plan Type is {productionPlanType}",
+                            Property = "Batch"
+                        });
+                    }
+                    if (inputDTO.Batch.HasValue && inputDTO.Batch <= 0)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = "Batch must greater than 0",
+                            Property = "Batch"
+                        });
+                    }
+                    if (inputDTO.DayNumber.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"DayNumber must null when Production Plan Type is {productionPlanType}",
+                            Property = "DayNumber"
+                        });
+                    }
+                }
+                //Production Plan Type is Batch
+                else if (productionPlanType.Equals(ProductionPlanType.Batch))
+                {
+                    if (!inputDTO.Quarter.IsNullOrEmpty())
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Quarter must null when Production Plan Type is {productionPlanType}",
+                            Property = "Quarter"
+                        });
+                    }
+                    if (!inputDTO.Month.IsNullOrEmpty())
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Month must null when Production Plan Type is {productionPlanType}",
+                            Property = "Month"
+                        });
+                    }
+                    if (inputDTO.Batch.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"Batch must null when Production Plan Type is {productionPlanType}",
+                            Property = "Batch"
+                        });
+                    }
+                    if (!inputDTO.DayNumber.HasValue)
+                    {
+                        errors.Add(new FormError
+                        {
+                            EntityOrder = entityOrder,
+                            ErrorMessage = $"DayNumber can not be null when Production Plan Type is {productionPlanType}",
+                            Property = "DayNumber"
+                        });
+                    }
+                    else
+                    {
+                        //lát khi viết tới add production plan child thì chỉnh tiếp chỗ này 
+                        if (inputDTO.DayNumber <= 0)
+                        {
+                            errors.Add(new FormError
+                            {
+                                EntityOrder = entityOrder,
+                                ErrorMessage = "DayNumber must greater than 0",
+                                Property = "DayNumber"
+                            });
+                        }
+                    }
+                }
             }
-            entityOrder++;
+
+            if (errors.Count == 0)
+            {
+                //Check duplication time in estimation
+                //TH Production Plan Type Year
+                if (productionPlanType.Equals(ProductionPlanType.Year))
+                {
+                    ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductionEstimationInputDTO, ProductionEstimation>(inputDTOs, "Month", _entityListErrorWrapper);
+                    foreach (ProductionEstimationInputDTO inputDTO in inputDTOs)
+                    {
+                        Enum.TryParse(inputDTO.Month, true, out int parsedResult);
+                        if (parsedResult < productionPlan.ExpectedStartingDate.Month
+                            || parsedResult > productionPlan.DueDate.Month)
+                        {
+                            errors.Add(new FormError
+                            {
+                                EntityOrder = inputDTOs.IndexOf(inputDTO),
+                                ErrorMessage = $"Production Estimation list with Month : {inputDTO.Month} not in Production Plan duration",
+                                Property = "Month"
+                            });
+                        }
+                    }
+                }
+                else if (productionPlanType.Equals(ProductionPlanType.Month))
+                {
+
+                }
+                else
+                {
+
+                }
+            }
             if (errors.Count > 0)
             {
                 ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionEstimation>(errors, _entityListErrorWrapper);

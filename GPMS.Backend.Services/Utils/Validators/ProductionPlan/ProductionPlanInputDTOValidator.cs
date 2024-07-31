@@ -44,6 +44,15 @@ namespace GPMS.Backend.Services.Utils.Validators
                 .WithMessage("Due Date is required");
             RuleFor(inputDTO => inputDTO.DueDate).GreaterThan(inputDTO => inputDTO.StartingDate)
                 .WithMessage("Due Date must greater than Starting Date");
+            RuleFor(inputDTO => inputDTO.DueDate.Year).Equal(inputDTO => inputDTO.StartingDate.Year)
+                .WithMessage("Due Date and Starting Date must be in the same year");
+            RuleFor(inputDTO => inputDTO.DueDate.Day > inputDTO.StartingDate.Day
+                        ? inputDTO.DueDate.Month - inputDTO.StartingDate.Month
+                        : inputDTO.DueDate.Month - inputDTO.StartingDate.Month - 1)
+                .GreaterThan(1)
+                .LessThanOrEqualTo(12)
+                .When(inputDTO => inputDTO.Type.Equals(ProductionPlanType.Year))
+                .WithMessage("Year Production Plan time must longer than 1 month and not longer than 12 months");
 
             RuleFor(inputDTO => inputDTO.Type).IsEnumName(typeof(ProductionPlanType), false)
                 .When(inputDTO => !inputDTO.Type.IsNullOrEmpty())

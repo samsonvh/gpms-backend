@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Statuses.Products;
+using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.Specifications;
@@ -25,6 +26,7 @@ namespace GPMS.Backend.Services.Services.Implementations
     {
         private readonly IGenericRepository<ProductionRequirement> _productionRequirementRepository;
         private readonly IGenericRepository<ProductSpecification> _productSpecificationRepository;
+        private readonly IGenericRepository<ProductionPlan> _productionPlanRepository;
         private readonly IMapper _mapper;
         private readonly IValidator<ProductionRequirementInputDTO> _productionRequirementValidator;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
@@ -33,6 +35,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public ProductionRequirementService(
             IGenericRepository<ProductionRequirement> productionRequirementRepository,
             IGenericRepository<ProductSpecification> productSpecificationRepository,
+            IGenericRepository<ProductionPlan> productionPlanRepository,
             IMapper mapper,
             IValidator<ProductionRequirementInputDTO> productionRequirementValidator,
             EntityListErrorWrapper entityListErrorWrapper,
@@ -40,13 +43,14 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             _productionRequirementRepository = productionRequirementRepository;
             _productSpecificationRepository = productSpecificationRepository;
+            _productionPlanRepository = productionPlanRepository;
             _mapper = mapper;
             _productionRequirementValidator = productionRequirementValidator;
             _entityListErrorWrapper = entityListErrorWrapper;
             _productionEstimationService = productionEstimationService;
         }
 
-        public async Task AddList(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId)
+        public async Task AddRequirementListForAnnualProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId)
         {
             ServiceUtils.ValidateInputDTOList<ProductionRequirementInputDTO, ProductionRequirement>
                 (inputDTOs, _productionRequirementValidator, _entityListErrorWrapper);
@@ -59,10 +63,32 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionRequirement.ProductSpecificationId = inputDTO.ProductionSpecificationId;
 
                 _productionRequirementRepository.Add(productionRequirement);
-                await _productionEstimationService.AddList(inputDTO.ProductionEstimations, productionRequirement.Id, productionPlanId);
+                await _productionEstimationService.AddEstimationListForAnnualProductionPlan(inputDTO.ProductionEstimations, productionRequirement.Id, productionPlanId);
+
             }
 
         }
+
+        public async Task AddRequirementListForChildProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId)
+        {
+            ServiceUtils.ValidateInputDTOList<ProductionRequirementInputDTO, ProductionRequirement>
+                (inputDTOs, _productionRequirementValidator, _entityListErrorWrapper);
+            foreach (ProductionRequirementInputDTO inputDTO in inputDTOs)
+            {
+                await ValidateSpecification(inputDTO.ProductionSpecificationId, inputDTOs.IndexOf(inputDTO) + 1);
+
+                var productionRequirement = _mapper.Map<ProductionRequirement>(inputDTO);
+                productionRequirement.ProductionPlanId = productionPlanId;
+                productionRequirement.ProductSpecificationId = inputDTO.ProductionSpecificationId;
+
+                _productionRequirementRepository.Add(productionRequirement);
+                await _productionEstimationService
+                    .AddEstimationListForChildProductionPlan
+                    (inputDTO.ProductionEstimations, productionRequirement.Id, productionPlanId);
+            }
+        }
+
+
 
         private async Task ValidateSpecification(Guid productSpecificationId, int entityOrder)
         {
@@ -83,7 +109,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             else
             {
-                if (!(productionSpecification.Product.Status.Equals(ProductStatus.Approved) 
+                if (!(productionSpecification.Product.Status.Equals(ProductStatus.Approved)
                     || productionSpecification.Product.Status.Equals(ProductStatus.InProduction)))
                 {
                     errors.Add(new FormError
@@ -96,7 +122,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionRequirement>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionRequirement>(errors, _entityListErrorWrapper);
             }
         }
     }
