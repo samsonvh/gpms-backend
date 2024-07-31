@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
+using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
@@ -12,9 +13,11 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Services.Utils.Validators;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,5 +238,82 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest)
+        {
+            IQueryable<ProductionPlan> query = _productionPlanRepository.GetAll();
+            query = Filter(query, productionPlanPageRequest);
+            query = query.SortByAndPaging(productionPlanPageRequest);
+            List<ProductionPlan> productionPlanList = await query.ToListAsync();
+            int totalItem = productionPlanList.Count;
+            productionPlanList = productionPlanList.PagingEntityList(productionPlanPageRequest);
+            List<ProductionPlanListingDTO> productionPlanListingDTOs = new List<ProductionPlanListingDTO>();
+            foreach(ProductionPlan productionPlan in productionPlanList)
+            {
+                ProductionPlanListingDTO productionPlanListingDTO = _mapper.Map<ProductionPlanListingDTO>(productionPlan);
+                productionPlanListingDTOs.Add(productionPlanListingDTO);
+            }
+
+            int pageCount = totalItem / productionPlanPageRequest.PageSize;
+            if (totalItem % productionPlanPageRequest.PageSize > 0)
+            {
+                pageCount += 1;
+            }
+
+            DefaultPageResponseListingDTO<ProductionPlanListingDTO> defaultPageResponseListingDTO =
+                new DefaultPageResponseListingDTO<ProductionPlanListingDTO>
+                {
+                    Data = productionPlanListingDTOs,
+                    PageCount = pageCount,
+                    PageIndex = productionPlanPageRequest.PageIndex,
+                    PageSize = productionPlanPageRequest.PageSize,
+                    TotalItem = totalItem
+                };
+            return defaultPageResponseListingDTO;
+        }
+
+        private IQueryable<ProductionPlan> Filter(IQueryable<ProductionPlan> query, ProductionPlanPageRequest productionPlanPageRequest)
+        {
+            // Lọc theo Code
+            if (!string.IsNullOrWhiteSpace(productionPlanPageRequest.Code))
+            {
+                var codeLower = productionPlanPageRequest.Code.ToLower();
+                query = query.Where(pp => pp.Code.ToLower().Contains(codeLower));
+            }
+
+            if (!string.IsNullOrWhiteSpace(productionPlanPageRequest.Name))
+            {
+                var nameLower = productionPlanPageRequest.Name.ToLower();
+                query = query.Where(pp => pp.Name.ToLower().Contains(nameLower));
+            }
+
+            if (productionPlanPageRequest.ExpectedStartingDate.HasValue)
+            {
+                var expectedStartingDate = productionPlanPageRequest.ExpectedStartingDate.Value.Date;
+                query = query.Where(pp => pp.ExpectedStartingDate.Date == expectedStartingDate);
+            }
+
+            if (productionPlanPageRequest.DueDate.HasValue)
+            {
+                var dueDate = productionPlanPageRequest.DueDate.Value.Date;
+                query = query.Where(pp => pp.DueDate.Date == dueDate);
+            }
+
+            if (!string.IsNullOrWhiteSpace(productionPlanPageRequest.Status) &&
+                Enum.TryParse<ProductionPlanStatus>(productionPlanPageRequest.Status, true, out var parsedStatus))
+            {
+                query = query.Where(pp => pp.Status == parsedStatus);
+            }
+
+            if (!string.IsNullOrWhiteSpace(productionPlanPageRequest.Type)
+                && Enum.TryParse<ProductionPlanType>(productionPlanPageRequest.Type, true, out var parsedType))
+            {
+                query = query
+                .Where(productionPlan => productionPlan.Type == parsedType);
+            }
+
+            return query;
+        }
+
     }
 }

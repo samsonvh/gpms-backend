@@ -116,7 +116,11 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductionPlanInputDTO, ProductionPlan>()
             .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
             .ForMember(productionPlan => productionPlan.ProductionRequirements, options => options.Ignore());
+            CreateMap<ProductionPlan, ProductionPlanListingDTO>();
             CreateMap<ProductionPlan, ProductionPlanDTO>()
+
+                .ForMember(dest => dest.ProductionRequirements, opt => opt.MapFrom(src => src.ProductionRequirements))
+
                 .ForMember(productionPlanDTO => productionPlanDTO.CreatorName, opt => opt.MapFrom(productionPlan => productionPlan.Creator.FullName))
                 .ForMember(productionPlanDTO => productionPlanDTO.ReviewerName, opt => opt.MapFrom(productionPlan => productionPlan.Reviewer.FullName))
                 .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(productionPlan => productionPlan.ProductionRequirements))
