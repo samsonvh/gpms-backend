@@ -13,6 +13,10 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
+using GPMS.Backend.Data.Models.Requests;
+using GPMS.Backend.Data.Enums.Statuses.Requests;
+using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
@@ -150,6 +154,24 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionSeries => productionSeries.FaultyQuantity, options => options.Ignore());
             CreateMap<ProductionSeries, ProductionSeriesDTO>();
             CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
+
+            //WarehouseRequest
+            CreateMap<WarehouseRequestInputDTO, WarehouseRequest>();
+            CreateMap<WarehouseRequest, CreateUpdateResponseDTO<WarehouseRequest>>();
+            CreateMap<WarehouseRequest, WarehouseRequestDTO>()
+                .ForMember(warehouseRequestDto => warehouseRequestDto.WarehouseTicket, options => options.MapFrom(warehouseRequest => warehouseRequest.WarehouseTicket));
+
+            //WarehouseRequest Requirement
+            CreateMap<WarehouseRequestRequirement, CreateUpdateResponseDTO<WarehouseRequestRequirement>>();
+            CreateMap<WarehouseRequestRequirementInputDTO, WarehouseRequestRequirement>()
+                .ForMember(warehouseRequestRequirement => warehouseRequestRequirement.ProductionRequirementId, opt => opt.MapFrom(dto => dto.ProducitonRequirementId));
+            CreateMap<WarehouseRequest, ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>>();
+
+            //warehouseTicket
+            CreateMap<WarehouseTicket, WarehouseTicketDTO>()
+                .ForMember(warehouseTicketDto => warehouseTicketDto.ProductSpeccificationId,
+                                opt => opt.MapFrom(warehouseTicket => warehouseTicket.ProductSpecificationId));
+
         }
     }
 }

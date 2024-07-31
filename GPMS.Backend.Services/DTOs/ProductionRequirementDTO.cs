@@ -1,3 +1,5 @@
+
+using System;
 ﻿using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Models.Requests;
@@ -13,7 +15,6 @@ namespace GPMS.Backend.Services.DTOs
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }
-
         public SpecificationDTO ProductSpecification { get; set; }
         public List<ProductionEstimationDTO> ProductionEstimations { get; set; } = new List<ProductionEstimationDTO>();
 

@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GPMS.Backend.Services.DTOs.ResponseDTOs
+namespace GPMS.Backend.Services.DTOs.InputDTOs
 {
-    public class ChangeStatusResponseDTO<Model, S> where Model : class
+    public class ChangeStatusInputDTO
     {
-        public Guid Id { get; set; }
         public string Status { get; set; }
+        public string? Description { get; set; }
     }
 }
