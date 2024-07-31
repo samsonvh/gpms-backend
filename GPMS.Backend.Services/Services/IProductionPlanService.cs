@@ -10,13 +10,19 @@ using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface IProductionPlanService : IBaseService<ProductionPlanInputDTO, 
                                     CreateUpdateResponseDTO<ProductionPlan>, ProductionPlanListingDTO, ProductionPlanDTO> 
     {
+
+        Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest);
+
+
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddChildProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
+
     }
 }
