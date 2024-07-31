@@ -25,5 +25,6 @@ namespace GPMS.Backend.Services.Services
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddChildProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
         Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id, string productionPlanStatus);
+        Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id, string productionPlanStatus);
     }
 }

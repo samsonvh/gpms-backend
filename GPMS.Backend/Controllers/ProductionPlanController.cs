@@ -146,5 +146,24 @@ namespace GPMS.Backend.Controllers
             return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of production plan sucessfully", Data = responseData });
         }
 
+        [HttpPatch]
+        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1_START)]
+        [SwaggerOperation(Summary = "Start production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Start production plan successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Produces("application/json")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> StartProducitonPlan([FromRoute] Guid id, [FromBody] string status)
+        {
+            _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
+            var productionPlan = await _productionPlanService.StartProductionPlan(id, status);
+            var responseData = new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
+            {
+                Id = productionPlan.Id,
+                Status = productionPlan.Status
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Start production plan sucessfully", Data = responseData });
+        }
     }
 }
