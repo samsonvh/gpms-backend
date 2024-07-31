@@ -21,6 +21,7 @@ using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Data.Enums.Types;
 using FluentValidation;
 using System.Reflection.Metadata.Ecma335;
+using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 
 namespace GPMS.Backend.Controllers
 {
@@ -124,5 +125,26 @@ namespace GPMS.Backend.Controllers
             };
             return Ok(response);
         }
+
+        [HttpPatch]
+        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1)]
+        [SwaggerOperation(Summary = "Change status of production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of production plan successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Produces("application/json")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
+        {
+            _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
+            var productionPlan = await _productionPlanService.ChangeStatus(id, status);
+            var responseData = new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
+            {
+                Id = productionPlan.Id,
+                Status = productionPlan.Status
+            };
+
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of production plan sucessfully", Data = responseData });
+        }
+
     }
 }

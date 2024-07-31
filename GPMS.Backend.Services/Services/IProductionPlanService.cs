@@ -11,6 +11,7 @@ using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.PageRequests;
+using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 
 namespace GPMS.Backend.Services.Services
 {
@@ -23,6 +24,6 @@ namespace GPMS.Backend.Services.Services
 
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddChildProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
-
+        Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id, string productionPlanStatus);
     }
 }

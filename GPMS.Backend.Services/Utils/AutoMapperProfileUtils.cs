@@ -20,6 +20,7 @@ using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
+using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -130,6 +131,8 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionPlanDTO => productionPlanDTO.ProductionRequirements, opt => opt.MapFrom(productionPlan => productionPlan.ProductionRequirements))
                 .ForMember(productionPlanDTO => productionPlanDTO.ParentProductionPlan, opt => opt.Ignore())
             .ForMember(productionPlanDTO => productionPlanDTO.ChildProductionPlans, opt => opt.Ignore());
+
+            CreateMap<ProductionPlan, ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>();
             //take 
             CreateMap<ProductionProcessStepIO, ProductionProcessStepIODTO>();
 
