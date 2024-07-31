@@ -25,13 +25,16 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class ProductionPlanService : IProductionPlanService
     {
         private readonly IGenericRepository<ProductionPlan> _productionPlanRepository;
+        private readonly IGenericRepository<ProductionRequirement> _productionRequirementRepository;
         private readonly IValidator<ProductionPlanInputDTO> _productionPlanValidator;
         private readonly IMapper _mapper;
         private readonly IProductionRequirementService _productionRequirementService;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly CurrentLoginUserDTO _currentLoginUser;
 
-        public ProductionPlanService(IGenericRepository<ProductionPlan> productionPlanRepository,
+        public ProductionPlanService(
+                                    IGenericRepository<ProductionPlan> productionPlanRepository,
+                                    IGenericRepository<ProductionRequirement> productionRequirementRepository,
                                     IValidator<ProductionPlanInputDTO> productionPlanValidator,
                                     IMapper mapper,
                                     IProductionRequirementService productionRequirementService,
@@ -39,6 +42,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                                     CurrentLoginUserDTO currentLoginUser)
         {
             _productionPlanRepository = productionPlanRepository;
+            _productionRequirementRepository = productionRequirementRepository;
             _productionPlanValidator = productionPlanValidator;
             _mapper = mapper;
             _productionRequirementService = productionRequirementService;
@@ -55,7 +59,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<ProductionPlanInputDTO, ProductionPlan>
                 (inputDTOs, _productionPlanRepository, "Code", "Code", _entityListErrorWrapper);
             List<CreateUpdateResponseDTO<ProductionPlan>> productionPlanIdCodeList =
-                await HandleAddProductionPlan(inputDTOs);
+                await HandleAddAnnualProductionPlan(inputDTOs);
 
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
@@ -72,8 +76,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<ProductionPlanInputDTO, ProductionPlan>
                 (inputDTOs, _productionPlanRepository, "Code", "Code", _entityListErrorWrapper);
             List<CreateUpdateResponseDTO<ProductionPlan>> productionPlanIdCodeList =
-                await HandleAddProductionPlan(inputDTOs);
-
+                await HandleAddChildProductionPlan(inputDTOs);
+            Guid parentProductionPlanId = (Guid)inputDTOs.FirstOrDefault().ParentProductionPlanId;
+            //CheckProductionPlanRequirementQuantityWithParentProductionPlan(inputDTOs,parentProductionPlanId);
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Create Production Plan Failed", _entityListErrorWrapper);
@@ -82,7 +87,26 @@ namespace GPMS.Backend.Services.Services.Implementations
             return productionPlanIdCodeList;
         }
 
-        private async Task<List<CreateUpdateResponseDTO<ProductionPlan>>> HandleAddProductionPlan
+        private async void CheckProductionPlanRequirementQuantityWithParentProductionPlan
+            (List<ProductionPlanInputDTO> inputDTOs, Guid parentProductionPlanId)
+        {
+            
+            ProductionPlan parentProductionPlan = 
+                await _productionPlanRepository
+                    .Search(productionPlan => productionPlan.Id.Equals(parentProductionPlanId))
+                    .Include(productionPlan => productionPlan.ProductionRequirements)
+                        .ThenInclude(requirement => requirement.ProductionEstimations)
+                    .FirstOrDefaultAsync();
+
+            if (parentProductionPlan != null)
+            {
+                List<ProductionEstimation> parentEstimation = 
+                    parentProductionPlan.ProductionRequirements.SelectMany(requirement => requirement.ProductionEstimations).ToList();
+
+            }
+        }
+
+        private async Task<List<CreateUpdateResponseDTO<ProductionPlan>>> HandleAddAnnualProductionPlan
         (List<ProductionPlanInputDTO> inputDTOs)
         {
             List<CreateUpdateResponseDTO<ProductionPlan>> productionPlanIdCodeList = new List<CreateUpdateResponseDTO<ProductionPlan>>();
@@ -99,12 +123,34 @@ namespace GPMS.Backend.Services.Services.Implementations
                     Code = productionPlan.Code,
                 };
                 productionPlanIdCodeList.Add(productionPlanIdCode);
-                await _productionRequirementService.AddList(inputDTO.ProductionRequirements, productionPlan.Id);
+                await _productionRequirementService.AddRequirementListForAnnualProductionPlan(inputDTO.ProductionRequirements, productionPlan.Id);
             }
 
             return productionPlanIdCodeList;
         }
 
+        private async Task<List<CreateUpdateResponseDTO<ProductionPlan>>> HandleAddChildProductionPlan
+        (List<ProductionPlanInputDTO> inputDTOs)
+        {
+            List<CreateUpdateResponseDTO<ProductionPlan>> productionPlanIdCodeList = new List<CreateUpdateResponseDTO<ProductionPlan>>();
+            foreach (ProductionPlanInputDTO inputDTO in inputDTOs)
+            {
+                ProductionPlan productionPlan = _mapper.Map<ProductionPlan>(inputDTO);
+                productionPlan.CreatorId = _currentLoginUser.StaffId;
+                productionPlan.Type = (ProductionPlanType)Enum.Parse(typeof(ProductionPlanType), inputDTO.Type);
+                productionPlan.Status = ProductionPlanStatus.Pending;
+                _productionPlanRepository.Add(productionPlan);
+                CreateUpdateResponseDTO<ProductionPlan> productionPlanIdCode = new CreateUpdateResponseDTO<ProductionPlan>
+                {
+                    Id = productionPlan.Id,
+                    Code = productionPlan.Code,
+                };
+                productionPlanIdCodeList.Add(productionPlanIdCode);
+                await _productionRequirementService.AddRequirementListForChildProductionPlan(inputDTO.ProductionRequirements, productionPlan.Id);
+            }
+
+            return productionPlanIdCodeList;
+        }
 
         public Task AddList(List<ProductionPlanInputDTO> inputDTOs, Guid? parentEntityId = null)
         {
