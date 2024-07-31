@@ -4,6 +4,7 @@ using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
@@ -130,11 +131,22 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             var productionPlan = await _productionPlanRepository
                 .Search(productionPlan => productionPlan.Id == id)
+                .Include(productionPlan => productionPlan.ParentProductionPlan)
+                .Include(productionPlan => productionPlan.ChildProductionPlans)
                 .Include(productionPlan => productionPlan.ProductionRequirements)
                     .ThenInclude(productionRequirement => productionRequirement.ProductSpecification)
+                        .ThenInclude(productSpecification => productSpecification.Product)
                 .Include(productionPlan => productionPlan.ProductionRequirements)
                     .ThenInclude(productionRequirement => productionRequirement.ProductionEstimations)
-               .ThenInclude(productionEstimation => productionEstimation.ProductionSeries)
+                        .ThenInclude(productionEstimation => productionEstimation.ProductionSeries)
+                .Include(productionPlan => productionPlan.Creator)
+                .Include(productionPlan => productionPlan.Reviewer)
+                .Include(productionPlan => productionPlan.ParentProductionPlan.Creator)
+                .Include(productionPlan => productionPlan.ParentProductionPlan.Reviewer)
+                .Include(productionPlan => productionPlan.ChildProductionPlans)
+                    .ThenInclude(child => child.Creator)
+                .Include(productionPlan => productionPlan.ChildProductionPlans)
+                    .ThenInclude(child => child.Reviewer)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync();
 
@@ -142,8 +154,82 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.NotFound, $"Production Plan with ID: {id} not found");
             }
-            return _mapper.Map<ProductionPlanDTO>(productionPlan);
+
+            ProductionPlanDTO productionPlanDTO = _mapper.Map<ProductionPlanDTO>(productionPlan);
+
+            foreach (var requirement in productionPlanDTO.ProductionRequirements)
+            {
+                var productionRequirement = productionPlan.ProductionRequirements
+                    .FirstOrDefault(r => r.Id == requirement.Id);
+
+                if (productionRequirement != null)
+                {
+                    requirement.ProductionEstimations = productionRequirement.ProductionEstimations
+                        .Select(e => _mapper.Map<ProductionEstimationDTO>(e))
+                        .ToList();
+                }
+            }
+
+            foreach (var requirement in productionPlanDTO.ProductionRequirements)
+            {
+                requirement.ProductSpecification.Measurements = null;
+                requirement.ProductSpecification.BillOfMaterials = null;
+                requirement.ProductSpecification.QualityStandards = null;
+            }
+            return MapParentAndChildProductionPlan(productionPlanDTO, productionPlan);
         }
+
+        private ProductionPlanDTO MapParentAndChildProductionPlan(ProductionPlanDTO productionPlanDTO, ProductionPlan productionPlan)
+        {
+
+
+            if (productionPlan.ParentProductionPlan != null)
+            {
+                productionPlanDTO.ParentProductionPlan = new ProductionPlanDTO();
+                productionPlanDTO.ParentProductionPlan.Id = productionPlan.ParentProductionPlan.Id;
+                productionPlanDTO.ParentProductionPlan.Code = productionPlan.ParentProductionPlan.Code;
+                productionPlanDTO.ParentProductionPlan.Name = productionPlan.ParentProductionPlan.Name;
+                productionPlanDTO.ParentProductionPlan.Description = productionPlan.ParentProductionPlan.Description;
+                productionPlanDTO.ParentProductionPlan.ExpectedStartingDate = productionPlan.ParentProductionPlan.ExpectedStartingDate;
+                productionPlanDTO.ParentProductionPlan.DueDate = productionPlan.ParentProductionPlan.DueDate;
+                productionPlanDTO.ParentProductionPlan.ActualStartingDate = productionPlan.ParentProductionPlan.ActualStartingDate;
+                productionPlanDTO.ParentProductionPlan.CompletionDate = productionPlan.ParentProductionPlan.CompletionDate;
+                productionPlanDTO.ParentProductionPlan.Type = productionPlan.ParentProductionPlan.Type.ToString();
+                productionPlanDTO.ParentProductionPlan.CreatedDate = productionPlan.ParentProductionPlan.CreatedDate;
+                productionPlanDTO.ParentProductionPlan.Status = productionPlan.ParentProductionPlan.Status.ToString();
+
+                productionPlanDTO.ParentProductionPlan.CreatorName = productionPlan.ParentProductionPlan.Creator.FullName;
+                if (productionPlan.ParentProductionPlan.Reviewer != null)
+                    productionPlanDTO.ParentProductionPlan.ReviewerName = productionPlan.ParentProductionPlan.Reviewer.FullName;
+            }
+
+            if (productionPlan.ChildProductionPlans.Count > 0)
+            {
+                List<ProductionPlanDTO> childProductionPlans = new List<ProductionPlanDTO>();
+                foreach (ProductionPlan childProductionPlan in productionPlan.ChildProductionPlans)
+                {
+                    ProductionPlanDTO childProductionPlanDTO = new ProductionPlanDTO();
+                    childProductionPlanDTO.Id = childProductionPlan.Id;
+                    childProductionPlanDTO.Code = childProductionPlan.Code;
+                    childProductionPlanDTO.Name = childProductionPlan.Name;
+                    childProductionPlanDTO.Description = childProductionPlan.Description;
+                    childProductionPlanDTO.ExpectedStartingDate = childProductionPlan.ExpectedStartingDate;
+                    childProductionPlanDTO.DueDate = childProductionPlan.DueDate;
+                    childProductionPlanDTO.ActualStartingDate = childProductionPlan.ActualStartingDate;
+                    childProductionPlanDTO.CompletionDate = childProductionPlan.CompletionDate;
+                    childProductionPlanDTO.Type = childProductionPlan.Type.ToString();
+                    childProductionPlanDTO.CreatedDate = childProductionPlan.CreatedDate;
+                    childProductionPlanDTO.Status = childProductionPlan.Status.ToString();
+                    childProductionPlanDTO.CreatorName = childProductionPlan.Creator.FullName;
+                    if (childProductionPlan.Reviewer != null)
+                        childProductionPlanDTO.ParentProductionPlan.ReviewerName = childProductionPlan.Reviewer.FullName;
+                    childProductionPlans.Add(childProductionPlanDTO);
+                }
+                productionPlanDTO.ChildProductionPlans = childProductionPlans;
+            }
+            return productionPlanDTO;
+        }
+
 
         public Task<CreateUpdateResponseDTO<ProductionPlan>> Add(ProductionPlanInputDTO inputDTO)
         {

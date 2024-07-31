@@ -12,5 +12,6 @@ namespace GPMS.Backend.Services.DTOs
         public float SizeWidth { get; set; }
         public float Consumption { get; set; }
         public string? Description { get; set; }
+        public MaterialDTO Material { get; set; }
     }
 }
