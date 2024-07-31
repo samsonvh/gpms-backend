@@ -18,6 +18,9 @@ using Swashbuckle.AspNetCore.Annotations;
 using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.PageRequests;
+using GPMS.Backend.Data.Enums.Types;
+using FluentValidation;
+using System.Reflection.Metadata.Ecma335;
 
 namespace GPMS.Backend.Controllers
 {
@@ -27,31 +30,68 @@ namespace GPMS.Backend.Controllers
         private readonly IProductionPlanService _productionPlanService;
 
         private readonly ILogger<ProductionPlanController> _logger;
+        private readonly CurrentLoginUserDTO _currentLoginUserDTO;
 
-        public ProductionPlanController(IProductionPlanService productionPlanSerivce, ILogger<ProductionPlanController> logger)
+        public ProductionPlanController(
+            IProductionPlanService productionPlanSerivce,
+            ILogger<ProductionPlanController> logger,
+            CurrentLoginUserDTO currentLoginUserDTO)
         {
             _productionPlanService = productionPlanSerivce;
             _logger = logger;
+            _currentLoginUserDTO = currentLoginUserDTO;
         }
 
         [HttpPost]
         [Route(APIEndPoint.PRODUCTION_PLANS_V1)]
         [SwaggerOperation(Summary = "Add production plan using form")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Add Production Plan Successfully")]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Add Production Plan Failed", typeof(List<FormError>))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Create Production Plan Successfully")]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Create Production Plan List Failed", typeof(List<FormError>))]
         [Produces("application/json")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> AddProductionPlans([FromBody] ProductionPlanInputDTO productionPlanInputDTO)
+        public async Task<IActionResult> AddProductionPlans([FromBody] List<ProductionPlanInputDTO> productionPlanInputDTOs)
         {
-            CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);
-            CreateUpdateResponseDTO<ProductionPlan> result = await _productionPlanService.Add(productionPlanInputDTO, currentLoginUserDTO);
+            _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
+            List<CreateUpdateResponseDTO<ProductionPlan>> result = await ClassifyAndAddProductionPlan(productionPlanInputDTOs);
             BaseReponse baseReponse = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.Created,
-                Message = "Add Production Plan Successfully",
+                Message = "Create Production Plan Successfully",
                 Data = result
             };
             return Ok(baseReponse);
+        }
+
+        private async Task<List<CreateUpdateResponseDTO<ProductionPlan>>> ClassifyAndAddProductionPlan
+            (List<ProductionPlanInputDTO> inputDTOs)
+        {
+            List<CreateUpdateResponseDTO<ProductionPlan>> result = new List<CreateUpdateResponseDTO<ProductionPlan>>();
+            List<ProductionPlanInputDTO> yearProductionPlanList = new List<ProductionPlanInputDTO>();
+            List<ProductionPlanInputDTO> childProductionPlanList = new List<ProductionPlanInputDTO>();
+            foreach (ProductionPlanInputDTO inputDTO in inputDTOs)
+            {
+                if (inputDTO.Type.ToLower().Equals(ProductionPlanType.Year.ToString().ToLower()))
+                {
+                    yearProductionPlanList.Add(inputDTO);
+                }
+                else
+                {
+                    childProductionPlanList.Add(inputDTO);
+                }
+            }
+            if (yearProductionPlanList.Count > 0)
+            {
+                result = await _productionPlanService.AddAnnualProductionPlanList(yearProductionPlanList);
+            }
+            else if (childProductionPlanList.Count > 0)
+            {
+                result = await _productionPlanService.AddChildProductionPlanList(childProductionPlanList);
+            }
+            else 
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Production Plan List Is Required");
+            }
+            return result;
         }
 
         [HttpGet]

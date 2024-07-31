@@ -17,8 +17,12 @@ namespace GPMS.Backend.Services.Services
     public interface IProductionPlanService : IBaseService<ProductionPlanInputDTO, 
                                     CreateUpdateResponseDTO<ProductionPlan>, ProductionPlanListingDTO, ProductionPlanDTO> 
     {
-        Task<CreateUpdateResponseDTO<ProductionPlan>> Add(ProductionPlanInputDTO inputDTO, CurrentLoginUserDTO currentLoginUserDTO);
+
         Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest);
+
+
+        Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
+        Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddChildProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
 
     }
 }

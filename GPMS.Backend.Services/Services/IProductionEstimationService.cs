@@ -11,6 +11,6 @@ namespace GPMS.Backend.Services.Services
 {
     public interface IProductionEstimationService
     {
-        Task<List<CreateUpdateResponseDTO<ProductionEstimation>>> AddList(List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId);
+        Task AddList(List<ProductionEstimationInputDTO> inputDTOs, Guid productionRequirementId, Guid productionPlanId);
     }
 }
