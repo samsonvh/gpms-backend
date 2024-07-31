@@ -77,19 +77,6 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             await CheckUniqueStaffCode(staff.Code);
 
-            /*if (inputDTO.PersonalInfo.Position != StaffPosition.FactoryDirector && inputDTO.PersonalInfo.Position != StaffPosition.Admin)
-            {
-                if (!inputDTO.PersonalInfo.DepartmentId.HasValue)
-                {
-                    throw new APIException(400, "Manager/Staff must be in one department");
-                }
-                await CheckValidDepartmentId(inputDTO.PersonalInfo.DepartmentId.Value);
-            }
-            else
-            {
-                inputDTO.PersonalInfo.DepartmentId = null;
-            }*/
-
             staff.Account = account;
             account.Staff = staff;
 
