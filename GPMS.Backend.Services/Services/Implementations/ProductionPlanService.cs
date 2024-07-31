@@ -2,10 +2,12 @@
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Statuses.Products;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.Specifications;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
@@ -35,6 +37,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IProductionRequirementService _productionRequirementService;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly CurrentLoginUserDTO _currentLoginUser;
+        private readonly IGenericRepository<Staff> _staffRepository;
+        private readonly IGenericRepository<Product> _productRepository;
 
         public ProductionPlanService(
                                     IGenericRepository<ProductionPlan> productionPlanRepository,
@@ -43,7 +47,9 @@ namespace GPMS.Backend.Services.Services.Implementations
                                     IMapper mapper,
                                     IProductionRequirementService productionRequirementService,
                                     EntityListErrorWrapper entityListErrorWrapper,
-                                    CurrentLoginUserDTO currentLoginUser)
+                                    CurrentLoginUserDTO currentLoginUser,
+                                    IGenericRepository<Staff> staffRepository,
+                                    IGenericRepository<Product> productRepository)
         {
             _productionPlanRepository = productionPlanRepository;
             _productionRequirementRepository = productionRequirementRepository;
@@ -52,6 +58,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             _productionRequirementService = productionRequirementService;
             _entityListErrorWrapper = entityListErrorWrapper;
             _currentLoginUser = currentLoginUser;
+            _staffRepository = staffRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList
@@ -94,8 +102,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         private async void CheckProductionPlanRequirementQuantityWithParentProductionPlan
             (List<ProductionPlanInputDTO> inputDTOs, Guid parentProductionPlanId)
         {
-            
-            ProductionPlan parentProductionPlan = 
+
+            ProductionPlan parentProductionPlan =
                 await _productionPlanRepository
                     .Search(productionPlan => productionPlan.Id.Equals(parentProductionPlanId))
                     .Include(productionPlan => productionPlan.ProductionRequirements)
@@ -104,7 +112,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             if (parentProductionPlan != null)
             {
-                List<ProductionEstimation> parentEstimation = 
+                List<ProductionEstimation> parentEstimation =
                     parentProductionPlan.ProductionRequirements.SelectMany(requirement => requirement.ProductionEstimations).ToList();
 
             }
@@ -294,7 +302,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             int totalItem = productionPlanList.Count;
             productionPlanList = productionPlanList.PagingEntityList(productionPlanPageRequest);
             List<ProductionPlanListingDTO> productionPlanListingDTOs = new List<ProductionPlanListingDTO>();
-            foreach(ProductionPlan productionPlan in productionPlanList)
+            foreach (ProductionPlan productionPlan in productionPlanList)
             {
                 ProductionPlanListingDTO productionPlanListingDTO = _mapper.Map<ProductionPlanListingDTO>(productionPlan);
                 productionPlanListingDTOs.Add(productionPlanListingDTO);
@@ -361,5 +369,76 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
+        private async Task<ProductionPlan> GetProductionPlanById(Guid id)
+        {
+            return await _productionPlanRepository
+                .Search(productionPlan => productionPlan.Id == id)
+                .Include(productionPlan => productionPlan.Creator)
+                .Include(productionPlan => productionPlan.ProductionRequirements)
+                    .ThenInclude(productionRequirement => productionRequirement.ProductSpecification)
+                        .ThenInclude(productSpecification => productSpecification.Product)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id, string productionPlanStatus)
+        {
+            var productionPlan = await GetProductionPlanById(id);
+
+            if (productionPlan == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found");
+            }
+
+            var parsedStatus = ValidateProductionPlanStatus(productionPlanStatus, productionPlan);
+
+            if (parsedStatus == ProductionPlanStatus.Approved && productionPlan.Status == ProductionPlanStatus.Pending)
+            {
+                await ApproveProductionPlan(productionPlan);
+            }
+
+            productionPlan.Status = parsedStatus;
+            await _productionPlanRepository.Save();
+
+            return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);
+        }
+
+        private ProductionPlanStatus ValidateProductionPlanStatus(string productionPlanStatus, ProductionPlan productionPlan)
+        {
+            if (!Enum.TryParse(productionPlanStatus, true, out ProductionPlanStatus parsedStatus))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
+            }
+
+            switch (productionPlan.Status)
+            {
+                case ProductionPlanStatus.Pending:
+                    if (parsedStatus == ProductionPlanStatus.Finished || parsedStatus == ProductionPlanStatus.InProgress)
+                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Pending} to {parsedStatus}.");
+                    break;
+
+                case ProductionPlanStatus.Approved:
+                    if (parsedStatus == ProductionPlanStatus.Pending || parsedStatus == ProductionPlanStatus.Declined || parsedStatus == ProductionPlanStatus.Finished)
+                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Approved} to {parsedStatus}.");
+                    break;
+
+                case ProductionPlanStatus.Declined:
+                    if (parsedStatus == ProductionPlanStatus.Pending || parsedStatus == ProductionPlanStatus.Approved || parsedStatus == ProductionPlanStatus.InProgress || parsedStatus == ProductionPlanStatus.Finished)
+                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Declined} to {parsedStatus}.");
+                    break;
+            }
+
+            return parsedStatus;
+        }
+
+        private async Task ApproveProductionPlan(ProductionPlan productionPlan)
+        {
+            if (productionPlan.Creator != null)
+            {
+                productionPlan.Creator.Status = StaffStatus.In_production;
+                await _staffRepository.Save();
+            }
+
+            productionPlan.ReviewerId = _currentLoginUser.StaffId;
+        }
     }
 }
