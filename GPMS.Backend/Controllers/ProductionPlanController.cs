@@ -153,10 +153,10 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> StartProducitonPlan([FromRoute] Guid id, [FromBody] string status)
+        public async Task<IActionResult> StartProducitonPlan([FromRoute] Guid id)
         {
             _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
-            var productionPlan = await _productionPlanService.StartProductionPlan(id, status);
+            var productionPlan = await _productionPlanService.StartProductionPlan(id);
             var responseData = new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
             {
                 Id = productionPlan.Id,

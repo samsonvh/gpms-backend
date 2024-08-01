@@ -308,12 +308,6 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionPlanListingDTOs.Add(productionPlanListingDTO);
             }
 
-            int pageCount = totalItem / productionPlanFilterModel.PageSize;
-            if (totalItem % productionPlanFilterModel.PageSize > 0)
-            {
-                pageCount += 1;
-            }
-
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> defaultPageResponseListingDTO =
                 new DefaultPageResponseListingDTO<ProductionPlanListingDTO>
                 {
@@ -456,12 +450,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         #region Start Production Plan
-        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id, string productionPlanStatus)
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id)
         {
-            if (Enum.TryParse(productionPlanStatus,true,out ProductionPlanStatus parsedStatus))
-            {
-                
-            }
             var productionPlan = await _productionPlanRepository.Search(productionPlan => productionPlan.Id.Equals(id))
                                         .Include(productionPlan => productionPlan.ProductionRequirements)
                                             .ThenInclude(requirement => requirement.ProductSpecification)

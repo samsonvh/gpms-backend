@@ -144,8 +144,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 Data = data,
                 Pagination = new PaginationResponseModel
                 {
-                    PageIndex = materialFilterModel.PageIndex,
-                    PageSize = materialFilterModel.PageSize,
+                    PageIndex = materialFilterModel.Pagination.PageIndex,
+                    PageSize = materialFilterModel.Pagination.PageSize,
                     TotalRows = totalItem
                 }
             };

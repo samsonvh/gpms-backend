@@ -29,7 +29,7 @@ namespace GPMS.Backend.Services.Utils
             var parameter = Expression.Parameter(entityType, "entity"); //entity
             var propertyAccess = Expression.Property(parameter, property); //entity.property
             var orderByProperty = Expression.Lambda<Func<E, Guid>>(propertyAccess, parameter); //entity => entity.property
-            if (filterModel.IsAscending)
+            if ((bool)filterModel.IsAscending)
                 query = query.OrderBy(orderByProperty);
             else
                 query = query.OrderByDescending(orderByProperty);
@@ -48,7 +48,7 @@ namespace GPMS.Backend.Services.Utils
                 {
                     if (propertyInfo.PropertyType.Name.Equals(typeof(string).Name))
                     {
-                        query.Where(entity => entity.GetType().GetProperty(propertyInfo.Name).GetValue(entity).ToString().Contains(entityFilterModelFieldValue.ToString(),StringComparison.OrdinalIgnoreCase));
+                        query.Where(entity => entity.GetType().GetProperty(propertyInfo.Name).GetValue(entity).ToString().Contains(entityFilterModelFieldValue.ToString(), StringComparison.OrdinalIgnoreCase));
                     }
                 }
             }
@@ -57,14 +57,17 @@ namespace GPMS.Backend.Services.Utils
 
         public static List<E> PagingEntityList<E>(this List<E> entityList, BaseFilterModel baseFilterModel)
         {
-            return entityList.Skip((baseFilterModel.PageIndex - 1) * baseFilterModel.PageSize)
-                            .Take(baseFilterModel.PageSize)
-                            .ToList();
+
+            return entityList.Skip((int)((baseFilterModel.Pagination.PageIndex - 1) * baseFilterModel.Pagination.PageSize))
+                        .Take((int)baseFilterModel.Pagination.PageSize)
+                        .ToList();
         }
         public static IQueryable<E> PagingEntityQuery<E>(this IQueryable<E> query, BaseFilterModel baseFilterModel)
         {
-            return query.Skip((baseFilterModel.PageIndex - 1) * baseFilterModel.PageSize)
-                            .Take(baseFilterModel.PageSize);
+
+            return query.Skip((int)((baseFilterModel.Pagination.PageIndex - 1) * baseFilterModel.Pagination.PageSize))
+                            .Take((int)baseFilterModel.Pagination.PageSize);
+
         }
     }
 }
