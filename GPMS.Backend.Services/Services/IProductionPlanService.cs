@@ -15,10 +15,10 @@ using GPMS.Backend.Services.PageRequests;
 namespace GPMS.Backend.Services.Services
 {
     public interface IProductionPlanService : IBaseService<ProductionPlanInputDTO, 
-                                    CreateUpdateResponseDTO<ProductionPlan>, ProductionPlanListingDTO, ProductionPlanDTO> 
+                                    CreateUpdateResponseDTO<ProductionPlan>, ProductionPlanListingDTO, ProductionPlanDTO, ProductionPlanFilterModel> 
     {
 
-        Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest);
+        Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanFilterModel productionPlanFilterModel);
 
 
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);

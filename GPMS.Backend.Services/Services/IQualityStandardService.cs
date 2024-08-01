@@ -8,12 +8,13 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface IQualityStandardService
     : IBaseService<QualityStandardInputDTO,CreateUpdateResponseDTO<QualityStandard>,
-    QualityStandardListingDTO,QualityStandardDTO>
+    QualityStandardListingDTO,QualityStandardDTO, QualityStandardFilterModel>
     {
         Task AddList (List<QualityStandardInputDTO> inputDTOs, Guid specificationId, 
         List<CreateUpdateResponseDTO<Material>> materialCodeList);

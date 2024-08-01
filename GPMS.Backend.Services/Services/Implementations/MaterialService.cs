@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -128,9 +129,17 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<MaterialDTO>(material);
         }
 
-        public async Task<List<MaterialListingDTO>> GetAll()
+        public async Task<DefaultPageResponseListingDTO<MaterialListingDTO>> GetAll(MaterialFilterModel materialFilterModel)
         {
-            return _mapper.Map<List<MaterialListingDTO>>(await _materialRepository.GetAll().ToListAsync());
+            var query = _materialRepository.GetAll();
+
+
+            var data = _mapper.Map<List<MaterialListingDTO>>(await _materialRepository.GetAll().ToListAsync());
+            return new DefaultPageResponseListingDTO<MaterialListingDTO>
+            {
+                Data = data,
+            };
+            
         }
 
         public Task<CreateUpdateResponseDTO<Material>> Update(MaterialInputDTO inputDTO)
@@ -142,5 +151,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
     }
 }

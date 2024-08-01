@@ -12,6 +12,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -87,9 +88,16 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<List<SpecificationListingDTO>> GetAll()
+        public Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilter specificationFilter)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)
+        {
+            List<ProductSpecification> specifications = await _specificationRepository
+                .Search(specification => specification.ProductId == productId).ToListAsync();
+            return _mapper.Map<List<CreateProductSpecificationListingDTO>>(specifications);
         }
 
         public Task<CreateUpdateResponseDTO<ProductSpecification>> Update(SpecificationInputDTO inputDTO)

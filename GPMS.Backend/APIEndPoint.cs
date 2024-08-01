@@ -9,6 +9,8 @@ namespace GPMS.Backend
     {
         //Default Route
         public const string API_VERSION_1 = "/api/v1";
+        public const string CREATE_PRODUCTION_PLAN = "/create-production-plan";
+        public const string FILTER = "/filter";
 
         //Authentication
         public const string AUTHENTICATION_V1 = API_VERSION_1 + "/authentication";
@@ -43,10 +45,14 @@ namespace GPMS.Backend
         //Products 
         public const string PRODUCTS_V1 = API_VERSION_1 + "/products";
         public const string PRODUCTS_ID_V1 = PRODUCTS_V1 + "/{id}";
+        public const string PRODUCTS_ID_CREATE_PRODUCTION_PLAN_V1 = PRODUCTS_V1 + "/{id}" + CREATE_PRODUCTION_PLAN;
+
 
         //Specifications
         public const string SPECIFICATIONS_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/specifications";
         public const string SPECIFICATION_ID_OF_PRODUCT_ID_v1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
+        public const string SPECIFICATIONS_OF_PRODUCT_ID_CREATE_PRODUCTION_PLAN_V1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
+        
         //Bill Of Materials 
         public const string BILL_OF_MATERIALS_OF_SPECIFICATION_ID_V1 = SPECIFICATION_ID_OF_PRODUCT_ID_v1 + "/bill-of-materials";
         public const string BILL_OF_MATERIAL_ID_OF_SPECIFICATION_ID_V1 = BILL_OF_MATERIALS_OF_SPECIFICATION_ID_V1 + "/{billOfMaterialId}";

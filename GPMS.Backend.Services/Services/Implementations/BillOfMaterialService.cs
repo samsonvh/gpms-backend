@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -72,10 +73,36 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<List<BOMListingDTO>> GetAll()
+        public Task<DefaultPageResponseListingDTO<BOMListingDTO>> GetAll(BaseFilterModel filter)
         {
             throw new NotImplementedException();
         }
+
+        // public async Task<List<BOMListingDTO>> GetAll()
+        // {
+        //     var query = _billOfMaterialRepository.GetAll();
+        //     query = Filters(query, accountFilterModel);
+        //     query = query.SortBy<Account>(accountFilterModel);
+        //     int totalItem = query.Count();
+        //     int pageCount = totalItem / accountFilterModel.PageSize;
+        //     if (totalItem % accountFilterModel.PageSize > 0)
+        //     {
+        //         pageCount += 1;
+        //     }
+        //     query = query.PagingEntityQuery<Account>(accountFilterModel);
+        //     var accounts = await query.ProjectTo<AccountListingDTO>(_mapper.ConfigurationProvider)
+        //                                 .ToListAsync();
+        //     return new DefaultPageResponseListingDTO<AccountListingDTO>
+        //     {
+        //         Data = accounts,
+        //         PageIndex = accountFilterModel.PageIndex,
+        //         PageSize = accountFilterModel.PageSize,
+        //         TotalItem = totalItem,
+        //         PageCount = pageCount
+        //     };
+        // }
+
+
 
         public Task<CreateUpdateResponseDTO<BillOfMaterial>> Update(BOMInputDTO inputDTO)
         {

@@ -112,9 +112,9 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all production plan successfully", typeof(List<ProductionPlanListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProductionPlans([FromQuery] ProductionPlanPageRequest productionPlanPageRequest)
+        public async Task<IActionResult> GetAllProductionPlans([FromQuery] ProductionPlanFilterModel productionPlanFilterModel)
         {
-            DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = await _productionPlanService.GetAll(productionPlanPageRequest);
+            DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = await _productionPlanService.GetAll(productionPlanFilterModel);
 
             BaseReponse response = new BaseReponse
             {

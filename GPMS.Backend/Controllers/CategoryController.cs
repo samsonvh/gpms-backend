@@ -28,7 +28,7 @@ namespace GPMS.Backend.Controllers
         }
 
         [HttpGet]
-        [Route(APIEndPoint.CATEGORY_V1)]
+        [Route(APIEndPoint.CATEGORY_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Category")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Category List")]
         [Produces("application/json")]

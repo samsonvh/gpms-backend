@@ -7,12 +7,13 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface IMaterialService
     : IBaseService<MaterialInputDTO, CreateUpdateResponseDTO<Material>,
-    MaterialListingDTO,MaterialDTO>
+    MaterialListingDTO,MaterialDTO, MaterialFilterModel>
     {
         Task<List<CreateUpdateResponseDTO<Material>>> AddList (List<MaterialInputDTO> inputDTOs); 
     }

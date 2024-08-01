@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Enums.Others;
@@ -10,7 +11,10 @@ using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -140,14 +144,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        public async Task<IEnumerable<AccountListingDTO>> GetAllAccounts()
+        public async Task<IEnumerable<AccountListingDTO>> GetAllAccounts(AccountFilterModel accountFilterModel)
         {
-            var accounts = await _accountRepository.GetAll().ToListAsync();
-            if (accounts == null)
-            {
-                throw new APIException(404, "Account not found because it may have been deleted or does not exist.");
-            }
-            return _mapper.Map<IEnumerable<AccountListingDTO>>(accounts);
+            throw new NotImplementedException();
         }
 
         public async Task<AccountDTO> Details(Guid id)
@@ -206,6 +205,58 @@ namespace GPMS.Backend.Services.Services.Implementations
                 default:
                     throw new APIException(400, "Unsupported account status for changing staff status.");
             }
+        }
+
+        public Task AddList(List<AccountInputDTO> inputDTOs, Guid? parentEntityId = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CreateUpdateResponseDTO<Account>> Update(AccountInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdateList(List<AccountInputDTO> inputDTOs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<DefaultPageResponseListingDTO<AccountListingDTO>> GetAll(AccountFilterModel accountFilterModel)
+        {
+            var query = _accountRepository.GetAll();
+            query = Filters(query, accountFilterModel);
+            query = query.SortBy<Account>(accountFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<Account>(accountFilterModel);
+            var accounts = await query.ProjectTo<AccountListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<AccountListingDTO>
+            {
+                Data = accounts,
+                Pagination = new PaginationResponseModel {
+                    PageIndex = accountFilterModel.PageIndex,
+                    PageSize = accountFilterModel.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<Account> Filters(IQueryable<Account> query, AccountFilterModel accountFilterModel)
+        {
+            if (!accountFilterModel.Code.IsNullOrEmpty())
+            {
+                query = query.Where(account => account.Code.Contains(accountFilterModel.Code));
+            }
+            if (!accountFilterModel.Email.IsNullOrEmpty())
+            {
+                query = query.Where(account => account.Email.Contains(accountFilterModel.Email));
+            }
+            if (Enum.TryParse(accountFilterModel.AccountStatus,true,out AccountStatus accountStatus))
+            {
+                query = query.Where(account => account.Status.Equals(accountFilterModel.AccountStatus));
+            }
+            return query;
         }
     }
 }

@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -60,6 +61,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<List<MeasurementListingDTO>> GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<DefaultPageResponseListingDTO<MeasurementListingDTO>> GetAll(MeasurementFilterModel filter)
         {
             throw new NotImplementedException();
         }

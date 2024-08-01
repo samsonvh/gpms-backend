@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
@@ -88,7 +89,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<List<QualityStandardListingDTO>> GetAll()
+        public Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAll(QualityStandardFilterModel qualityStandardFilterModel)
         {
             throw new NotImplementedException();
         }

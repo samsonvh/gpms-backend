@@ -14,6 +14,7 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -79,7 +80,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<List<ProcessListingDTO>> GetAll()
+        public Task<DefaultPageResponseListingDTO<ProcessListingDTO>> GetAll(ProcessFilterModel processFilterModel)
         {
             throw new NotImplementedException();
         }

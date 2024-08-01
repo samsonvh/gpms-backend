@@ -9,7 +9,9 @@ using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -30,17 +32,17 @@ namespace GPMS.Backend.Controllers
             _accountService = accountService;
         }
 
-        [HttpGet]
-        [Route(APIEndPoint.ACCOUNTS_V1)]
+        [HttpPost]
+        [Route(APIEndPoint.ACCOUNTS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all accounts")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(DefaultPageResponseListingDTO<AccountListingDTO>))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllAccounts()
+        // [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllAccounts([FromBody] AccountFilterModel accountFilterModel)
         {
-            var account = await _accountService.GetAllAccounts();
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all accounts sucessfully", Data = account });
+            var response = await _accountService.GetAll(accountFilterModel);
+            return Ok(response);
         }
 
         [HttpGet]
