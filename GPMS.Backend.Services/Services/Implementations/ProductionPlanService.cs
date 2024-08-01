@@ -376,7 +376,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id, string productionPlanStatus)
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id , string productionPlanStatus)
         {
             var productionPlan = await GetProductionPlanById(id);
 
@@ -457,40 +457,26 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id, string productionPlanStatus)
         {
             var productionPlan = await GetProductionPlanById(id);
-
             if (productionPlan == null)
             {
-                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found");
+                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found.");
             }
-
+            if (!productionPlan.Status.Equals(ProductionPlanStatus.Approved))
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start production plan with a status other than approved.");
+            }
             if (_currentLoginUser.StaffId != productionPlan.CreatorId)
             {
-                throw new APIException((int)HttpStatusCode.Forbidden, "Only the creator can start the production plan.");
+                throw new APIException((int)HttpStatusCode.BadRequest, "Only the creator can start the production plan.");
             }
-
-            /*ProductionPlanStatus parsedStatus = ValidateProductionPlanStatus(productionPlanStatus, productionPlan);
-
-            if (parsedStatus != ProductionPlanStatus.InProgress)
+            if (!productionPlan.Type.Equals(ProductionPlanType.Batch))
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status for starting the production plan.");
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can only start production plan with Type set to Batch.");
             }
 
-            foreach (var requirement in productionPlan.ProductionRequirements)
-            {
-                var productSpecification = requirement.ProductSpecification;
-                var product = productSpecification.Product;
+            return null;
+            // return result;
 
-                product.Status = ProductStatus.InProduction;
-                await _productRepository.Save();
-            }
-
-            productionPlan.Status = parsedStatus;
-            await _productionPlanRepository.Save();*/
-
-            var result = await ChangeStatus(id, productionPlanStatus);
-            return result;
-
-            /*return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);*/
         }
     }
 }

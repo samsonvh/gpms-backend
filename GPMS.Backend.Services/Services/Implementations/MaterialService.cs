@@ -17,6 +17,7 @@ using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -132,14 +133,35 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<DefaultPageResponseListingDTO<MaterialListingDTO>> GetAll(MaterialFilterModel materialFilterModel)
         {
             var query = _materialRepository.GetAll();
-
-
+            query = Filters(query, materialFilterModel);
+            query = query.SortBy<Material>(materialFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(materialFilterModel);
             var data = _mapper.Map<List<MaterialListingDTO>>(await _materialRepository.GetAll().ToListAsync());
             return new DefaultPageResponseListingDTO<MaterialListingDTO>
             {
                 Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = materialFilterModel.PageIndex,
+                    PageSize = materialFilterModel.PageSize,
+                    TotalRows = totalItem
+                }
             };
             
+        }
+
+        private IQueryable<Material> Filters(IQueryable<Material> query, MaterialFilterModel materialFilterModel)
+        {
+            if (!materialFilterModel.Code.IsNullOrEmpty())
+            {
+                query = query.Where(material => material.Code.Contains(materialFilterModel.Code));
+            }
+            if (!materialFilterModel.Name.IsNullOrEmpty())
+            {
+                query = query.Where(material => material.Name.Contains(materialFilterModel.Name));
+            }
+            return query;
         }
 
         public Task<CreateUpdateResponseDTO<Material>> Update(MaterialInputDTO inputDTO)

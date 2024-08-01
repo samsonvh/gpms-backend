@@ -36,13 +36,7 @@ namespace GPMS.Backend.Controllers
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllMaterial ([FromBody] MaterialFilterModel materialFilterModel)
         {
-            var data = await _materialService.GetAll(materialFilterModel);
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Material List",
-                Data = data
-            };
+            var response = await _materialService.GetAll(materialFilterModel);
             return Ok(response);
         }
 

@@ -10,7 +10,7 @@ namespace GPMS.Backend.Services.Filters
     {
         public string? Code { get; set; }
         public string? Name { get; set; }
-        public string? ColorCode { get; set; }
-        public string? ColorName { get; set; }
+        // public string? ColorCode { get; set; }
+        // public string? ColorName { get; set; }
     }
 }
