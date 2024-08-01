@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.PageRequests;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -57,15 +58,22 @@ namespace GPMS.Backend.Services.Utils
 
         public static List<E> PagingEntityList<E>(this List<E> entityList, BaseFilterModel baseFilterModel)
         {
-
-            return entityList.Skip((int)((baseFilterModel.Pagination.PageIndex - 1) * baseFilterModel.Pagination.PageSize))
+            if (baseFilterModel.Pagination == null)
+            {
+                baseFilterModel.Pagination = new PaginationRequestModel();
+            }
+            return entityList.Skip((int)((baseFilterModel.Pagination.PageIndex) * baseFilterModel.Pagination.PageSize))
                         .Take((int)baseFilterModel.Pagination.PageSize)
                         .ToList();
         }
         public static IQueryable<E> PagingEntityQuery<E>(this IQueryable<E> query, BaseFilterModel baseFilterModel)
         {
+            if (baseFilterModel.Pagination == null)
+            {
+                baseFilterModel.Pagination = new PaginationRequestModel();
+            }
 
-            return query.Skip((int)((baseFilterModel.Pagination.PageIndex - 1) * baseFilterModel.Pagination.PageSize))
+            return query.Skip((int)((baseFilterModel.Pagination.PageIndex) * baseFilterModel.Pagination.PageSize))
                             .Take((int)baseFilterModel.Pagination.PageSize);
 
         }
