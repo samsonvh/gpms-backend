@@ -235,8 +235,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 Data = accounts,
                 Pagination = new PaginationResponseModel {
-                    PageIndex = accountFilterModel.PageIndex,
-                    PageSize = accountFilterModel.PageSize,
+                    PageIndex = accountFilterModel.Pagination.PageIndex,
+                    PageSize = accountFilterModel.Pagination.PageSize,
                     TotalRows = totalItem
                 }
             };

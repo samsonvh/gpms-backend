@@ -379,11 +379,6 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productListingDTOs.Add(productListingDTO);
             }
 
-            int pageCount = totalItem / productFilterModel.PageSize;
-            if (totalItem % productFilterModel.PageSize > 0)
-            {
-                pageCount += 1;
-            }
             DefaultPageResponseListingDTO<ProductListingDTO> defaultPageResponseListingDTO =
             new DefaultPageResponseListingDTO<ProductListingDTO>
             {
