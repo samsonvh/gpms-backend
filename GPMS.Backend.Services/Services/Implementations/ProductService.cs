@@ -345,15 +345,15 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         #region Get All Product
 
-        public async Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductPageRequest productPageRequest)
+        public async Task<DefaultPageResponseListingDTO<ProductListingDTO>> GetAll(ProductFilterModel productFilterModel)
         {
             IQueryable<Product> query = _productRepository.GetAll();
-            query = Filter(query, productPageRequest);
-            query = query.SortByAndPaging(productPageRequest);
+            query = Filter(query, productFilterModel);
+            query = query.SortBy(productFilterModel);
             List<Product> productList = await query.ToListAsync();
-            productList = FilterColorAndSize(productList, productPageRequest);
+            productList = FilterColorAndSize(productList, productFilterModel);
             int totalItem = productList.Count;
-            productList = productList.PagingEntityList(productPageRequest);
+            productList = productList.PagingEntityList(productFilterModel);
             List<ProductListingDTO> productListingDTOs = new List<ProductListingDTO>();
             foreach (Product product in productList)
             {
@@ -379,64 +379,68 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productListingDTOs.Add(productListingDTO);
             }
 
-            int pageCount = totalItem / productPageRequest.PageSize;
-            if (totalItem % productPageRequest.PageSize > 0)
+            int pageCount = totalItem / productFilterModel.PageSize;
+            if (totalItem % productFilterModel.PageSize > 0)
             {
                 pageCount += 1;
             }
             DefaultPageResponseListingDTO<ProductListingDTO> defaultPageResponseListingDTO =
             new DefaultPageResponseListingDTO<ProductListingDTO>
             {
-                Data = productListingDTOs,
-                PageCount = pageCount,
-                PageIndex = productPageRequest.PageIndex,
-                PageSize = productPageRequest.PageSize,
-                TotalItem = totalItem
+                
             };
             return defaultPageResponseListingDTO;
         }
 
-        private List<Product> FilterColorAndSize(List<Product> productList, ProductPageRequest productPageRequest)
+        private List<Product> FilterColorAndSize(List<Product> productList, ProductFilterModel productFilterModel)
         {
-            if (!productPageRequest.Size.IsNullOrEmpty())
+            if (!productFilterModel.Size.IsNullOrEmpty())
             {
                 productList = productList
                 .Where(product => product.Sizes.Split(",", StringSplitOptions.TrimEntries)
                                                 .Select(size => size.ToLower())
-                                                .Contains(productPageRequest.Size.ToLower()))
+                                                .Contains(productFilterModel.Size.ToLower()))
                                                 .ToList();
             }
-            if (!productPageRequest.Color.IsNullOrEmpty())
+            if (!productFilterModel.Color.IsNullOrEmpty())
             {
                 productList = productList
                 .Where(product => product.Colors.Split(",", StringSplitOptions.TrimEntries)
                                                 .Select(color => color.ToLower())
-                                                .Contains(productPageRequest.Color.ToLower()))
+                                                .Contains(productFilterModel.Color.ToLower()))
                                                 .ToList();
             }
             return productList;
         }
 
-        private IQueryable<Product> Filter(IQueryable<Product> query, ProductPageRequest productPageRequest)
+        private IQueryable<Product> Filter(IQueryable<Product> query, ProductFilterModel productFilterModel)
         {
-            if (!productPageRequest.Code.IsNullOrEmpty())
+            if (!productFilterModel.Code.IsNullOrEmpty())
             {
                 query = query
-                .Where(product => product.Code.ToLower().Contains(productPageRequest.Code.ToLower()));
+                .Where(product => product.Code.ToLower().Contains(productFilterModel.Code.ToLower()));
             }
-            if (!productPageRequest.Name.IsNullOrEmpty())
+            if (!productFilterModel.Name.IsNullOrEmpty())
             {
                 query = query
-                .Where(product => product.Name.ToLower().Contains(productPageRequest.Name.ToLower()));
+                .Where(product => product.Name.ToLower().Contains(productFilterModel.Name.ToLower()));
             }
 
-            if (!productPageRequest.Status.IsNullOrEmpty()
-                    && Enum.TryParse<ProductStatus>(productPageRequest.Status, true, out ProductStatus parsedProductStatus))
+            if (!productFilterModel.Status.IsNullOrEmpty()
+                    && Enum.TryParse<ProductStatus>(productFilterModel.Status, true, out ProductStatus parsedProductStatus))
             {
                 query = query
                 .Where(product => product.Status.Equals(parsedProductStatus));
             }
             return query;
+        }
+
+        public async Task<List<CreateProductListingDTO>> GetAllProductForCreateProductionPlan()
+        {
+            List<Product> products = await _productRepository.GetAll().ToListAsync();
+            
+            return _mapper.Map<List<CreateProductListingDTO>>(products);
+
         }
         #endregion Get All Product
 

@@ -5,22 +5,23 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.PageRequests;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Utils
 {
     public static class LinQUtil
     {
-        public static IQueryable<E> SortByAndPaging<E>
-        (this IQueryable<E> query, DefaultPageRequest pageRequest)
+        public static IQueryable<E> SortBy<E>
+        (this IQueryable<E> query, BaseFilterModel filterModel)
         where E : class
         {
             Type entityType = typeof(E);
-            if (pageRequest.OrderBy.IsNullOrEmpty())
+            if (filterModel.OrderBy.IsNullOrEmpty())
             {
-                pageRequest.OrderBy = "Id";
+                filterModel.OrderBy = "Id";
             }
-            PropertyInfo? property = entityType.GetProperty(pageRequest.OrderBy);
+            PropertyInfo? property = entityType.GetProperty(filterModel.OrderBy);
             if (property == null)
             {
                 property = entityType.GetProperty("Id");
@@ -28,18 +29,42 @@ namespace GPMS.Backend.Services.Utils
             var parameter = Expression.Parameter(entityType, "entity"); //entity
             var propertyAccess = Expression.Property(parameter, property); //entity.property
             var orderByProperty = Expression.Lambda<Func<E, Guid>>(propertyAccess, parameter); //entity => entity.property
-            if (pageRequest.IsAscending)
+            if (filterModel.IsAscending)
                 query = query.OrderBy(orderByProperty);
             else
                 query = query.OrderByDescending(orderByProperty);
 
             return query;
         }
-        public static List<E> PagingEntityList<E>(this List<E> entityList, DefaultPageRequest pageRequest)
+
+        public static IQueryable<E> Filter<E, F>(this IQueryable<E> query, F entityFilterModel)
+        where E : class
+        where F : class
         {
-            return entityList.Skip((pageRequest.PageIndex - 1) * pageRequest.PageSize)
-                            .Take(pageRequest.PageSize)
+            foreach (PropertyInfo propertyInfo in entityFilterModel.GetType().GetProperties())
+            {
+                var entityFilterModelFieldValue = propertyInfo.GetValue(entityFilterModel);
+                if (!entityFilterModelFieldValue.Equals(null))
+                {
+                    if (propertyInfo.PropertyType.Name.Equals(typeof(string).Name))
+                    {
+                        query.Where(entity => entity.GetType().GetProperty(propertyInfo.Name).GetValue(entity).ToString().Contains(entityFilterModelFieldValue.ToString(),StringComparison.OrdinalIgnoreCase));
+                    }
+                }
+            }
+            return query;
+        }
+
+        public static List<E> PagingEntityList<E>(this List<E> entityList, BaseFilterModel baseFilterModel)
+        {
+            return entityList.Skip((baseFilterModel.PageIndex - 1) * baseFilterModel.PageSize)
+                            .Take(baseFilterModel.PageSize)
                             .ToList();
+        }
+        public static IQueryable<E> PagingEntityQuery<E>(this IQueryable<E> query, BaseFilterModel baseFilterModel)
+        {
+            return query.Skip((baseFilterModel.PageIndex - 1) * baseFilterModel.PageSize)
+                            .Take(baseFilterModel.PageSize);
         }
     }
 }

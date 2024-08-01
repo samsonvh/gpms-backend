@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Authorization;
@@ -27,15 +28,15 @@ namespace GPMS.Backend.Controllers
             _materialService = materialService;
         }
 
-        [HttpGet]
-        [Route(APIEndPoint.MATERIAL_V1)]
+        [HttpPost]
+        [Route(APIEndPoint.MATERIAL_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Material")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Material List")]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllMaterial ()
+        public async Task<IActionResult> GetAllMaterial ([FromBody] MaterialFilterModel materialFilterModel)
         {
-            var data = await _materialService.GetAll();
+            var data = await _materialService.GetAll(materialFilterModel);
             BaseReponse response = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,

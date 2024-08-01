@@ -13,6 +13,7 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -79,7 +80,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<List<SemiFinishedProductListingDTO>> GetAll()
+        public Task<DefaultPageResponseListingDTO<SemiFinishedProductListingDTO>> GetAll(SemiFinishedProductFilterModel semiFinishedProductFilter)
         {
             throw new NotImplementedException();
         }

@@ -293,14 +293,14 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanPageRequest productionPlanPageRequest)
+        public async Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanFilterModel productionPlanFilterModel)
         {
             IQueryable<ProductionPlan> query = _productionPlanRepository.GetAll();
-            query = Filter(query, productionPlanPageRequest);
-            query = query.SortByAndPaging(productionPlanPageRequest);
+            query = Filter(query, productionPlanFilterModel);
+            query = query.SortBy(productionPlanFilterModel);
             List<ProductionPlan> productionPlanList = await query.ToListAsync();
             int totalItem = productionPlanList.Count;
-            productionPlanList = productionPlanList.PagingEntityList(productionPlanPageRequest);
+            productionPlanList = productionPlanList.PagingEntityList(productionPlanFilterModel);
             List<ProductionPlanListingDTO> productionPlanListingDTOs = new List<ProductionPlanListingDTO>();
             foreach (ProductionPlan productionPlan in productionPlanList)
             {
@@ -308,8 +308,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionPlanListingDTOs.Add(productionPlanListingDTO);
             }
 
-            int pageCount = totalItem / productionPlanPageRequest.PageSize;
-            if (totalItem % productionPlanPageRequest.PageSize > 0)
+            int pageCount = totalItem / productionPlanFilterModel.PageSize;
+            if (totalItem % productionPlanFilterModel.PageSize > 0)
             {
                 pageCount += 1;
             }
@@ -317,16 +317,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> defaultPageResponseListingDTO =
                 new DefaultPageResponseListingDTO<ProductionPlanListingDTO>
                 {
-                    Data = productionPlanListingDTOs,
-                    PageCount = pageCount,
-                    PageIndex = productionPlanPageRequest.PageIndex,
-                    PageSize = productionPlanPageRequest.PageSize,
-                    TotalItem = totalItem
+                    
                 };
             return defaultPageResponseListingDTO;
         }
 
-        private IQueryable<ProductionPlan> Filter(IQueryable<ProductionPlan> query, ProductionPlanPageRequest productionPlanPageRequest)
+        private IQueryable<ProductionPlan> Filter(IQueryable<ProductionPlan> query, ProductionPlanFilterModel productionPlanPageRequest)
         {
             // Lọc theo Code
             if (!string.IsNullOrWhiteSpace(productionPlanPageRequest.Code))

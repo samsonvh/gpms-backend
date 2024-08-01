@@ -25,7 +25,7 @@ namespace GPMS.Backend.Controllers
         private readonly IMapper _mapper;
         private readonly CurrentLoginUserDTO _currentLoginUser;
 
-        public ProductController(ILogger<ProductController> logger, 
+        public ProductController(ILogger<ProductController> logger,
         IProductService productService, IMapper mapper,
         CurrentLoginUserDTO currentLoginUser)
         {
@@ -86,19 +86,38 @@ namespace GPMS.Backend.Controllers
         }
         [HttpGet]
         [Route(APIEndPoint.PRODUCTS_V1)]
-        [SwaggerOperation(Summary = "Get all product",Description = "Factory director, Production manager can get all product")]
+        [SwaggerOperation(Summary = "Get all product", Description = "Factory director, Production manager can get all product")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<ProductListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProducts([FromQuery]ProductPageRequest productPageRequest)
+        public async Task<IActionResult> GetAllProducts([FromQuery] ProductFilterModel productFilterModel)
         {
-            DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productPageRequest);
+            DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productFilterModel);
 
             BaseReponse response = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
                 Message = "Get all product",
                 Data = pageResponse
+            };
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route(APIEndPoint.PRODUCTS_V1 + "/create-production-plan")]
+        [SwaggerOperation(Summary = "Get all product for create production plan", Description = "Factory director, Production manager can get all production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<CreateProductListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllProductsForCreateProductionPlan()
+        {
+            List<CreateProductListingDTO> createProductListingDTOs = await _productService.GetAllProductForCreateProductionPlan();
+
+            BaseReponse response = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get all product",
+                Data = createProductListingDTOs
             };
             return Ok(response);
         }

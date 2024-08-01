@@ -8,11 +8,12 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface IProcessService : IBaseService<ProcessInputDTO, CreateUpdateResponseDTO<ProductProductionProcess>,
-    ProcessListingDTO,ProcessDTO>
+    ProcessListingDTO,ProcessDTO,ProcessFilterModel>
     {
         Task AddList(List<ProcessInputDTO> inputDTOs, Guid productId,
         List<CreateUpdateResponseDTO<Material>> materialCodeList, 

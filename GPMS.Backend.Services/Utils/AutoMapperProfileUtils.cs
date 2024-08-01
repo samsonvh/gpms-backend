@@ -73,7 +73,7 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
-
+            CreateMap<Product,CreateProductListingDTO>();
             //SemiFinishedProduct
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             CreateMap<SemiFinishedProduct, SemiFinishedProductDTO>();
@@ -89,6 +89,7 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(specificationDTO => specificationDTO.Measurements, opt => opt.MapFrom(productSpecification => productSpecification.Measurements))
                 .ForMember(specificationDTO => specificationDTO.QualityStandards, opt => opt.MapFrom(productSpecification => productSpecification.QualityStandards))
                 .ForMember(specificationDTO => specificationDTO.BillOfMaterials, opt => opt.MapFrom(productSpecification => productSpecification.BillOfMaterials));
+            CreateMap<ProductSpecification,CreateProductSpecificationListingDTO>();
             //Measurement
             CreateMap<MeasurementInputDTO, Measurement>();
             CreateMap<Measurement, MeasurementDTO>();
