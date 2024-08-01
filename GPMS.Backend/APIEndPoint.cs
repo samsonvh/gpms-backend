@@ -69,6 +69,7 @@ namespace GPMS.Backend
         //Production Plans
         public const string PRODUCTION_PLANS_V1 = API_VERSION_1 + "/production-plans";
         public const string PRODUCTION_PLANS_ID_V1 = PRODUCTION_PLANS_V1 + "/{id}";
+        public const string PRODUCTION_PLANS_ID_V1_START = PRODUCTION_PLANS_ID_V1 + "/start";
         //Requirements
         public const string REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 = PRODUCTION_PLANS_ID_V1 + "/reqirements";
         public const string REQUIREMENT_ID_OF_PRODUCTION_PLAN_ID_V1 = REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 + "/{requirementId}";

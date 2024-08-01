@@ -392,6 +392,11 @@ namespace GPMS.Backend.Services.Services.Implementations
                 await ApproveProductionPlan(productionPlan);
             }
 
+            if (parsedStatus == ProductionPlanStatus.InProgress && productionPlan.Status == ProductionPlanStatus.Approved)
+            {
+                await ChangeStatusToInProgress(productionPlan);
+            }
+
             productionPlan.Status = parsedStatus;
             await _productionPlanRepository.Save();
 
@@ -435,6 +440,57 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
 
             productionPlan.ReviewerId = _currentLoginUser.StaffId;
+        }
+
+        private async Task ChangeStatusToInProgress(ProductionPlan productionPlan)
+        {
+            foreach (var requirement in productionPlan.ProductionRequirements)
+            {
+                var productSpecification = requirement.ProductSpecification;
+                var product = productSpecification.Product;
+
+                product.Status = ProductStatus.InProduction;
+                await _productRepository.Save();
+            }
+        }
+
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id, string productionPlanStatus)
+        {
+            var productionPlan = await GetProductionPlanById(id);
+
+            if (productionPlan == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found");
+            }
+
+            if (_currentLoginUser.StaffId != productionPlan.CreatorId)
+            {
+                throw new APIException((int)HttpStatusCode.Forbidden, "Only the creator can start the production plan.");
+            }
+
+            /*ProductionPlanStatus parsedStatus = ValidateProductionPlanStatus(productionPlanStatus, productionPlan);
+
+            if (parsedStatus != ProductionPlanStatus.InProgress)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status for starting the production plan.");
+            }
+
+            foreach (var requirement in productionPlan.ProductionRequirements)
+            {
+                var productSpecification = requirement.ProductSpecification;
+                var product = productSpecification.Product;
+
+                product.Status = ProductStatus.InProduction;
+                await _productRepository.Save();
+            }
+
+            productionPlan.Status = parsedStatus;
+            await _productionPlanRepository.Save();*/
+
+            var result = await ChangeStatus(id, productionPlanStatus);
+            return result;
+
+            /*return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);*/
         }
     }
 }
