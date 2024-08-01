@@ -317,7 +317,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> defaultPageResponseListingDTO =
                 new DefaultPageResponseListingDTO<ProductionPlanListingDTO>
                 {
-                    
+
                 };
             return defaultPageResponseListingDTO;
         }
@@ -376,7 +376,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus(Guid id , string productionPlanStatus)
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus
+            (Guid id, string productionPlanStatus)
         {
             var productionPlan = await GetProductionPlanById(id);
 
@@ -454,9 +455,46 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
+        #region Start Production Plan
         public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id, string productionPlanStatus)
         {
-            var productionPlan = await GetProductionPlanById(id);
+            if (Enum.TryParse(productionPlanStatus,true,out ProductionPlanStatus parsedStatus))
+            {
+                
+            }
+            var productionPlan = await _productionPlanRepository.Search(productionPlan => productionPlan.Id.Equals(id))
+                                        .Include(productionPlan => productionPlan.ProductionRequirements)
+                                            .ThenInclude(requirement => requirement.ProductSpecification)
+                                                .ThenInclude(specification => specification.Product)
+                                        .FirstOrDefaultAsync();
+            ValidateProductionPlanForStart(productionPlan);
+            await HandleStartProductionPlan(productionPlan);
+            return new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
+            {
+                Id = productionPlan.Id,
+                Status = productionPlan.Status.ToString()
+            };
+        }
+
+        private async Task HandleStartProductionPlan(ProductionPlan productionPlan)
+        {
+            List<Product> products = productionPlan.ProductionRequirements
+                                .Select(requirement => requirement.ProductSpecification.Product).ToList();
+            foreach (Product product in products)
+            {
+                if (product.Status.Equals(ProductStatus.Approved))
+                {
+                    product.Status = ProductStatus.InProduction;
+                    _productRepository.Update(product);
+                }
+            }
+            productionPlan.Status = ProductionPlanStatus.InProgress;
+            _productionPlanRepository.Update(productionPlan);
+            await _productRepository.Save();
+        }
+
+        private void ValidateProductionPlanForStart(ProductionPlan productionPlan)
+        {
             if (productionPlan == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found.");
@@ -473,10 +511,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Can only start production plan with Type set to Batch.");
             }
-
-            return null;
-            // return result;
-
         }
+        #endregion 
     }
 }

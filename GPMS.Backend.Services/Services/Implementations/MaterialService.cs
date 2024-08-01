@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
@@ -137,7 +138,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             query = query.SortBy<Material>(materialFilterModel);
             int totalItem = query.Count();
             query = query.PagingEntityQuery(materialFilterModel);
-            var data = _mapper.Map<List<MaterialListingDTO>>(await _materialRepository.GetAll().ToListAsync());
+            var data = await query.ProjectTo<MaterialListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
             return new DefaultPageResponseListingDTO<MaterialListingDTO>
             {
                 Data = data,
