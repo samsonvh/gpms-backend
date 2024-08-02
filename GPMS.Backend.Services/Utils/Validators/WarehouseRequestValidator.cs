@@ -21,7 +21,7 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.Description).MaximumLength(500).WithMessage("Description can not longer than 500 characters");
             RuleFor(inputDTO => inputDTO.Description).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$").WithMessage("Description can not contains special character");
 
-            RuleFor(inputDTO => inputDTO.WarehouseRequestRequirementInputDTOs).NotNull().WithMessage("Warehouse Request Requirement is required");
+            RuleFor(inputDTO => inputDTO.WarehouseRequestRequirements).NotNull().WithMessage("Warehouse Request Requirement is required");
         }
     }
 }

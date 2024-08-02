@@ -91,17 +91,17 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<ProductListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProducts([FromQuery] ProductFilterModel productFilterModel)
+        public async Task<IActionResult> GetAllProducts([FromBody] ProductFilterModel productFilterModel)
         {
             DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productFilterModel);
 
-            BaseReponse response = new BaseReponse
+           /* BaseReponse response = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
                 Message = "Get all product",
                 Data = pageResponse
-            };
-            return Ok(response);
+            };*/
+            return Ok(pageResponse);
         }
 
         [HttpGet]

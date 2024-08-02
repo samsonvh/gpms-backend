@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 
 namespace GPMS.Backend.Controllers
 {
@@ -33,7 +34,7 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.DEPARTMENTS_V1)]
         [SwaggerOperation(Summary = "Get all departments")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all departments successfully", typeof(AccountDTO))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all departments successfully", typeof(DepartmentListingDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
         [Produces("application/json")]
         public async Task<IActionResult> GetAllDepartments()
