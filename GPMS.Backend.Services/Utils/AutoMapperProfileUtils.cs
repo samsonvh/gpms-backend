@@ -75,6 +75,7 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
             CreateMap<Product,CreateProductListingDTO>();
             //SemiFinishedProduct
+            CreateMap<SemiFinishedProduct, SemiFinishedProductListingDTO>();
             CreateMap<SemiFinishedProductInputDTO, SemiFinishedProduct>();
             CreateMap<SemiFinishedProduct, SemiFinishedProductDTO>();
             //Material
@@ -90,9 +91,11 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(specificationDTO => specificationDTO.QualityStandards, opt => opt.MapFrom(productSpecification => productSpecification.QualityStandards))
                 .ForMember(specificationDTO => specificationDTO.BillOfMaterials, opt => opt.MapFrom(productSpecification => productSpecification.BillOfMaterials));
             CreateMap<ProductSpecification,CreateProductSpecificationListingDTO>();
+            CreateMap<ProductSpecification, SpecificationListingDTO>();
             //Measurement
             CreateMap<MeasurementInputDTO, Measurement>();
             CreateMap<Measurement, MeasurementDTO>();
+            CreateMap<Measurement, MeasurementListingDTO>();
             //Bill Of Material
             CreateMap<BOMInputDTO, BillOfMaterial>();
             CreateMap<BillOfMaterial, BOMDTO>()
@@ -101,11 +104,14 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<QualityStandardInputDTO, QualityStandard>();
             CreateMap<QualityStandard, QualityStandardDTO>()
                 .ForMember(qualityStandardDTO => qualityStandardDTO.ImageURL, options => options.Ignore());
+            CreateMap<QualityStandard, QualityStandardListingDTO>()
+                .ForMember(qualityStandardListingDTO => qualityStandardListingDTO.ImageURL, options => options.Ignore());
             //Process 
             CreateMap<ProcessInputDTO, ProductProductionProcess>()
             .ForMember(process => process.Steps, options => options.Ignore());
             CreateMap<ProductProductionProcess, ProcessDTO>()
                 .ForMember(dest => dest.ProductionProcessSteps, opt => opt.MapFrom(src => src.Steps));
+            CreateMap<ProductProductionProcess, ProcessListingDTO>();
             //Step
             CreateMap<StepInputDTO, Data.Models.Products.ProductionProcesses.ProductionProcessStep>();
             CreateMap<ProductionProcessStep, ProductionProcessStepDTO>()

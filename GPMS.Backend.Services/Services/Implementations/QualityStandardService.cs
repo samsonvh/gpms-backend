@@ -4,9 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
@@ -15,8 +17,10 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -89,9 +93,47 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAll(QualityStandardFilterModel qualityStandardFilterModel)
+        public async Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAll(QualityStandardFilterModel qualityStandardFilterModel)
         {
-            throw new NotImplementedException();
+            var query = _qualityStandardRepository.GetAll();
+            query = Filters(query, qualityStandardFilterModel);
+            query = query.SortBy<QualityStandard>(qualityStandardFilterModel);
+            List<QualityStandard> qualityStandardList = await query.ToListAsync();
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(qualityStandardFilterModel);
+            var data = await query.ProjectTo<QualityStandardListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            List<QualityStandardListingDTO> qualityListingDTOs = new List<QualityStandardListingDTO>();
+            foreach (QualityStandard qualityStandard in qualityStandardList)
+            {
+                QualityStandardListingDTO qualityListingDTO = _mapper.Map<QualityStandardListingDTO>(qualityStandard);
+                if (!qualityStandard.ImageURL.IsNullOrEmpty())
+                {
+                    string[] imageArr = qualityStandard.ImageURL.Split(";", StringSplitOptions.None);
+                    qualityListingDTO.ImageURL.AddRange(imageArr);
+                }
+                qualityListingDTOs.Add(qualityListingDTO);
+            }
+
+            return new DefaultPageResponseListingDTO<QualityStandardListingDTO>
+            {
+                Data = qualityListingDTOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = qualityStandardFilterModel.Pagination.PageIndex,
+                    PageSize = qualityStandardFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<QualityStandard> Filters(IQueryable<QualityStandard> query, QualityStandardFilterModel qualityStandardFilterModel)
+        {
+            if (!qualityStandardFilterModel.Name.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Name.Contains(qualityStandardFilterModel.Name));
+            }
+            return query;
         }
 
         public Task<CreateUpdateResponseDTO<QualityStandard>> Update(QualityStandardInputDTO inputDTO)

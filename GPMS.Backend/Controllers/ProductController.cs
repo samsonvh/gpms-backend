@@ -84,23 +84,24 @@ namespace GPMS.Backend.Controllers
 
             return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of product sucessfully", Data = responseData });
         }
-        [HttpGet]
-        [Route(APIEndPoint.PRODUCTS_V1)]
+
+        [HttpPost]
+        [Route(APIEndPoint.PRODUCTS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all product", Description = "Factory director, Production manager can get all product")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<ProductListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProducts([FromQuery] ProductFilterModel productFilterModel)
+        public async Task<IActionResult> GetAllProducts([FromBody] ProductFilterModel productFilterModel)
         {
             DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productFilterModel);
 
-            BaseReponse response = new BaseReponse
+           /* BaseReponse response = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
                 Message = "Get all product",
                 Data = pageResponse
-            };
-            return Ok(response);
+            };*/
+            return Ok(pageResponse);
         }
 
         [HttpGet]

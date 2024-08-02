@@ -6,8 +6,9 @@ using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Filters
 {
-    public class SpecificationFilter : BaseFilterModel
+    public class SpecificationFilterModel : BaseFilterModel
     {
-        
+        public string? Size { get; set; }
+        public string? Color { get; set; }
     }
 }

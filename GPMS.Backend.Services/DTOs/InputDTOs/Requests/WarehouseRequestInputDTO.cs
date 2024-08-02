@@ -11,6 +11,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Requests
     {
         public string Name { get; set; }
         public string? Description { get; set; }
-        public List<WarehouseRequestRequirementInputDTO> WarehouseRequestRequirementInputDTOs { get; set; }
+        public List<WarehouseRequestRequirementInputDTO> WarehouseRequestRequirements { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace GPMS.Backend.Services.Filters
 {
     public class QualityStandardFilterModel : BaseFilterModel
     {
-        
+        public string? Name { get; set; }
     }
 }

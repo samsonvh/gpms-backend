@@ -132,7 +132,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             if (departmentId.HasValue)
             {
-                
+
                 var existingDepartment = await _departmentRepository
                     .Search(department => department.Id == departmentId.Value)
                     .FirstOrDefaultAsync();
@@ -234,7 +234,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             return new DefaultPageResponseListingDTO<AccountListingDTO>
             {
                 Data = accounts,
-                Pagination = new PaginationResponseModel {
+                Pagination = new PaginationResponseModel
+                {
                     PageIndex = accountFilterModel.Pagination.PageIndex,
                     PageSize = accountFilterModel.Pagination.PageSize,
                     TotalRows = totalItem
@@ -252,7 +253,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 query = query.Where(account => account.Email.Contains(accountFilterModel.Email));
             }
-            if (Enum.TryParse(accountFilterModel.AccountStatus,true,out AccountStatus accountStatus))
+            if (Enum.TryParse(accountFilterModel.AccountStatus, true, out AccountStatus accountStatus))
             {
                 query = query.Where(account => account.Status.Equals(accountFilterModel.AccountStatus));
             }
