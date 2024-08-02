@@ -26,13 +26,25 @@ namespace GPMS.Backend.Controllers
         [HttpPost]
         [Route(APIEndPoint.QUALITY_STANDARD_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all quality standard", Description = "Factory director, Production manager can get all quality standard")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(DefaultPageResponseListingDTO<QualityStandardListingDTO>))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all quality successfully", typeof(DefaultPageResponseListingDTO<QualityStandardListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllQualityStandards([FromBody] QualityStandardFilterModel qualityStandardFilterModel)
         {
             var pageResponses = await _qualityStandardService.GetAll(qualityStandardFilterModel);
 
+            return Ok(pageResponses);
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.QUALITY_STANDARD_OF_SPECIFICATION_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all quality standard")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all quality of product successfully", typeof(DefaultPageResponseListingDTO<QualityStandardListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllQualityStandardsOfProduct([FromRoute] Guid id, [FromBody] QualityStandardFilterModel qualityStandardFilterModel)
+        {
+            var pageResponses = await _qualityStandardService.GetAllQualityOfSpecification(id, qualityStandardFilterModel);
             return Ok(pageResponses);
         }
     }

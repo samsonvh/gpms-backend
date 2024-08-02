@@ -145,5 +145,40 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAllQualityOfSpecification(Guid specificationId, QualityStandardFilterModel qualityStandardFilterModel)
+        {
+            var query = _qualityStandardRepository.GetAll();
+            query = Filters(query, qualityStandardFilterModel);
+            query = query.Where(qualityStandard => qualityStandard.ProductSpecificationId == specificationId);
+            query = query.SortBy<QualityStandard>(qualityStandardFilterModel);
+            List<QualityStandard> qualityStandardList = await query.ToListAsync();
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(qualityStandardFilterModel);
+            var data = await query.ProjectTo<QualityStandardListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+
+            List<QualityStandardListingDTO> qualityListingDTOs = new List<QualityStandardListingDTO>();
+            foreach (QualityStandard qualityStandard in qualityStandardList)
+            {
+                QualityStandardListingDTO qualityListingDTO = _mapper.Map<QualityStandardListingDTO>(qualityStandard);
+                if (!qualityStandard.ImageURL.IsNullOrEmpty())
+                {
+                    string[] imageArr = qualityStandard.ImageURL.Split(";", StringSplitOptions.None);
+                    qualityListingDTO.ImageURL.AddRange(imageArr);
+                }
+                qualityListingDTOs.Add(qualityListingDTO);
+            }
+
+            return new DefaultPageResponseListingDTO<QualityStandardListingDTO>
+            {
+                Data = qualityListingDTOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = qualityStandardFilterModel.Pagination.PageIndex,
+                    PageSize = qualityStandardFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
     }
 }

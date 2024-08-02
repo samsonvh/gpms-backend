@@ -33,15 +33,8 @@ namespace GPMS.Backend.Controllers
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllMeasurements([FromBody] MeasurementFilterModel measurementFilterModel)
         {
-            var measuremenet = await _measurementService.GetAll(measurementFilterModel);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all measurement sucessfully",
-                Data = measuremenet
-            };
-            return Ok(response);
+            var pageResponses = await _measurementService.GetAll(measurementFilterModel);
+            return Ok(pageResponses);
         }
     }
 }
