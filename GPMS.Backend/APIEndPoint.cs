@@ -53,7 +53,7 @@ namespace GPMS.Backend
         public const string SPECIFICATION_ID_OF_PRODUCT_ID_v1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
         public const string SPECIFICATIONS_OF_PRODUCT_ID_CREATE_PRODUCTION_PLAN_V1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
         public const string SPECIFICATIONS_V1 = API_VERSION_1 + "/specifications";
-
+        public const string SPECIFICATIONS_ID_V1 = API_VERSION_1 + "/specifications" + "/{id}";
         //Measurements
         public const string MEASUREMENT_V1 = API_VERSION_1 + "/measurements";
 
@@ -74,6 +74,7 @@ namespace GPMS.Backend
 
         //QualityStandard
         public const string QUALITY_STANDARD_V1 = API_VERSION_1 + "/quality-standards";
+        public const string QUALITY_STANDARD_OF_SPECIFICATION_V1 = SPECIFICATIONS_ID_V1 + "/quality-standards";
         #region Production Plans
         //Production Plans
         public const string PRODUCTION_PLANS_V1 = API_VERSION_1 + "/production-plans";

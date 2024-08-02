@@ -1,11 +1,18 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using GPMS.Backend.Data.Enums.Others;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
+using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,16 +74,45 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         }
 
-        public async Task<IEnumerable<StaffListingDTO>> GetAllStaffs()
+        public async Task<DefaultPageResponseListingDTO<StaffListingDTO>> GetAll(StaffFilterModel staffFilterModel)
         {
-            var staffs = await _staffRepository.GetAll()
-                                                .Include(department => department.Department)
-                                                .ToListAsync();
-            if (staffs == null)
+            var query = _staffRepository.GetAll();
+            query = Filters(query, staffFilterModel);
+            query = query.SortBy<Staff>(staffFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<Staff>(staffFilterModel);
+            var staffs = await query.ProjectTo<StaffListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<StaffListingDTO>
             {
-                throw new APIException((int)HttpStatusCode.NotFound, "Staff not found because it may have been deleted or does not exist.");
-            }
-            return _mapper.Map<IEnumerable<StaffListingDTO>>(staffs);
+                Data = staffs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = staffFilterModel.Pagination.PageIndex,
+                    PageSize = staffFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
+
+        private IQueryable<Staff> Filters(IQueryable<Staff> query, StaffFilterModel staffFilterModel)
+        {
+            if (!staffFilterModel.Code.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Code.Contains(staffFilterModel.Code));
+            }
+
+            if (Enum.TryParse(staffFilterModel.Position, true, out StaffPosition staffPosition))
+            {
+                query = query.Where(staff => staff.Position.Equals(staffFilterModel.Position));
+            }
+
+            if (Enum.TryParse(staffFilterModel.Status, true, out StaffStatus staffStatus))
+            {
+                query = query.Where(staff => staff.Status.Equals(staffFilterModel.Status));
+            }
+            return query;
+        }
+
     }
 }

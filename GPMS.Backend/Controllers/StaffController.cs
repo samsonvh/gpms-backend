@@ -13,6 +13,8 @@ using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
+using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 
 namespace GPMS.Backend.Controllers
 {
@@ -32,16 +34,16 @@ namespace GPMS.Backend.Controllers
             _currentLoginUser = currentLoginUser;
         }
 
-        [HttpGet]
-        [Route(APIEndPoint.STAFFS_V1)]
+        [HttpPost]
+        [Route(APIEndPoint.STAFFS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all staffs")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all staffs successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all staffs successfully", typeof(List<StaffListingDTO>))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Staff not found")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAllDepartments()
+        public async Task<IActionResult> GetAllStaffs([FromBody] StaffFilterModel staffFilterModel)
         {
-            var staff = await _staffService.GetAllStaffs();
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = staff });
+            var pageResponses = await _staffService.GetAll(staffFilterModel);
+            return Ok(pageResponses);
         }
 
         [HttpGet]
