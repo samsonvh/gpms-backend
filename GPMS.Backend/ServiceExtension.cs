@@ -102,6 +102,7 @@ namespace GPMS.Backend
             services.AddScoped<IProductionRequirementService, ProductionRequirementService>();
             services.AddScoped<IProductionEstimationService, ProductionEstimationService>();
             services.AddScoped<IProductionSeriesService, ProductionSeriesService>();
+            services.AddScoped<ISemiFinishedProductService, SemiFinishProductService>();
 
             //Add IValidator
             services.AddTransient<IValidator<LoginInputDTO>, LoginInputDTOValidator>();

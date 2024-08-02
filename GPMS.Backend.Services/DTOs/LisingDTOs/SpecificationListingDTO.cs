@@ -7,6 +7,9 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class SpecificationListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public int InventoryQuantity { get; set; }
+        public string Size { get; set; }
+        public string Color { get; set; }
     }
 }

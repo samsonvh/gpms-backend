@@ -21,6 +21,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using GPMS.Backend.Data.Models.Staffs;
+using GPMS.Backend.Services.Filters;
+using AutoMapper.QueryableExtensions;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -379,12 +381,16 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productListingDTOs.Add(productListingDTO);
             }
 
-            DefaultPageResponseListingDTO<ProductListingDTO> defaultPageResponseListingDTO =
-            new DefaultPageResponseListingDTO<ProductListingDTO>
+            return new DefaultPageResponseListingDTO<ProductListingDTO>
             {
-                
+                Data = productListingDTOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = productFilterModel.Pagination.PageIndex,
+                    PageSize = productFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
             };
-            return defaultPageResponseListingDTO;
         }
 
         private List<Product> FilterColorAndSize(List<Product> productList, ProductFilterModel productFilterModel)
@@ -415,6 +421,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 query = query
                 .Where(product => product.Code.ToLower().Contains(productFilterModel.Code.ToLower()));
             }
+
             if (!productFilterModel.Name.IsNullOrEmpty())
             {
                 query = query

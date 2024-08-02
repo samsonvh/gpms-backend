@@ -19,5 +19,6 @@ namespace GPMS.Backend.Services.Services
         Task UpdateList (List<I> inputDTOs);
         Task<DefaultPageResponseListingDTO<L>> GetAll(F filter);
         Task<D> Details(Guid id);
+
     }
 }

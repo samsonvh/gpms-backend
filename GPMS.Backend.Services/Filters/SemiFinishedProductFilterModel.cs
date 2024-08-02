@@ -8,6 +8,7 @@ namespace GPMS.Backend.Services.Filters
 {
     public class SemiFinishedProductFilterModel : BaseFilterModel
     {
-        
+        public string? Code { get; set; }
+        public string? Name { get; set; }
     }
 }

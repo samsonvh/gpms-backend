@@ -7,6 +7,9 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class MeasurementListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public float Measure {  get; set; } 
+        public string Unit { get; set; }
     }
 }

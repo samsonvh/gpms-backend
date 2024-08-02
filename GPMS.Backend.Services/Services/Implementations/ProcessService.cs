@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
@@ -16,6 +18,8 @@ using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -80,9 +84,37 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<DefaultPageResponseListingDTO<ProcessListingDTO>> GetAll(ProcessFilterModel processFilterModel)
+        public async Task<DefaultPageResponseListingDTO<ProcessListingDTO>> GetAll(ProcessFilterModel processFilterModel)
         {
-            throw new NotImplementedException();
+            var query = _processRepository.GetAll();
+            query = Filters(query, processFilterModel);
+            query = query.SortBy<ProductProductionProcess>(processFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(processFilterModel);
+            var data = await query.ProjectTo<ProcessListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            return new DefaultPageResponseListingDTO<ProcessListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = processFilterModel.Pagination.PageIndex,
+                    PageSize = processFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<ProductProductionProcess> Filters(IQueryable<ProductProductionProcess> query, ProcessFilterModel processFilterModel)
+        {
+            if (!processFilterModel.Code.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Code.Contains(processFilterModel.Code));
+            }
+            if (!processFilterModel.Name.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Name.Contains(processFilterModel.Name));
+            }
+            return query;
         }
 
         public Task<CreateUpdateResponseDTO<ProductProductionProcess>> Update(ProcessInputDTO inputDTO)
@@ -93,6 +125,27 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<ProcessInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<DefaultPageResponseListingDTO<ProcessListingDTO>> GetAllProcessOfProduct(Guid productId, ProcessFilterModel processFilterModel)
+        {
+            IQueryable<ProductProductionProcess> query = _processRepository.GetAll();
+            query = query.Where(process => process.ProductId == productId);
+            query = Filters(query, processFilterModel);
+            int totalItem = query.Count();
+            query = query.SortBy<ProductProductionProcess>(processFilterModel);
+            query = query.PagingEntityQuery(processFilterModel);
+            var data = await query.ProjectTo<ProcessListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            return new DefaultPageResponseListingDTO<ProcessListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = processFilterModel.Pagination.PageIndex,
+                    PageSize = processFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
     }
 }

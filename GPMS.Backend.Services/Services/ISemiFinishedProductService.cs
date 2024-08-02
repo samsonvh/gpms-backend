@@ -16,5 +16,6 @@ namespace GPMS.Backend.Services.Services
     SemiFinishedProductListingDTO,SemiFinishedProductDTO, SemiFinishedProductFilterModel>
     {
         Task<List<CreateUpdateResponseDTO<SemiFinishedProduct>>> AddList(List<SemiFinishedProductInputDTO> inputDTOs, Guid productId);
+        Task<DefaultPageResponseListingDTO<SemiFinishedProductListingDTO>> GetAllSemiOfProduct(Guid productId, SemiFinishedProductFilterModel semiFinishedProductFilterModel);
     }
 }
