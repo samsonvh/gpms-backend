@@ -123,7 +123,9 @@ namespace GPMS.Backend.Services.Utils
                                 opt => opt.MapFrom(productionProcessStepIO => productionProcessStepIO.SemiFinishedProduct.Code))
                 .ForMember(productionProcessStepIODTO => productionProcessStepIODTO.SemiFinishedProductName,
                                 opt => opt.MapFrom(productionProcessStepIO => productionProcessStepIO.SemiFinishedProduct.Name));
-
+            CreateMap<ProductionProcessStep, StepListingDTO>();
+            //StepIO
+            CreateMap<ProductionProcessStepIO, StepIOListingDTO>();
             //Production Plan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>()
             .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
@@ -170,6 +172,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<WarehouseRequest, CreateUpdateResponseDTO<WarehouseRequest>>();
             CreateMap<WarehouseRequest, WarehouseRequestDTO>()
                 .ForMember(warehouseRequestDto => warehouseRequestDto.WarehouseTicket, options => options.MapFrom(warehouseRequest => warehouseRequest.WarehouseTicket));
+            CreateMap<WarehouseRequest, WarehouseRequestListingDTO>();
 
             //WarehouseRequest Requirement
             CreateMap<WarehouseRequestRequirement, CreateUpdateResponseDTO<WarehouseRequestRequirement>>();

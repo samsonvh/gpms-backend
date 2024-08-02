@@ -4,16 +4,21 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
+using GPMS.Backend.Data.Enums.Statuses.Staffs;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Process;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
@@ -78,6 +83,44 @@ namespace GPMS.Backend.Services.Services.Implementations
                 _stepIORepository.Add(productionProcessStepIO);
                 _stepIOInputDTOWrapper.StepIOInputDTOList.Add(stepIOInputDTO);
             }
+        }
+
+        #region Get All StepIO
+        public async Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetAll(StepIOFilterModel stepIOFilterModel)
+        {
+            var query = _stepIORepository.GetAll();
+            query = Filters(query, stepIOFilterModel);
+            query = query.SortBy<ProductionProcessStepIO>(stepIOFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<ProductionProcessStepIO>(stepIOFilterModel);
+            var stepIOs = await query.ProjectTo<StepIOListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<StepIOListingDTO>
+            {
+                Data = stepIOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = stepIOFilterModel.Pagination.PageIndex,
+                    PageSize = stepIOFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+        #endregion
+
+        private IQueryable<ProductionProcessStepIO> Filters(IQueryable<ProductionProcessStepIO> query, StepIOFilterModel stepIOFilterModel)
+        {
+            if (Enum.TryParse(stepIOFilterModel.Type, true, out ProductionProcessStepIOType stepIOType))
+            {
+                query = query.Where(stepIO => stepIO.Type.Equals(stepIOFilterModel.Type));
+            }
+
+            if (stepIOFilterModel.IsProduct.HasValue)
+            {
+                query = query.Where(stepIO => stepIO.IsProduct == stepIOFilterModel.IsProduct.Value);
+            }
+
+            return query;
         }
 
         private void CheckContainsOnlyOneOutputAndAtLeastOneInput(List<StepIOInputDTO> inputDTOs)

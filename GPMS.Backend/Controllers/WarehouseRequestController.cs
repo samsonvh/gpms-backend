@@ -11,7 +11,9 @@ using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.Utils;
@@ -34,6 +36,17 @@ namespace GPMS.Backend.Controllers
             _warehouseRequestService = warehouseRequestService;
             _logger = logger;
             _currentLoginUser = currentLoginUser;
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.WAREHOUSE_REQUESTS_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all warehouse requests")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all warehouse requests successfully", typeof(DefaultPageResponseListingDTO<WarehouseRequestListingDTO>))]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAllWarehouseRequests([FromBody] WarehouseRequestFilterModel warehouseRequestFilterModel)
+        {
+            var response = await _warehouseRequestService.GetAll(warehouseRequestFilterModel);
+            return Ok(response);
         }
 
         [HttpPost]
