@@ -31,15 +31,9 @@ namespace GPMS.Backend.Controllers
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllQualityStandards([FromBody] QualityStandardFilterModel qualityStandardFilterModel)
         {
-            var qualityStandards = await _qualityStandardService.GetAll(qualityStandardFilterModel);
+            var pageResponses = await _qualityStandardService.GetAll(qualityStandardFilterModel);
 
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all specification successfully",
-                Data = qualityStandards
-            };
-            return Ok(response);
+            return Ok(pageResponses);
         }
     }
 }
