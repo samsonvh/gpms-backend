@@ -15,6 +15,7 @@ using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Services.Utils.Validators;
@@ -311,7 +312,13 @@ namespace GPMS.Backend.Services.Services.Implementations
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> defaultPageResponseListingDTO =
                 new DefaultPageResponseListingDTO<ProductionPlanListingDTO>
                 {
-
+                    Data = productionPlanListingDTOs,
+                    Pagination = new PaginationResponseModel
+                    {
+                        PageIndex = productionPlanFilterModel.Pagination.PageIndex,
+                        PageSize = productionPlanFilterModel.Pagination.PageSize,
+                        TotalRows = totalItem
+                    }
                 };
             return defaultPageResponseListingDTO;
         }

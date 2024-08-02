@@ -84,8 +84,9 @@ namespace GPMS.Backend.Controllers
 
             return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of product sucessfully", Data = responseData });
         }
-        [HttpGet]
-        [Route(APIEndPoint.PRODUCTS_V1)]
+
+        [HttpPost]
+        [Route(APIEndPoint.PRODUCTS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all product", Description = "Factory director, Production manager can get all product")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all product successfully", typeof(List<ProductListingDTO>))]
         [Produces("application/json")]

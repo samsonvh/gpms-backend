@@ -107,13 +107,13 @@ namespace GPMS.Backend.Controllers
             return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of production plan sucessfully", Data = productionPlan });
         }
 
-        [HttpGet]
-        [Route(APIEndPoint.PRODUCTION_PLANS_V1)]
+        [HttpPost]
+        [Route(APIEndPoint.PRODUCTION_PLANS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all production plan", Description = "Factory director, Production manager can get all production plan")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all production plan successfully", typeof(List<ProductionPlanListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProductionPlans([FromQuery] ProductionPlanFilterModel productionPlanFilterModel)
+        public async Task<IActionResult> GetAllProductionPlans([FromBody] ProductionPlanFilterModel productionPlanFilterModel)
         {
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = await _productionPlanService.GetAll(productionPlanFilterModel);
 

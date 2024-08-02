@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Products.ProductionProcesses;
 using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Models.Warehouses;
 using GPMS.Backend.Data.Repositories;
@@ -15,6 +17,7 @@ using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -88,9 +91,37 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilter specificationFilter)
+        public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilter)
         {
-            throw new NotImplementedException();
+            var query = _specificationRepository.GetAll();
+            query = Filters(query, specificationFilter);
+            query = query.SortBy<ProductSpecification>(specificationFilter);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(specificationFilter);
+            var data = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            return new DefaultPageResponseListingDTO<SpecificationListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = specificationFilter.Pagination.PageIndex,
+                    PageSize = specificationFilter.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<ProductSpecification> Filters(IQueryable<ProductSpecification> query, SpecificationFilterModel specificationFilter)
+        {
+            if (!specificationFilter.Size.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Size.Contains(specificationFilter.Size));
+            }
+            if (!specificationFilter.Color.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Color.Contains(specificationFilter.Color));
+            }
+            return query;
         }
 
         public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)

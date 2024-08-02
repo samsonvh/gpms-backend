@@ -9,15 +9,18 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Services
 {
     public interface ISpecificationService
     : IBaseService<SpecificationInputDTO, CreateUpdateResponseDTO<ProductSpecification>,
-        SpecificationListingDTO, SpecificationDTO,SpecificationFilter>
+        SpecificationListingDTO, SpecificationDTO,SpecificationFilterModel>
     {
         Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, 
         List<CreateUpdateResponseDTO<Material>> materialCodeList, string sizes, string colors);
         Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId);
+        Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilterModel);
+
     }
 }

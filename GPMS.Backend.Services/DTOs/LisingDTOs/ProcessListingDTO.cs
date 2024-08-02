@@ -7,6 +7,10 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class ProcessListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public string Code { get; set; }
+        public string Name { get; set; }
+        public int OrderNumber { get; set; }
+
     }
 }

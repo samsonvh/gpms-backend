@@ -175,5 +175,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
+        public Task<DefaultPageResponseListingDTO<MaterialListingDTO>> GetAll(int productId, MaterialFilterModel filter)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

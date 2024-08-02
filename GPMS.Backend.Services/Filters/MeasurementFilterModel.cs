@@ -8,6 +8,6 @@ namespace GPMS.Backend.Services.Filters
 {
     public class MeasurementFilterModel : BaseFilterModel
     {
-        
+        public string? Name { get; set; }
     }
 }

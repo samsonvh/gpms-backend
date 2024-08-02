@@ -7,6 +7,8 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class QualityStandardListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public List<string> ImageURL { get; set; } = new List<string>();
     }
 }

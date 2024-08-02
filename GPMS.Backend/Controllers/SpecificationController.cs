@@ -5,7 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -45,5 +47,23 @@ namespace GPMS.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpPost]
+        [Route(APIEndPoint.SPECIFICATIONS_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all specification for create production plan", Description = "Factory director, Production manager can get all specification")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(DefaultPageResponseListingDTO<SpecificationListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllSpecifications([FromBody] SpecificationFilterModel specificationFilterModel)
+        {
+            var specifications = await _specificationService.GetAll(specificationFilterModel);
+
+            BaseReponse response = new BaseReponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Message = "Get all specification successfully",
+                Data = specifications
+            };
+            return Ok(response);
+        }
     }
 }
