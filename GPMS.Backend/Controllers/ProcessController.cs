@@ -36,14 +36,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProcesses([FromBody] ProcessFilterModel processFilterModel)
         {
             DefaultPageResponseListingDTO<ProcessListingDTO> pageResponse = await _processService.GetAll(processFilterModel);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all processes",
-                Data = pageResponse
-            };
-            return Ok(response);
+            return Ok(pageResponse);
         }
 
         [HttpPost]
@@ -54,14 +47,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProcessesOfProduct([FromRoute] Guid id, [FromBody] ProcessFilterModel processFilterModel)
         {
             DefaultPageResponseListingDTO<ProcessListingDTO> pageResponse = await _processService.GetAllProcessOfProduct(id, processFilterModel);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all processes of product",
-                Data = pageResponse
-            };
-            return Ok(response);
+            return Ok(pageResponse);
         }
     }
 }

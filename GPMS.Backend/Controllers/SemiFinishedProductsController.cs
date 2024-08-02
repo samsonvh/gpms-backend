@@ -44,14 +44,8 @@ namespace GPMS.Backend.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> GetAllSemiFinishedProductOfProduct([FromRoute] Guid id, [FromBody] SemiFinishedProductFilterModel semiFinishedProductFilterModel)
         {
-            var result = await _semiFinishedProductService.GetAllSemiOfProduct(id, semiFinishedProductFilterModel);
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all processes of product",
-                Data = result
-            };
-            return Ok(response);
+            var pageResponses = await _semiFinishedProductService.GetAllSemiOfProduct(id, semiFinishedProductFilterModel);
+            return Ok(pageResponses);
         }
     }
 }

@@ -116,14 +116,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProductionPlans([FromBody] ProductionPlanFilterModel productionPlanFilterModel)
         {
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = await _productionPlanService.GetAll(productionPlanFilterModel);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all production plan sucessfully",
-                Data = pageResponse
-            };
-            return Ok(response);
+            return Ok(pageResponse);
         }
 
         [HttpPatch]

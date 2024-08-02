@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
@@ -31,7 +32,7 @@ namespace GPMS.Backend.Controllers
         [HttpPost]
         [Route(APIEndPoint.MATERIAL_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Material")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Material List")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Material List", typeof(DefaultPageResponseListingDTO<MaterialListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllMaterial ([FromBody] MaterialFilterModel materialFilterModel)
