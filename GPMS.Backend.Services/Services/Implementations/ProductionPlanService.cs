@@ -292,7 +292,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
-
+        #region Get All Production Plan
         public async Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanFilterModel productionPlanFilterModel)
         {
             IQueryable<ProductionPlan> query = _productionPlanRepository.GetAll();
@@ -358,6 +358,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             return query;
         }
+        #endregion
 
         private async Task<ProductionPlan> GetProductionPlanById(Guid id)
         {
@@ -369,86 +370,48 @@ namespace GPMS.Backend.Services.Services.Implementations
                         .ThenInclude(productSpecification => productSpecification.Product)
                 .FirstOrDefaultAsync();
         }
-
-        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> ChangeStatus
-            (Guid id, string productionPlanStatus)
+        #region Approve Production Plan
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> Approve
+            (Guid id)
         {
             var productionPlan = await GetProductionPlanById(id);
-
             if (productionPlan == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found");
             }
-
-            var parsedStatus = ValidateProductionPlanStatus(productionPlanStatus, productionPlan);
-
-            if (parsedStatus == ProductionPlanStatus.Approved && productionPlan.Status == ProductionPlanStatus.Pending)
+            if (!productionPlan.Status.Equals(ProductionPlanStatus.Pending))
             {
-                await ApproveProductionPlan(productionPlan);
+                throw new APIException((int)HttpStatusCode.NotFound,  "Cannot approve Production Plan with a Status is not Pending.");
             }
-
-            if (parsedStatus == ProductionPlanStatus.InProgress && productionPlan.Status == ProductionPlanStatus.Approved)
-            {
-                await ChangeStatusToInProgress(productionPlan);
-            }
-
-            productionPlan.Status = parsedStatus;
+            productionPlan.Creator.Status = StaffStatus.In_production;
+            _staffRepository.Update(productionPlan.Creator);
+            productionPlan.ReviewerId = _currentLoginUser.StaffId;
+            productionPlan.Status = ProductionPlanStatus.Approved;
+            _productionPlanRepository.Update(productionPlan);
             await _productionPlanRepository.Save();
-
             return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);
         }
-
-        private ProductionPlanStatus ValidateProductionPlanStatus(string productionPlanStatus, ProductionPlan productionPlan)
+        #endregion
+        #region Decline Production Plan
+        public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> Decline
+            (Guid id)
         {
-            if (!Enum.TryParse(productionPlanStatus, true, out ProductionPlanStatus parsedStatus))
+            var productionPlan = await GetProductionPlanById(id);
+            if (productionPlan == null)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Invalid status value provided.");
+                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found");
             }
-
-            switch (productionPlan.Status)
+            if (!productionPlan.Status.Equals(ProductionPlanStatus.Pending))
             {
-                case ProductionPlanStatus.Pending:
-                    if (parsedStatus == ProductionPlanStatus.Finished || parsedStatus == ProductionPlanStatus.InProgress)
-                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Pending} to {parsedStatus}.");
-                    break;
-
-                case ProductionPlanStatus.Approved:
-                    if (parsedStatus == ProductionPlanStatus.Pending || parsedStatus == ProductionPlanStatus.Declined || parsedStatus == ProductionPlanStatus.Finished)
-                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Approved} to {parsedStatus}.");
-                    break;
-
-                case ProductionPlanStatus.Declined:
-                    if (parsedStatus == ProductionPlanStatus.Pending || parsedStatus == ProductionPlanStatus.Approved || parsedStatus == ProductionPlanStatus.InProgress || parsedStatus == ProductionPlanStatus.Finished)
-                        throw new APIException((int)HttpStatusCode.BadRequest, $"Cannot change status from {ProductionPlanStatus.Declined} to {parsedStatus}.");
-                    break;
+                throw new APIException((int)HttpStatusCode.NotFound, "Cannot decline Production Plan with a Status is not Pending.");
             }
-
-            return parsedStatus;
-        }
-
-        private async Task ApproveProductionPlan(ProductionPlan productionPlan)
-        {
-            if (productionPlan.Creator != null)
-            {
-                productionPlan.Creator.Status = StaffStatus.In_production;
-                await _staffRepository.Save();
-            }
-
             productionPlan.ReviewerId = _currentLoginUser.StaffId;
+            productionPlan.Status = ProductionPlanStatus.Declined;
+            _productionPlanRepository.Update(productionPlan);
+            await _productionPlanRepository.Save();
+            return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);
         }
-
-        private async Task ChangeStatusToInProgress(ProductionPlan productionPlan)
-        {
-            foreach (var requirement in productionPlan.ProductionRequirements)
-            {
-                var productSpecification = requirement.ProductSpecification;
-                var product = productSpecification.Product;
-
-                product.Status = ProductStatus.InProduction;
-                await _productRepository.Save();
-            }
-        }
-
+        #endregion
         #region Start Production Plan
         public async Task<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>> StartProductionPlan(Guid id)
         {
@@ -487,19 +450,19 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             if (productionPlan == null)
             {
-                throw new APIException((int)HttpStatusCode.NotFound, "Production plan not found.");
+                throw new APIException((int)HttpStatusCode.NotFound, "Production Plan not found.");
             }
             if (!productionPlan.Status.Equals(ProductionPlanStatus.Approved))
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start production plan with a status other than approved.");
+                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Production Plan with a Status is not Approved.");
             }
             if (_currentLoginUser.StaffId != productionPlan.CreatorId)
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Only the creator can start the production plan.");
+                throw new APIException((int)HttpStatusCode.BadRequest, "Only the Creator can start the Production Plan.");
             }
             if (!productionPlan.Type.Equals(ProductionPlanType.Batch))
             {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Can only start production plan with Type set to Batch.");
+                throw new APIException((int)HttpStatusCode.BadRequest, "Can only start Production Plan with Production Plan Type set to Batch.");
             }
         }
         #endregion 

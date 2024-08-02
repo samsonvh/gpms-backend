@@ -22,6 +22,7 @@ using GPMS.Backend.Data.Enums.Types;
 using FluentValidation;
 using System.Reflection.Metadata.Ecma335;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
+using GPMS.Backend.Data.Enums.Others;
 
 namespace GPMS.Backend.Controllers
 {
@@ -88,7 +89,7 @@ namespace GPMS.Backend.Controllers
             {
                 result = await _productionPlanService.AddChildProductionPlanList(childProductionPlanList);
             }
-            else 
+            else
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Production Plan List Is Required");
             }
@@ -127,22 +128,30 @@ namespace GPMS.Backend.Controllers
         }
 
         [HttpPatch]
-        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1)]
-        [SwaggerOperation(Summary = "Change status of production plan")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of production plan successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
+        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1 + APIEndPoint.APPROVE)]
+        [SwaggerOperation(Summary = "Approve production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Approve production plan successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Approve production plan failed")]
         [Produces("application/json")]
-        [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
+        [Authorize(Roles = "FactoryDirector")]
+        public async Task<IActionResult> ApproveProductionPlan([FromRoute] Guid id)
         {
             _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
-            var productionPlan = await _productionPlanService.ChangeStatus(id, status);
-            var responseData = new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
-            {
-                Id = productionPlan.Id,
-                Status = productionPlan.Status
-            };
+            var responseData = await _productionPlanService.Approve(id);
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Approve production plan successfully", Data = responseData });
+        }
 
+        [HttpPatch]
+        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1 + APIEndPoint.DECLINE)]
+        [SwaggerOperation(Summary = "Decline production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Decline production plan successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Decline production plan failed")]
+        [Produces("application/json")]
+        [Authorize(Roles = "FactoryDirector")]
+        public async Task<IActionResult> DeclineProductionPlan([FromRoute] Guid id)
+        {
+            _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
+            var responseData = await _productionPlanService.Decline(id);
             return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of production plan sucessfully", Data = responseData });
         }
 
@@ -156,12 +165,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> StartProducitonPlan([FromRoute] Guid id)
         {
             _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
-            var productionPlan = await _productionPlanService.StartProductionPlan(id);
-            var responseData = new ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>
-            {
-                Id = productionPlan.Id,
-                Status = productionPlan.Status
-            };
+            var responseData = await _productionPlanService.StartProductionPlan(id);
 
             return Ok(new BaseReponse { StatusCode = 200, Message = "Start production plan sucessfully", Data = responseData });
         }
