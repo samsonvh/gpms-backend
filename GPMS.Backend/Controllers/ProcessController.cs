@@ -33,7 +33,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerOperation(Summary = "Get all processes")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all processes successfully", typeof(DefaultPageResponseListingDTO<ProcessListingDTO>))]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAllProcesses([FromQuery] ProcessFilterModel processFilterModel)
+        public async Task<IActionResult> GetAllProcesses([FromBody] ProcessFilterModel processFilterModel)
         {
             DefaultPageResponseListingDTO<ProcessListingDTO> pageResponse = await _processService.GetAll(processFilterModel);
 

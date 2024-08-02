@@ -76,9 +76,9 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             int totalQuantity = 0;
 
-            var warehouseRequestRequirementResponses = await _warehouseRequestRequirementService.AddListWarehouseRequestRequirement(inputDTO.WarehouseRequestRequirementInputDTOs, warehouseRequest.Id);
+            var warehouseRequestRequirementResponses = await _warehouseRequestRequirementService.AddListWarehouseRequestRequirement(inputDTO.WarehouseRequestRequirements, warehouseRequest.Id);
 
-            totalQuantity = inputDTO.WarehouseRequestRequirementInputDTOs.Sum(req => req.Quantity);
+            totalQuantity = inputDTO.WarehouseRequestRequirements.Sum(req => req.Quantity);
 
             warehouseRequest.Quantity = totalQuantity;
             await _warehouseRequestRepository.Save();
