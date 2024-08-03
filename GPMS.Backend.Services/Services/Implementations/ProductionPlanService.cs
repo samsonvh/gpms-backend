@@ -89,7 +89,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (ProductionPlanInputDTO inputDTO in inputDTOs)
             {
                 ProductionPlan productionPlan = _mapper.Map<ProductionPlan>(inputDTO);
-                productionPlan.CreatorId = _currentLoginUser.StaffId;
+                productionPlan.CreatorId = _currentLoginUser.Id;
                 productionPlan.Type = (ProductionPlanType)Enum.Parse(typeof(ProductionPlanType), inputDTO.Type);
                 productionPlan.Status = ProductionPlanStatus.Approved;
                 _productionPlanRepository.Add(productionPlan);
@@ -131,7 +131,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (ProductionPlanInputDTO inputDTO in inputDTOs)
             {
                 ProductionPlan productionPlan = _mapper.Map<ProductionPlan>(inputDTO);
-                productionPlan.CreatorId = _currentLoginUser.StaffId;
+                productionPlan.CreatorId = _currentLoginUser.Id;
                 productionPlan.Type = (ProductionPlanType)Enum.Parse(typeof(ProductionPlanType), inputDTO.Type);
                 productionPlan.Status = ProductionPlanStatus.Pending;
                 _productionPlanRepository.Add(productionPlan);
@@ -416,7 +416,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             ValidateForApproveProductionPlan(productionPlan);
             productionPlan.Creator.Status = StaffStatus.In_production;
             _staffRepository.Update(productionPlan.Creator);
-            productionPlan.ReviewerId = _currentLoginUser.StaffId;
+            productionPlan.ReviewerId = _currentLoginUser.Id;
             productionPlan.Status = ProductionPlanStatus.Approved;
             _productionPlanRepository.Update(productionPlan);
             await _productionPlanRepository.Save();
@@ -461,7 +461,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             var productionPlan = await GetProductionPlanById(id);
             ValidateForDeclineProductionPlan(productionPlan);
             HandleDeclineProductionPlan(productionPlan);
-            productionPlan.ReviewerId = _currentLoginUser.StaffId;
+            productionPlan.ReviewerId = _currentLoginUser.Id;
             _productionPlanRepository.Update(productionPlan);
             await _productionPlanRepository.Save();
             return _mapper.Map<ChangeStatusResponseDTO<ProductionPlan, ProductionPlanStatus>>(productionPlan);
@@ -494,10 +494,10 @@ namespace GPMS.Backend.Services.Services.Implementations
                 foreach (ProductionPlan childProductionPlan in productionPlan.ChildProductionPlans)
                 {
                     childProductionPlan.Status = ProductionPlanStatus.Declined;
-                    childProductionPlan.ReviewerId = _currentLoginUser.StaffId;
+                    childProductionPlan.ReviewerId = _currentLoginUser.Id;
                     _productionPlanRepository.Update(childProductionPlan);
                 }
-                productionPlan.ReviewerId = _currentLoginUser.StaffId;
+                productionPlan.ReviewerId = _currentLoginUser.Id;
                 productionPlan.Status = ProductionPlanStatus.Declined;
                 _productionPlanRepository.Update(productionPlan);
             }
@@ -517,10 +517,10 @@ namespace GPMS.Backend.Services.Services.Implementations
                 }
                 if (declineCount == productionPlan.ParentProductionPlan.ChildProductionPlans.Count - 1)
                 {
-                    productionPlan.ParentProductionPlan.ReviewerId = _currentLoginUser.StaffId;
+                    productionPlan.ParentProductionPlan.ReviewerId = _currentLoginUser.Id;
                     productionPlan.ParentProductionPlan.Status = ProductionPlanStatus.Declined;
                 }
-                productionPlan.ReviewerId = _currentLoginUser.StaffId;
+                productionPlan.ReviewerId = _currentLoginUser.Id;
                 productionPlan.Status = ProductionPlanStatus.Declined;
                 _productionPlanRepository.Update(productionPlan);
             }
@@ -556,7 +556,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Batch Production Plan with a Status is not Approved.");
             }
-            if (_currentLoginUser.StaffId != productionPlan.CreatorId)
+            if (_currentLoginUser.Id != productionPlan.CreatorId)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Only the Creator can start the Batch Production Plan.");
             }

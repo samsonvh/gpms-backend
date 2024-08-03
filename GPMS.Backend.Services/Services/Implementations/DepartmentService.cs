@@ -41,7 +41,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
 
             /*var currentStaff = await _staffRepository
-                .Search(staff => staff.Id == currentLoginUserDTO.StaffId)
+                .Search(staff => staff.Id == currentLoginUserDTO.Id)
                 .FirstOrDefaultAsync();*/
 
             /*if (currentStaff == null)

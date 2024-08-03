@@ -9,6 +9,6 @@ namespace GPMS.Backend.Services.Services
 {
     public interface IAuthenticationService
     {
-        Task<LoginResponseDTO> LoginWithCredential(LoginInputDTO loginInputDTO);
+        Task<LoginResponseDTO> SignInWIthEmailPassword(LoginInputDTO loginInputDTO);
     }
 }
