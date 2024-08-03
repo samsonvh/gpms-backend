@@ -229,7 +229,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             query = query.SortBy<Account>(accountFilterModel);
             int totalItem = query.Count();
             query = query.PagingEntityQuery<Account>(accountFilterModel);
-            var accounts = await query.ProjectTo<AccountListingDTO>(_mapper.ConfigurationProvider)
+            var accounts = await query.Include(account => account.Staff).ProjectTo<AccountListingDTO>(_mapper.ConfigurationProvider)
                                         .ToListAsync();
             return new DefaultPageResponseListingDTO<AccountListingDTO>
             {

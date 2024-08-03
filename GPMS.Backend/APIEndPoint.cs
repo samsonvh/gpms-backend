@@ -11,10 +11,13 @@ namespace GPMS.Backend
         public const string API_VERSION_1 = "/api/v1";
         public const string CREATE_PRODUCTION_PLAN = "/create-production-plan";
         public const string FILTER = "/filter";
+        public const string APPROVE = "/approve";
+        public const string DECLINE = "/decline";
 
         //Authentication
-        public const string AUTHENTICATION_V1 = API_VERSION_1 + "/authentication";
-        public const string AUTHENTICATION_CREDENTIALS_V1 = AUTHENTICATION_V1 + "/credentials";
+        public const string AUTH_V1 = API_VERSION_1 + "/auth";
+        public const string AUTH_SIGN_IN_V1 = AUTH_V1 + "/sign-in";
+        public const string AUTH_SIGN_IN_WITH_TOKEN_V1 = AUTH_V1 + "/sign-in-with-token";
 
         //Accounts
         public const string ACCOUNTS_V1 = API_VERSION_1 + "/accounts";
