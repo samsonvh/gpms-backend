@@ -55,7 +55,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             var account = await _accountService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of account sucessfully", Data = account });
+            return Ok(account);
         }
 
         [HttpPost]

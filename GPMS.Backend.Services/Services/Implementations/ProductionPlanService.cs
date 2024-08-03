@@ -292,10 +292,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
 
-        public Task<CreateUpdateResponseDTO<ProductionPlan>> Add(ProductionPlanInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
         #region Get All Production Plan
         public async Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanFilterModel productionPlanFilterModel)
         {
@@ -611,6 +607,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             _productionPlanRepository.Update(productionPlan);
             await _productRepository.Save();
         }
+
+        public Task<ProductionPlanDTO> Add(ProductionPlanInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
 
         #endregion
     }

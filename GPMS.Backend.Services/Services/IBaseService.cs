@@ -13,7 +13,7 @@ namespace GPMS.Backend.Services.Services
     where D : class
     where F : class
     {
-        Task<CU> Add(I inputDTO);
+        Task<D> Add(I inputDTO);
         Task AddList(List<I> inputDTOs, Guid? parentEntityId = null);
         Task<CU> Update(I inputDTO);
         Task UpdateList (List<I> inputDTOs);

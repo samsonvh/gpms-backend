@@ -45,7 +45,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _mapper = mapper;
         }
 
-        public async Task<CreateUpdateResponseDTO<Account>> Add(AccountInputDTO inputDTO)
+        public async Task<AccountDTO> Add(AccountInputDTO inputDTO)
         {
             ValidationResult validateResult = await _accountInputDTOValidator.ValidateAsync(inputDTO);
             if (!validateResult.IsValid)
@@ -89,7 +89,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             await _accountRepository.Save();
             await _staffRepository.Save();
-            return _mapper.Map<CreateUpdateResponseDTO<Account>>(account);
+            return _mapper.Map<AccountDTO>(account);
         }
 
         private async Task CheckUniqueAccountCode(string code)
@@ -259,5 +259,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return query;
         }
+
     }
 }

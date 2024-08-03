@@ -16,5 +16,6 @@ namespace GPMS.Backend.Services.Services
     MaterialListingDTO,MaterialDTO, MaterialFilterModel>
     {
         Task<List<CreateUpdateResponseDTO<Material>>> AddList (List<MaterialInputDTO> inputDTOs); 
+        Task<MaterialDTO> Add(MaterialInputDTO inputDTO);
     }
 }

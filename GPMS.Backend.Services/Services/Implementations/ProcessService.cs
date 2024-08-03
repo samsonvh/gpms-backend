@@ -46,10 +46,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<ProductProductionProcess>> Add(ProcessInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task AddList(List<ProcessInputDTO> inputDTOs, Guid? productId = null)
         {
@@ -146,6 +143,11 @@ namespace GPMS.Backend.Services.Services.Implementations
                     TotalRows = totalItem
                 }
             };
+        }
+
+        public Task<ProcessDTO> Add(ProcessInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
         }
     }
 }
