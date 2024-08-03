@@ -13,7 +13,7 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
         public Guid Id { get; set; }
         public string Code { get; set; }
         public string Email { get; set; }
-        public string Poition { get; set; }
+        public string Position { get; set; }
         public string Status { get; set; }
     }
 }

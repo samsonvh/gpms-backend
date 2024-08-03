@@ -38,7 +38,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all accounts successfully", typeof(DefaultPageResponseListingDTO<AccountListingDTO>))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
-        // [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAccounts([FromBody] AccountFilterModel accountFilterModel)
         {
             var response = await _accountService.GetAll(accountFilterModel);

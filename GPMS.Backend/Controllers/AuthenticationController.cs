@@ -4,10 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
+using GPMS.Backend.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -20,13 +22,16 @@ namespace GPMS.Backend.Controllers
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IAuthenticationService _authenticationService;
-        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthenticationService authenticationService)
+        private readonly CurrentLoginUserDTO _currentLoginUserDTO;
+        public AuthenticationController(ILogger<AuthenticationController> logger, 
+        IAuthenticationService authenticationService, CurrentLoginUserDTO currentLoginUserDTO)
         {
             _logger = logger;
             _authenticationService = authenticationService;
+            _currentLoginUserDTO = currentLoginUserDTO;
         }
         [HttpPost]
-        [Route(APIEndPoint.AUTHENTICATION_CREDENTIALS_V1)]
+        [Route(APIEndPoint.AUTH_SIGN_IN_V1)]
         [SwaggerOperation(Summary = "Login to system using email and password")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Login Successfully", typeof(LoginResponseDTO))]
         [SwaggerResponse((int)HttpStatusCode.Unauthorized, "Unauthorized")]
@@ -34,13 +39,7 @@ namespace GPMS.Backend.Controllers
         [Produces("application/json")]
         public async Task<IActionResult> LoginWithCredential([FromBody] LoginInputDTO loginInputDTO)
         {
-            LoginResponseDTO loginResponseDTO = await _authenticationService.LoginWithCredential(loginInputDTO);
-            BaseReponse baseReponse = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Login Successfully",
-                Data = loginResponseDTO
-            };
+            LoginResponseDTO baseReponse = await _authenticationService.SignInWIthEmailPassword(loginInputDTO);
             return Ok(baseReponse);
         }
         [HttpGet]
@@ -49,13 +48,12 @@ namespace GPMS.Backend.Controllers
         {
             return Ok(BCrypt.Net.BCrypt.HashPassword(password));
         }
-        [HttpGet]
-        [Route("api/v1/authentication/testauthorize")]
-        [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> TestAuthorize()
+        [HttpPost]
+        [Route(APIEndPoint.AUTH_SIGN_IN_WITH_TOKEN_V1)]
+        public async Task<IActionResult> SignInWithToken()
         {
-            
-            return Ok("Test Authorize Successfully");
+            _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);  
+            return Ok(_currentLoginUserDTO);
         }
     }
 }

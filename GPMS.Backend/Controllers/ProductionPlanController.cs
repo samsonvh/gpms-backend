@@ -127,6 +127,20 @@ namespace GPMS.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpPost]
+        [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1 + "/child" + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all child production plan of parent production plan", Description = "Factory director, Production manager can get all child production plan of parent production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all child production plan successfully", typeof(List<ProductionPlanListingDTO>))]
+        [Produces("application/json")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllChildProductionPlans([FromBody] ProductionPlanFilterModel productionPlanFilterModel, [FromRoute] Guid id)
+        {
+            DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = 
+            await _productionPlanService.GetAllChildByParentId(productionPlanFilterModel,id);
+
+            return Ok(pageResponse);
+        }
+
         [HttpPatch]
         [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1 + APIEndPoint.APPROVE)]
         [SwaggerOperation(Summary = "Approve production plan")]
@@ -152,7 +166,7 @@ namespace GPMS.Backend.Controllers
         {
             _currentLoginUserDTO.DecryptAccessToken(Request.Headers["Authorization"]);
             var responseData = await _productionPlanService.Decline(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of production plan sucessfully", Data = responseData });
+            return Ok(new BaseReponse { StatusCode = 200, Message = "Decline production plan sucessfully", Data = responseData });
         }
 
         [HttpPatch]

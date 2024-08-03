@@ -20,7 +20,7 @@ namespace GPMS.Backend.Services.Services
     {
 
         Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAll(ProductionPlanFilterModel productionPlanFilterModel);
-
+        Task<DefaultPageResponseListingDTO<ProductionPlanListingDTO>> GetAllChildByParentId(ProductionPlanFilterModel productionPlanFilterModel, Guid id);
 
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddAnnualProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);
         Task<List<CreateUpdateResponseDTO<ProductionPlan>>> AddChildProductionPlanList(List<ProductionPlanInputDTO> inputDTOs);

@@ -30,7 +30,7 @@ namespace GPMS.Backend.Services.Utils
         {
             //account
             CreateMap<Account, AccountListingDTO>()
-                .ForMember(dto => dto.Poition, opt => opt.MapFrom(account => account.Staff.Position));
+                .ForMember(accountListingDTO => accountListingDTO.Position, options => options.MapFrom(account => account.Staff.Position));
             CreateMap<AccountInputDTO, Account>();
             CreateMap<Account, AccountDTO>()
                 .ForMember(dto => dto.FullName, opt => opt.MapFrom(account => account.Staff.FullName))
