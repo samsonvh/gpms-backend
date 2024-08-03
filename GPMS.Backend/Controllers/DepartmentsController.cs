@@ -31,7 +31,7 @@ namespace GPMS.Backend.Controllers
             _departmentService = departmentService;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(APIEndPoint.DEPARTMENTS_V1)]
         [SwaggerOperation(Summary = "Get all departments")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all departments successfully", typeof(DepartmentListingDTO))]
@@ -40,7 +40,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllDepartments()
         {
             var department = await _departmentService.GetAllDepartments();
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = department });
+            return Ok(department);
         }
 
         [HttpGet]

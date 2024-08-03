@@ -48,7 +48,7 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.ACCOUNTS_ID_V1)]
         [SwaggerOperation(Summary = "Get details of account")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of account successfully", typeof(AccountDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Account not found")]
         [Produces("application/json")]
         [Authorize(Roles = "Admin")]
@@ -61,45 +61,30 @@ namespace GPMS.Backend.Controllers
         [HttpPost]
         [Route(APIEndPoint.ACCOUNTS_V1)]
         [SwaggerOperation(Summary = "Provide account")]
-        [SwaggerResponse((int)HttpStatusCode.Created, "Provide account successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.Created, "Provide account successfully", typeof(AccountDTO))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid Data")]
         [Produces("application/json")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(AccountInputDTO accountInputDTO)
         {
             var createdAccount = await _accountService.Add(accountInputDTO);
-                
-            var responseData = new CreateUpdateResponseDTO<Account>
-            {
-                Id = createdAccount.Id,
-                Code = createdAccount.Code
-            };
-
-            BaseReponse baseReponse = new BaseReponse
-            {
-                StatusCode = 201,
-                Message = "Provide account sucessfully",
-                Data = responseData
-            };
-            return CreatedAtAction(nameof(Create), baseReponse);
+            
+            return CreatedAtAction(
+                nameof(Create),
+                new { id = createdAccount.Id }, 
+                createdAccount);
         }
 
         [HttpPatch]
         [Route(APIEndPoint.ACCOUNTS_ID_V1)]
         [SwaggerOperation(Summary = "Change status of account")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of account successfully", typeof(BaseReponse))]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Account not found")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of account successfully", typeof(AccountDTO))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
         public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
         {
             var account = await _accountService.ChangeStatus(id, status);
-            var responseData = new ChangeStatusResponseDTO<Account, AccountStatus>
-            {
-                Id = account.Id,
-                Status = account.Status
-            };
-
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of account sucessfully", Data = responseData });
+            return Ok(account);
         }
     }
 }
