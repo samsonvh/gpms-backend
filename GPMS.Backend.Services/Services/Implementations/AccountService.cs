@@ -162,7 +162,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<AccountDTO>(account);
         }
 
-        public async Task<ChangeStatusResponseDTO<Account, AccountStatus>> ChangeStatus(Guid id, string accountStatus)
+        public async Task<AccountDTO> ChangeStatus(Guid id, string accountStatus)
         {
             var account = await _accountRepository
                 .Search(account => account.Id == id)
@@ -191,7 +191,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             await _accountRepository.Save();
             await _staffRepository.Save();
-            return _mapper.Map<ChangeStatusResponseDTO<Account, AccountStatus>>(account);
+            return _mapper.Map<AccountDTO>(account);
         }
 
         private StaffStatus ChangeStatusStaffAndAccount(AccountStatus accountStatus)
