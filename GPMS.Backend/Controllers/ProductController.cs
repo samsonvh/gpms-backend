@@ -58,12 +58,12 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.PRODUCTS_ID_V1)]
         [SwaggerOperation(Summary = "Get details product")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get Details Product Successfully")]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Product not found", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Product not found", typeof(ProductDTO))]
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             var product = await _productService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of product sucessfully", Data = product });
+            return Ok(product);
         }
         [HttpPatch]
         [Route(APIEndPoint.PRODUCTS_ID_V1)]

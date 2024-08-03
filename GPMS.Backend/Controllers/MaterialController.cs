@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
@@ -44,13 +45,13 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.MATERIAL_ID_V1)]
         [SwaggerOperation(Summary = "Get details of material")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of material successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of material successfully", typeof(MaterialDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Material not found")]
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             var material = await _materialService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of material sucessfully", Data = material });
+            return Ok(material);
         }
     }
 }

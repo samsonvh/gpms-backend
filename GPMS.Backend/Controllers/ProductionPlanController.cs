@@ -98,13 +98,13 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.PRODUCTION_PLANS_ID_V1)]
         [SwaggerOperation(Summary = "Get details of production plan")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of production plan successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of production plan successfully", typeof(ProductionPlanDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Production Plan not found")]
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             var productionPlan = await _productionPlanService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of production plan sucessfully", Data = productionPlan });
+            return Ok(productionPlan);
         }
 
         [HttpPost]

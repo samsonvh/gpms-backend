@@ -98,14 +98,14 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1)]
         [SwaggerOperation(Summary = "Get details of warehouse request")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of warehouse request successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of warehouse request successfully", typeof(WarehouseRequestDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Warehouse request not found")]
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
             var warehouseRequest = await _warehouseRequestService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of warehouse request sucessfully", Data = warehouseRequest });
+            return Ok(warehouseRequest);
         }
     }
 }
