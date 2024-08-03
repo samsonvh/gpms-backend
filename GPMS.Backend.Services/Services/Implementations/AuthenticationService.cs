@@ -56,6 +56,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             AccountResponseDTO accountResponseDTO = new AccountResponseDTO
             {
                 Code = existedAccount.Code,
+                Email = existedAccount.Email,
                 FullName = existedAccount.Staff.FullName,
                 Position = existedAccount.Staff.Position.ToString(),
                 Department = (existedAccount.Staff.Position.Equals(StaffPosition.Admin) || existedAccount.Staff.Position.Equals(StaffPosition.FactoryDirector)) ? null : existedAccount.Staff.Department.Name,

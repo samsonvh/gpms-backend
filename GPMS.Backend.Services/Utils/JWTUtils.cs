@@ -31,6 +31,7 @@ namespace GPMS.Backend.Services.Utils
                 new Claim(ClaimTypes.NameIdentifier, account.Code.ToString()),
                 new Claim(ClaimTypes.Name, account.Staff.FullName),
                 new Claim(ClaimTypes.Role, account.Staff.Position.ToString()),
+                new Claim(ClaimTypes.Email,account.Email)
             };
             if (!account.Staff.Position.Equals(StaffPosition.Admin))
             {
@@ -76,6 +77,7 @@ namespace GPMS.Backend.Services.Utils
             currentLoginUserDTO.Department = claimsPrincipal.FindFirstValue("Department");
             currentLoginUserDTO.FullName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
             currentLoginUserDTO.Position = claimsPrincipal.FindFirstValue(ClaimTypes.Role);
+            currentLoginUserDTO.Email = claimsPrincipal.FindFirstValue(ClaimTypes.Email);
         }
     }
 }
