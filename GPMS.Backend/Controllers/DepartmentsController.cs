@@ -46,7 +46,7 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.STAFFS_OF_DEPARTMENT_ID_V1)]
         [SwaggerOperation(Summary = "Get details of deparment")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get department details successfully")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get department details successfully", typeof(DepartmentDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
         [SwaggerResponse((int)HttpStatusCode.Forbidden, "Access denied")]
         [Produces("application/json")]

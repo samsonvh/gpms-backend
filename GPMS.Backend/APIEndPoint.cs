@@ -56,7 +56,7 @@ namespace GPMS.Backend
         public const string SPECIFICATION_ID_OF_PRODUCT_ID_v1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
         public const string SPECIFICATIONS_OF_PRODUCT_ID_CREATE_PRODUCTION_PLAN_V1 = SPECIFICATIONS_OF_PRODUCT_ID_V1 + "/{specificationId}";
         public const string SPECIFICATIONS_V1 = API_VERSION_1 + "/specifications";
-
+        public const string SPECIFICATIONS_ID_V1 = API_VERSION_1 + "/specifications" + "/{id}";
         //Measurements
         public const string MEASUREMENT_V1 = API_VERSION_1 + "/measurements";
 
@@ -70,6 +70,9 @@ namespace GPMS.Backend
         //Steps 
         public const string STEPS_OF_PROCESS_ID_V1 = PROCESS_ID_OF_PRODUCT_ID_V1 + "/steps";
         public const string STEP_ID_OF_PROCESS_ID_V1 = STEPS_OF_PROCESS_ID_V1 + "/{stepId}";
+        public const string STEPS_V1 = API_VERSION_1 + "/steps";
+        //StepInputOutput
+        public const string STEP_INPUT_OUTPUT_V1 = API_VERSION_1 + "/step-input-outputs";
         //SemiFinishedProduct
         public const string SEMI_FINISHED_PRODUCT_V1 = API_VERSION_1 + "/semi-finished-products";
         public const string SEMI_FINISHED_PRODUCT_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/semi-finished-products";
@@ -77,6 +80,7 @@ namespace GPMS.Backend
 
         //QualityStandard
         public const string QUALITY_STANDARD_V1 = API_VERSION_1 + "/quality-standards";
+        public const string QUALITY_STANDARD_OF_SPECIFICATION_V1 = SPECIFICATIONS_ID_V1 + "/quality-standards";
         #region Production Plans
         //Production Plans
         public const string PRODUCTION_PLANS_V1 = API_VERSION_1 + "/production-plans";
@@ -106,6 +110,7 @@ namespace GPMS.Backend
         //Warehouse Requests
         public const string WAREHOUSE_REQUESTS_OF_REQUIREMENT_ID_V1 = API_VERSION_1 + "/warehouse-requests";
         public const string WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1 =  WAREHOUSE_REQUESTS_OF_REQUIREMENT_ID_V1 + "/{id}";
+        public const string WAREHOUSE_REQUESTS_V1 = API_VERSION_1 + "/warehouse-requests";
 
         #endregion Production Plans
     }

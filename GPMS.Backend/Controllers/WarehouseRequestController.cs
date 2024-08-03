@@ -11,7 +11,9 @@ using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using GPMS.Backend.Services.Utils;
@@ -34,6 +36,17 @@ namespace GPMS.Backend.Controllers
             _warehouseRequestService = warehouseRequestService;
             _logger = logger;
             _currentLoginUser = currentLoginUser;
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.WAREHOUSE_REQUESTS_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all warehouse requests")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all warehouse requests successfully", typeof(DefaultPageResponseListingDTO<WarehouseRequestListingDTO>))]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAllWarehouseRequests([FromBody] WarehouseRequestFilterModel warehouseRequestFilterModel)
+        {
+            var response = await _warehouseRequestService.GetAll(warehouseRequestFilterModel);
+            return Ok(response);
         }
 
         [HttpPost]
@@ -85,14 +98,14 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.WAREHOUSE_REQUEST_ID_OF_REQUIREMENT_ID_V1)]
         [SwaggerOperation(Summary = "Get details of warehouse request")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of warehouse request successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get details of warehouse request successfully", typeof(WarehouseRequestDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Warehouse request not found")]
         [Produces("application/json")]
         public async Task<IActionResult> Details([FromRoute] Guid id)
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
             var warehouseRequest = await _warehouseRequestService.Details(id);
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get details of warehouse request sucessfully", Data = warehouseRequest });
+            return Ok(warehouseRequest);
         }
     }
 }

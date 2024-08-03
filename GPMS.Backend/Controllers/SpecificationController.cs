@@ -55,15 +55,8 @@ namespace GPMS.Backend.Controllers
         // [Authorize(Roles = "Manager")]
         public async Task<IActionResult> GetAllSpecifications([FromBody] SpecificationFilterModel specificationFilterModel)
         {
-            var specifications = await _specificationService.GetAll(specificationFilterModel);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all specification successfully",
-                Data = specifications
-            };
-            return Ok(response);
+            var pageResponses = await _specificationService.GetAll(specificationFilterModel);
+            return Ok(pageResponses);
         }
     }
 }

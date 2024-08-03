@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Requests;
@@ -14,11 +15,14 @@ using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Requests;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -259,6 +263,41 @@ namespace GPMS.Backend.Services.Services.Implementations
             warehouseRequest.ReviewerId = _currentLoginUser.Id;
 
             return _mapper.Map<WarehouseRequestDTO>(warehouseRequest);
+        }
+
+        public async Task<DefaultPageResponseListingDTO<WarehouseRequestListingDTO>> GetAll(WarehouseRequestFilterModel warehouseFilterModel)
+        {
+            var query = _warehouseRequestRepository.GetAll();
+            query = Filters(query, warehouseFilterModel);
+            query = query.SortBy<WarehouseRequest>(warehouseFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<WarehouseRequest>(warehouseFilterModel);
+            var warehouseRequests = await query.ProjectTo<WarehouseRequestListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<WarehouseRequestListingDTO>
+            {
+                Data = warehouseRequests,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = warehouseFilterModel.Pagination.PageIndex,
+                    PageSize = warehouseFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<WarehouseRequest> Filters(IQueryable<WarehouseRequest> query, WarehouseRequestFilterModel warehouseRequestFilterModel)
+        {
+            if (!warehouseRequestFilterModel.Name.IsNullOrEmpty())
+            {
+                query = query.Where(warehouseRequest => warehouseRequest.Name.Contains(warehouseRequestFilterModel.Name));
+            }
+            
+            if (Enum.TryParse(warehouseRequestFilterModel.Status, true, out WarehouseRequestStatus warehouseRequestStatus))
+            {
+                query = query.Where(warehouseRequest => warehouseRequest.Status.Equals(warehouseRequestFilterModel.Status));
+            }
+            return query;
         }
     }
 }
