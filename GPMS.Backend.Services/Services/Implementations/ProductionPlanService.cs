@@ -588,6 +588,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
         private async Task HandleStartProductionPlan(ProductionPlan productionPlan)
         {
+            //Chuyển status của month và year sang InProgress
             if (productionPlan.ParentProductionPlan.ParentProductionPlan.Status.Equals(ProductionPlanStatus.Approved))
                 productionPlan.ParentProductionPlan.ParentProductionPlan.Status = ProductionPlanStatus.InProgress;
             if (productionPlan.ParentProductionPlan.Status.Equals(ProductionPlanStatus.Approved))
@@ -595,6 +596,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
             List<Product> products = productionPlan.ProductionRequirements
                                 .Select(requirement => requirement.ProductSpecification.Product).ToList();
+            //Chuyển status của product sang approve
             foreach (Product product in products)
             {
                 if (product.Status.Equals(ProductStatus.Approved))
@@ -603,7 +605,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     _productRepository.Update(product);
                 }
             }
-
+            //Chuyển 
             productionPlan.Status = ProductionPlanStatus.InProgress;
             productionPlan.ActualStartingDate = DateTime.UtcNow;
             _productionPlanRepository.Update(productionPlan);
