@@ -146,7 +146,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<ProcessDTO> Update(ProcessInputDTO inputDTO)
+        public Task<ProcessDTO> Update(Guid id, ProcessInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

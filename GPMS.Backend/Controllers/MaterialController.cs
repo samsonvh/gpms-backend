@@ -43,6 +43,18 @@ namespace GPMS.Backend.Controllers
             return CreatedAtAction(nameof(Details),new { id = response.Id }, response);
         }
 
+        [HttpPut]
+        [Route(APIEndPoint.MATERIAL_ID_V1)]
+        [SwaggerOperation(Summary = "Update Material By Id")]
+        [SwaggerResponse((int)HttpStatusCode.Created, "Update Material Successfully",typeof(MaterialDTO))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> UpdateMaterial([FromRoute] Guid id,[FromBody] MaterialInputDTO materialInputDTO)
+        {
+            var response = await _materialService.Update(id,materialInputDTO);
+            return Ok(response);
+        }
+
         [HttpPost]
         [Route(APIEndPoint.MATERIAL_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Material")]

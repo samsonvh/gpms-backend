@@ -78,7 +78,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<BOMDTO> Update(BOMInputDTO inputDTO)
+        public Task<BOMDTO> Update(Guid id, BOMInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }
