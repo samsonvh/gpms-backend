@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
@@ -31,12 +32,24 @@ namespace GPMS.Backend.Controllers
         }
 
         [HttpPost]
+        [Route(APIEndPoint.MATERIAL_V1)]
+        [SwaggerOperation(Summary = "Create Material")]
+        [SwaggerResponse((int)HttpStatusCode.Created, "Create Material Successfully",typeof(MaterialDTO))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> CreateMaterial([FromBody] MaterialInputDTO materialInputDTO)
+        {
+            var response = await _materialService.Add(materialInputDTO);
+            return CreatedAtAction(nameof(Details),new { id = response.Id }, response);
+        }
+
+        [HttpPost]
         [Route(APIEndPoint.MATERIAL_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Material")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Material List", typeof(DefaultPageResponseListingDTO<MaterialListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllMaterial ([FromBody] MaterialFilterModel materialFilterModel)
+        public async Task<IActionResult> GetAllMaterial([FromBody] MaterialFilterModel materialFilterModel)
         {
             var response = await _materialService.GetAll(materialFilterModel);
             return Ok(response);

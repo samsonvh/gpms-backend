@@ -118,10 +118,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public Task<CreateUpdateResponseDTO<SemiFinishedProduct>> Update(SemiFinishedProductInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<SemiFinishedProductInputDTO> inputDTOs)
         {
@@ -150,6 +146,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<SemiFinishedProductDTO> Add(SemiFinishedProductInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SemiFinishedProductDTO> Update(SemiFinishedProductInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

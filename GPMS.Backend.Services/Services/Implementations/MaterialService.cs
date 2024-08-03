@@ -46,13 +46,13 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
-
+        #region Add List
         public async Task<List<CreateUpdateResponseDTO<Material>>> AddList(List<MaterialInputDTO> inputDTOs)
         {
             ServiceUtils.ValidateInputDTOList<MaterialInputDTO, Material>
-                (inputDTOs, _materialValidator,_entityListErrorWrapper);
+                (inputDTOs, _materialValidator, _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<MaterialInputDTO, Material>
-                (inputDTOs, "Code",_entityListErrorWrapper);
+                (inputDTOs, "Code", _entityListErrorWrapper);
             await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
             List<CreateUpdateResponseDTO<Material>> responses = new List<CreateUpdateResponseDTO<Material>>();
             foreach (MaterialInputDTO materialInputDTO in inputDTOs)
@@ -111,10 +111,10 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors, _entityListErrorWrapper);
             }
         }
-
+        #endregion
         public async Task<MaterialDTO> Details(Guid id)
         {
             var material = await _materialRepository
@@ -145,7 +145,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                     TotalRows = totalItem
                 }
             };
-            
+
         }
 
         private IQueryable<Material> Filters(IQueryable<Material> query, MaterialFilterModel materialFilterModel)
@@ -161,10 +161,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public Task<CreateUpdateResponseDTO<Material>> Update(MaterialInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<MaterialInputDTO> inputDTOs)
         {
@@ -175,10 +171,32 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
-
-        public Task<MaterialDTO> Add(MaterialInputDTO inputDTO)
+        #region Add 
+        public async Task<MaterialDTO> Add(MaterialInputDTO inputDTO)
         {
+            ServiceUtils.ValidateInputDTO<MaterialInputDTO, Material>
+                (inputDTO, _materialValidator, _entityListErrorWrapper);
+            List<MaterialInputDTO> inputDTOs = [inputDTO];
+            await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
+            if (_entityListErrorWrapper.EntityListErrors.Count > 0)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Create Material Failed", _entityListErrorWrapper);
+            }
+            Material material = _mapper.Map<Material>(inputDTO);
+            _materialRepository.Add(material);
+            await _materialRepository.Save();
+            return _mapper.Map<MaterialDTO>(material);
+        }
+        #endregion
+        #region Update 
+        public async Task<MaterialDTO> Update(MaterialInputDTO inputDTO)
+        {
+            ServiceUtils.ValidateInputDTO<MaterialInputDTO,Material>
+                (inputDTO,_materialValidator,_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<MaterialInputDTO,Material>
+                (inputDTO,_materialRepository,"Code","Code",_entityListErrorWrapper);
             throw new NotImplementedException();
         }
+        #endregion
     }
 }

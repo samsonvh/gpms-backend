@@ -127,10 +127,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             return _mapper.Map<List<CreateProductSpecificationListingDTO>>(specifications);
         }
 
-        public Task<CreateUpdateResponseDTO<ProductSpecification>> Update(SpecificationInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<SpecificationInputDTO> inputDTOs)
         {
@@ -168,6 +164,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<SpecificationDTO> Add(SpecificationInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SpecificationDTO> Update(SpecificationInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

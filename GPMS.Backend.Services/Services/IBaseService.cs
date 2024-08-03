@@ -15,7 +15,7 @@ namespace GPMS.Backend.Services.Services
     {
         Task<D> Add(I inputDTO);
         Task AddList(List<I> inputDTOs, Guid? parentEntityId = null);
-        Task<CU> Update(I inputDTO);
+        Task<D> Update(I inputDTO);
         Task UpdateList (List<I> inputDTOs);
         Task<DefaultPageResponseListingDTO<L>> GetAll(F filter);
         Task<D> Details(Guid id);
