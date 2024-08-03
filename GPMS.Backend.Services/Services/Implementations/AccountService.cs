@@ -257,7 +257,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public Task<AccountDTO> Update(AccountInputDTO inputDTO)
+        public Task<AccountDTO> Update(Guid id,AccountInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

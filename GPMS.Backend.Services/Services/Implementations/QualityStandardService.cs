@@ -178,7 +178,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<QualityStandardDTO> Update(QualityStandardInputDTO inputDTO)
+        public Task<QualityStandardDTO> Update(Guid id,QualityStandardInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

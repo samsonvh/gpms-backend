@@ -150,7 +150,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<SemiFinishedProductDTO> Update(SemiFinishedProductInputDTO inputDTO)
+        public Task<SemiFinishedProductDTO> Update(Guid id,SemiFinishedProductInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

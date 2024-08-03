@@ -189,13 +189,25 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
         #endregion
         #region Update 
-        public async Task<MaterialDTO> Update(MaterialInputDTO inputDTO)
+        public async Task<MaterialDTO> Update(Guid id, MaterialInputDTO inputDTO)
         {
-            ServiceUtils.ValidateInputDTO<MaterialInputDTO,Material>
-                (inputDTO,_materialValidator,_entityListErrorWrapper);
-            ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<MaterialInputDTO,Material>
-                (inputDTO,_materialRepository,"Code","Code",_entityListErrorWrapper);
-            throw new NotImplementedException();
+            var existedMaterial = _materialRepository.Details(id);
+            if (existedMaterial == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Material Not Found");
+            }
+            ServiceUtils.ValidateInputDTO<MaterialInputDTO, Material>
+                (inputDTO, _materialValidator, _entityListErrorWrapper);
+            existedMaterial.Code = inputDTO.Code;
+            existedMaterial.Name = inputDTO.Name;
+            existedMaterial.ConsumptionUnit = inputDTO.ConsumptionUnit;
+            existedMaterial.SizeWidthUnit = inputDTO.SizeWidthUnit;
+            existedMaterial.ColorCode = inputDTO.ColorCode;
+            existedMaterial.ColorName = inputDTO.ColorName;
+            existedMaterial.Description = inputDTO.Description;
+            _materialRepository.Update(existedMaterial);
+            await _materialRepository.Save();
+            return _mapper.Map<MaterialDTO>(existedMaterial);
         }
         #endregion
     }
