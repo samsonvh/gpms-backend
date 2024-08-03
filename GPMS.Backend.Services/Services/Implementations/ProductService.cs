@@ -232,7 +232,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             Product product = _mapper.Map<Product>(inputDTO);
             product.CategoryId = categoryId;
-            product.CreatorId = _currentLoginUser.StaffId;
+            product.CreatorId = _currentLoginUser.Id;
             product.Status = ProductStatus.Pending;
             _productRepository.Add(product);
             return product;
@@ -298,7 +298,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             ProductStatus parsedStatus = ValidateProductStatus(productStatus, product);
             if (parsedStatus.Equals(ProductStatus.Approved) && product.Status.Equals(ProductStatus.Pending))
-                product.ReviewerId = _currentLoginUser.StaffId;
+                product.ReviewerId = _currentLoginUser.Id;
             product.Status = parsedStatus;
             await _productRepository.Save();
             return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);

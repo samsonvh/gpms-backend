@@ -22,7 +22,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _accountRepository = accountRepository;
             _loginValidator = loginValidator;
         }
-        public async Task<LoginResponseDTO> LoginWithCredential(LoginInputDTO loginInputDTO)
+        public async Task<LoginResponseDTO> SignInWIthEmailPassword(LoginInputDTO loginInputDTO)
         {
             ValidationResult validateResult = await _loginValidator.ValidateAsync(loginInputDTO);
             if (!validateResult.IsValid)
@@ -53,13 +53,17 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Wrong Email Or Password");
             }
-            LoginResponseDTO loginResponseDTO = new LoginResponseDTO
+            AccountResponseDTO accountResponseDTO = new AccountResponseDTO
             {
                 Code = existedAccount.Code,
                 FullName = existedAccount.Staff.FullName,
                 Position = existedAccount.Staff.Position.ToString(),
                 Department = (existedAccount.Staff.Position.Equals(StaffPosition.Admin) || existedAccount.Staff.Position.Equals(StaffPosition.FactoryDirector)) ? null : existedAccount.Staff.Department.Name,
-                Token = JWTUtils.GenerateJWTToken(existedAccount)
+            };
+            LoginResponseDTO loginResponseDTO = new LoginResponseDTO
+            {
+                Account = accountResponseDTO,
+                AccessToken = JWTUtils.GenerateJWTToken(existedAccount)
             }; 
             return loginResponseDTO;
         }

@@ -73,7 +73,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                      (inputDTO, _warehouseRequestValidator, _entityListErrorWrapper);
 
             var warehouseRequest = _mapper.Map<WarehouseRequest>(inputDTO);
-            warehouseRequest.CreatorId = _currentLoginUser.StaffId;
+            warehouseRequest.CreatorId = _currentLoginUser.Id;
             warehouseRequest.Status = WarehouseRequestStatus.Pending;
 
             _warehouseRequestRepository.Add(warehouseRequest);
@@ -92,7 +92,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<ChangeStatusResponseDTO<WarehouseRequest, WarehouseRequestStatus>> ChangeStatus(Guid id, ChangeStatusInputDTO inputDTO)
         {
             var staff = await _staffRepository
-                .Search(staff => staff.Id == _currentLoginUser.StaffId)
+                .Search(staff => staff.Id == _currentLoginUser.Id)
                 .Include(staff => staff.Department)
                 .FirstOrDefaultAsync(); 
 
@@ -136,7 +136,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 await ApprovedWarehouseRequest(warehouseRequest);
             }
 
-            warehouseRequest.ReviewerId = _currentLoginUser.StaffId;
+            warehouseRequest.ReviewerId = _currentLoginUser.Id;
 
             await _warehouseRequestRepository.Save();
 
@@ -235,7 +235,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<WarehouseRequestDTO> Details(Guid id)
         {
             var staff = await _staffRepository
-                .Search(staff => staff.Id == _currentLoginUser.StaffId)
+                .Search(staff => staff.Id == _currentLoginUser.Id)
                 .Include(staff => staff.Department)
                 .FirstOrDefaultAsync();
 
@@ -260,7 +260,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Warehouse request not found");
             }
 
-            warehouseRequest.ReviewerId = _currentLoginUser.StaffId;
+            warehouseRequest.ReviewerId = _currentLoginUser.Id;
 
             return _mapper.Map<WarehouseRequestDTO>(warehouseRequest);
         }

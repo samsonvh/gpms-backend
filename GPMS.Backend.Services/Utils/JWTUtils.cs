@@ -27,14 +27,14 @@ namespace GPMS.Backend.Services.Utils
         public static string GenerateJWTToken(Account account)
         {
             var claims = new List<Claim> {
-                new Claim("StaffId",account.Staff.Id.ToString()),
+                new Claim("Id",account.Staff.Id.ToString()),
                 new Claim(ClaimTypes.NameIdentifier, account.Code.ToString()),
                 new Claim(ClaimTypes.Name, account.Staff.FullName),
                 new Claim(ClaimTypes.Role, account.Staff.Position.ToString()),
             };
             if (!account.Staff.Position.Equals(StaffPosition.Admin))
             {
-                claims.Add(new Claim(ClaimTypes.Role, account.Staff.Position.ToString()));
+                claims.Add(new Claim("Department", account.Staff.Department.Name.ToString()));
             }
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
@@ -71,7 +71,7 @@ namespace GPMS.Backend.Services.Utils
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Failed to decrypt/validate access token");
             }
-            currentLoginUserDTO.StaffId = Guid.Parse(claimsPrincipal.FindFirstValue("StaffId"));
+            currentLoginUserDTO.Id = Guid.Parse(claimsPrincipal.FindFirstValue("Id"));
             currentLoginUserDTO.Code = claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier);
             currentLoginUserDTO.Department = claimsPrincipal.FindFirstValue("Department");
             currentLoginUserDTO.FullName = claimsPrincipal.FindFirstValue(ClaimTypes.Name);
