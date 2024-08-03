@@ -38,7 +38,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<BillOfMaterial>> Add(BOMInputDTO inputDTO)
+        public Task<BOMDTO> Add(BOMInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

@@ -56,10 +56,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<ProductSpecification>> Add(SpecificationInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid? productId)
         {
@@ -169,6 +165,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors,_entityListErrorWrapper);
             }
+        }
+
+        public Task<SpecificationDTO> Add(SpecificationInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
         }
     }
 }

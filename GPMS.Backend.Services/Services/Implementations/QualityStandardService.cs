@@ -47,10 +47,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             _qualityStandardImagesTempWrapper = qualityStandardImagesTempWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<QualityStandard>> Add(QualityStandardInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid? parentEntityId = null)
         {
@@ -179,6 +175,11 @@ namespace GPMS.Backend.Services.Services.Implementations
                     TotalRows = totalItem
                 }
             };
+        }
+
+        public Task<QualityStandardDTO> Add(QualityStandardInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
         }
     }
 }

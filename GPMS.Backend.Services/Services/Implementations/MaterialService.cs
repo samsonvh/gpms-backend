@@ -41,10 +41,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<Material>> Add(MaterialInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task AddList(List<MaterialInputDTO> inputDTOs, Guid? parentEntityId = null)
         {
@@ -176,6 +172,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<DefaultPageResponseListingDTO<MaterialListingDTO>> GetAll(int productId, MaterialFilterModel filter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<MaterialDTO> Add(MaterialInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

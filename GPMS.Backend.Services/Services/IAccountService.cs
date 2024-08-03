@@ -16,7 +16,6 @@ namespace GPMS.Backend.Services.Services
     public interface IAccountService : IBaseService<AccountInputDTO,CreateUpdateResponseDTO<Account>,AccountListingDTO,AccountDTO,AccountFilterModel>
     {
         Task<IEnumerable<AccountListingDTO>> GetAllAccounts(AccountFilterModel accountFilterModel);
-        Task<CreateUpdateResponseDTO<Account>> Add(AccountInputDTO inputDTO);
         Task<AccountDTO> Details(Guid id);
         Task<ChangeStatusResponseDTO<Account, AccountStatus>> ChangeStatus(Guid id, string accountStatus);
     }

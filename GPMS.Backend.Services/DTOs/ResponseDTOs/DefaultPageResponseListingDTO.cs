@@ -7,7 +7,8 @@ namespace GPMS.Backend.Services.DTOs.ResponseDTOs
 {
     public class DefaultPageResponseListingDTO<L> 
     {
-        public List<L>? Data { get; set; }
         public PaginationResponseModel Pagination { get; set; }
+        public List<L>? Data { get; set; }
+        
     }
 }

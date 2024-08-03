@@ -43,10 +43,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             _entityListErrorWrapper = entityListErrorWrapper;
         }
 
-        public Task<CreateUpdateResponseDTO<Measurement>> Add(MeasurementInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task AddList(List<MeasurementInputDTO> inputDTOs, Guid? specificationId = null)
         {
@@ -106,6 +103,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task UpdateList(List<MeasurementInputDTO> inputDTOs)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<MeasurementDTO> Add(MeasurementInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }
