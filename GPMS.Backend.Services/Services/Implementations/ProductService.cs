@@ -168,7 +168,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
 
         #region Add Product
-        public async Task<CreateUpdateResponseDTO<Product>> Add(ProductInputDTO inputDTO)
+        public async Task<ProductDTO> Add(ProductInputDTO inputDTO)
         {
             List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
             ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>
@@ -208,11 +208,13 @@ namespace GPMS.Backend.Services.Services.Implementations
             await HandleUploadProductImage(inputDTO);
             await HandleUploadQualityStandardImage();
             await _productRepository.Save();
-            return new CreateUpdateResponseDTO<Product>
+            /*return new CreateUpdateResponseDTO<Product>
             {
                 Id = product.Id,
                 Code = product.Code
-            };
+            };*/
+            var productDTO = _mapper.Map<ProductDTO>(product);
+            return productDTO;
         }
 
         private async Task<Guid> HandleAddCategory(string category)
@@ -287,8 +289,7 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         #region Change Product Status
 
-        public async Task<ChangeStatusResponseDTO<Product, ProductStatus>>
-        ChangeStatus(Guid id, string productStatus)
+        public async Task<ProductDTO> ChangeStatus(Guid id, string productStatus)
         {
             var product = _productRepository.Details(id);
 
@@ -301,7 +302,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 product.ReviewerId = _currentLoginUser.Id;
             product.Status = parsedStatus;
             await _productRepository.Save();
-            return _mapper.Map<ChangeStatusResponseDTO<Product, ProductStatus>>(product);
+            return _mapper.Map<ProductDTO>(product);
         }
 
         private ProductStatus ValidateProductStatus(string productStatus, Product product)

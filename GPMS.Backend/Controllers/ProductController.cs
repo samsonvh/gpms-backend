@@ -44,7 +44,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> DefineProduct([FromForm] ProductInputDTO productInputDTO)
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
-            CreateUpdateResponseDTO<Product> result = await _productService.Add(productInputDTO);
+            var result = await _productService.Add(productInputDTO);
             BaseReponse baseReponse = new BaseReponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
@@ -65,10 +65,11 @@ namespace GPMS.Backend.Controllers
             var product = await _productService.Details(id);
             return Ok(product);
         }
+
         [HttpPatch]
         [Route(APIEndPoint.PRODUCTS_ID_V1)]
         [SwaggerOperation(Summary = "Change status of product")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of product successfully", typeof(BaseReponse))]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of product successfully", typeof(ProductDTO))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
         [Authorize("Factory Director")]
@@ -76,13 +77,7 @@ namespace GPMS.Backend.Controllers
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
             var product = await _productService.ChangeStatus(id, status);
-            var responseData = new ChangeStatusResponseDTO<Product, ProductStatus>
-            {
-                Id = product.Id,
-                Status = product.Status
-            };
-
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Change status of product sucessfully", Data = responseData });
+            return Ok(product);
         }
 
         [HttpPost]
@@ -94,13 +89,6 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProducts([FromBody] ProductFilterModel productFilterModel)
         {
             DefaultPageResponseListingDTO<ProductListingDTO> pageResponse = await _productService.GetAll(productFilterModel);
-
-           /* BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all product",
-                Data = pageResponse
-            };*/
             return Ok(pageResponse);
         }
 
@@ -113,14 +101,7 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProductsForCreateProductionPlan()
         {
             List<CreateProductListingDTO> createProductListingDTOs = await _productService.GetAllProductForCreateProductionPlan();
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all product",
-                Data = createProductListingDTOs
-            };
-            return Ok(response);
+            return Ok(createProductListingDTOs);
         }
 
     }

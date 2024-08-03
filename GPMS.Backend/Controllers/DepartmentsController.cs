@@ -16,6 +16,7 @@ using GPMS.Backend.Services.Utils;
 using GPMS.Backend.Data.Models.Products;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.Filters;
 
 namespace GPMS.Backend.Controllers
 {
@@ -37,10 +38,10 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all departments successfully", typeof(DepartmentListingDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAllDepartments()
+        public async Task<IActionResult> GetAllDepartments([FromBody] DepartmentFilterModel departmentFilterModel)
         {
-            var department = await _departmentService.GetAllDepartments();
-            return Ok(new BaseReponse { StatusCode = 200, Message = "Get all departments sucessfully", Data = department });
+            var department = await _departmentService.GetAllDepartments(departmentFilterModel);
+            return Ok(department);
         }
 
         [HttpGet]

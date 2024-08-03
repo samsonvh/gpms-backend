@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -74,14 +78,26 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
 
-        public async Task<IEnumerable<DepartmentListingDTO>> GetAllDepartments()
+        public async Task<DefaultPageResponseListingDTO<DepartmentListingDTO>> GetAllDepartments(DepartmentFilterModel departmentFilterModel)
         {
-            var deparments = await _departmentRepository.GetAll().ToListAsync();
-            if (deparments == null)
+            var query = _departmentRepository.GetAll();
+            query = query.SortBy<Department>(departmentFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<Department>(departmentFilterModel);
+            var departments = await query.ProjectTo<DepartmentListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<DepartmentListingDTO>
             {
-                throw new APIException(404, "Deparment not found because it may have been deleted or does not exist.");
-            }
-            return _mapper.Map<IEnumerable<DepartmentListingDTO>>(deparments);
+                Data = departments,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = departmentFilterModel.Pagination.PageIndex,
+                    PageSize = departmentFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
+
+
     }
 }

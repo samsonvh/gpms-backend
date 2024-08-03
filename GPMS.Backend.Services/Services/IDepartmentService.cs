@@ -1,5 +1,6 @@
 ﻿using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
+using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace GPMS.Backend.Services.Services
 {
     public interface IDepartmentService
     {
-        Task<IEnumerable<DepartmentListingDTO>> GetAllDepartments();
+        Task<DefaultPageResponseListingDTO<DepartmentListingDTO>> GetAllDepartments(DepartmentFilterModel departmentFilterModel);
         Task<DepartmentDTO> Details(Guid id);
     }
 }
