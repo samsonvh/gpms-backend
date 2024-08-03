@@ -78,6 +78,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
+        public Task<BOMDTO> Update(BOMInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
         // public async Task<List<BOMListingDTO>> GetAll()
         // {
         //     var query = _billOfMaterialRepository.GetAll();
@@ -102,12 +107,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         //     };
         // }
 
-
-
-        public Task<CreateUpdateResponseDTO<BillOfMaterial>> Update(BOMInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<BOMInputDTO> inputDTOs)
         {

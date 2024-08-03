@@ -80,6 +80,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<SemiFinishedProduct, SemiFinishedProductDTO>();
             //Material
             CreateMap<MaterialInputDTO, Material>();
+            CreateMap<MaterialInputDTO, MaterialDTO>();
             CreateMap<Material, MaterialDTO>().ReverseMap();
             CreateMap<Material, MaterialListingDTO>().ReverseMap();
             //Specification

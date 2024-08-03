@@ -33,7 +33,7 @@ namespace GPMS.Backend.Controllers
         }
 
         [HttpPost]
-        [Route(APIEndPoint.DEPARTMENTS_V1)]
+        [Route(APIEndPoint.DEPARTMENTS_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all departments")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all departments successfully", typeof(DepartmentListingDTO))]
         [SwaggerResponse((int)HttpStatusCode.NotFound, "Department not found")]

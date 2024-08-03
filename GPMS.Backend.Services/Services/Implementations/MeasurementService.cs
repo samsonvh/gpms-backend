@@ -97,10 +97,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public Task<CreateUpdateResponseDTO<Measurement>> Update(MeasurementInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<MeasurementInputDTO> inputDTOs)
         {
@@ -108,6 +104,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<MeasurementDTO> Add(MeasurementInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<MeasurementDTO> Update(MeasurementInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

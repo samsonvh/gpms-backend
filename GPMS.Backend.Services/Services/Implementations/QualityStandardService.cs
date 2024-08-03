@@ -132,10 +132,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public Task<CreateUpdateResponseDTO<QualityStandard>> Update(QualityStandardInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
 
         public Task UpdateList(List<QualityStandardInputDTO> inputDTOs)
         {
@@ -178,6 +174,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         }
 
         public Task<QualityStandardDTO> Add(QualityStandardInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<QualityStandardDTO> Update(QualityStandardInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

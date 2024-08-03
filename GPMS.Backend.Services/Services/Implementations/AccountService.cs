@@ -212,10 +212,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<CreateUpdateResponseDTO<Account>> Update(AccountInputDTO inputDTO)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public Task UpdateList(List<AccountInputDTO> inputDTOs)
         {
@@ -260,5 +257,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
+        public Task<AccountDTO> Update(AccountInputDTO inputDTO)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
