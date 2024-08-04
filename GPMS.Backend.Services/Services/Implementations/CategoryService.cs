@@ -37,16 +37,14 @@ namespace GPMS.Backend.Services.Services.Implementations
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
         }
-        public async Task<CreateUpdateResponseDTO<Category>> Add(CategoryInputDTO inputDTO)
+        public async Task<CategoryDTO> Add(CategoryInputDTO inputDTO)
         {
             ServiceUtils.ValidateInputDTO<CategoryInputDTO,Category>
             (inputDTO, _categoryValidator,_entityListErrorWrapper);
             Category category = _mapper.Map<Category>(inputDTO);
             _categoryRepository.Add(category);
-            return new CreateUpdateResponseDTO<Category>
-            {
-                Id = category.Id
-            };
+            await _categoryRepository.Save();
+            return _mapper.Map<CategoryDTO>(category);
         }
 
         public async Task<CategoryDTO> Details(Guid id)
@@ -74,7 +72,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             query = query.SortBy<Category>(categoryFilterModel);
             int totalItem = query.Count();
             query = query.PagingEntityQuery<Category>(categoryFilterModel);
-            var categories = await query.ProjectTo<CategoryDTO>(_mapper.ConfigurationProvider)
+            var categories = await query.ProjectTo<CategoryDTO>(_mapper.ConfigurationProvider) 
                                         .ToListAsync();
             return new DefaultPageResponseListingDTO<CategoryDTO>
             {

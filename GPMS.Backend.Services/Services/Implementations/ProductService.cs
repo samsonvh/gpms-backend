@@ -31,7 +31,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IGenericRepository<Product> _productRepository;
         private readonly IGenericRepository<QualityStandard> _qualityStandardRepository;
         private readonly IValidator<ProductInputDTO> _productValidator;
-        private readonly IValidator<ProductDefinitionInputDTO> _productDefinitionValidator;
         private readonly ICategoryService _categoryService;
         private readonly ISemiFinishedProductService _semiFinishedProductService;
         private readonly IMaterialService _materialService;
@@ -49,7 +48,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         IGenericRepository<Product> productRepository,
         IGenericRepository<QualityStandard> qualityStandardRepository,
         IValidator<ProductInputDTO> productValidator,
-        IValidator<ProductDefinitionInputDTO> productDefinitionValidator,
         ICategoryService categoryService,
         ISemiFinishedProductService semiFinishedProductService,
         IMaterialService materialService,
@@ -59,7 +57,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
         StepIOInputDTOWrapper stepIOInputDTOWrapper,
-        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper, 
+        QualityStandardImagesTempWrapper qualityStandardImagesTempWrapper,
         IGenericRepository<Staff> staffRepository,
         CurrentLoginUserDTO currentLoginUser
         )
@@ -67,7 +65,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             _productRepository = productRepository;
             _qualityStandardRepository = qualityStandardRepository;
             _productValidator = productValidator;
-            _productDefinitionValidator = productDefinitionValidator;
             _categoryService = categoryService;
             _semiFinishedProductService = semiFinishedProductService;
             _materialService = materialService;
@@ -131,10 +128,10 @@ namespace GPMS.Backend.Services.Services.Implementations
                 SemiFinishedProducts = _mapper.Map<List<SemiFinishedProductDTO>>(product.SemiFinishedProducts),
 
                 Specifications = _mapper.Map<List<SpecificationDTO>>(product.Specifications),
-                
+
                 Processes = _mapper.Map<List<ProcessDTO>>(product.ProductionProcesses)
             };
-            foreach (ProductSpecification specification in product.Specifications) 
+            foreach (ProductSpecification specification in product.Specifications)
             {
                 foreach (QualityStandard qualityStandard in specification.QualityStandards)
                 {
@@ -154,7 +151,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
-            
+
         public Task<CreateUpdateResponseDTO<Product>> Update(ProductInputDTO inputDTO)
         {
             throw new NotImplementedException();
@@ -170,120 +167,213 @@ namespace GPMS.Backend.Services.Services.Implementations
         #region Add Product
         public async Task<ProductDTO> Add(ProductInputDTO inputDTO)
         {
-            List<ProductDefinitionInputDTO> definitionInputDTOs = new List<ProductDefinitionInputDTO>();
             ServiceUtils.ValidateInputDTO<ProductInputDTO, Product>
                 (inputDTO, _productValidator, _entityListErrorWrapper);
-            ServiceUtils.ValidateInputDTO<ProductDefinitionInputDTO, Product>
-                (inputDTO.Definition, _productDefinitionValidator, _entityListErrorWrapper);
-            definitionInputDTOs.Add(inputDTO.Definition);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<ProductDefinitionInputDTO, Product>
-                (definitionInputDTOs, "Code", _entityListErrorWrapper);
-            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductDefinitionInputDTO, Product>
-                (inputDTO.Definition, _productRepository, "Code", "Code", _entityListErrorWrapper);
-            Guid categoryId = await HandleAddCategory(inputDTO.Definition.Category);
-            Product product = HandleAddProduct(inputDTO.Definition, categoryId);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductInputDTO, Product>
+                (inputDTO, _productRepository, "Code", "Code", _entityListErrorWrapper);
+            //Add Category
+            CheckCategoryExist(inputDTO.CategoryId);
+            //Add Product
+            Product product = HandleAddProduct(inputDTO);
             //add semifinish product list
-            List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList =
-            await _semiFinishedProductService.AddList(inputDTO.Definition.SemiFinishedProducts, product.Id);
-            //add material list
-            List<CreateUpdateResponseDTO<Material>> materialCodeList =
-                await _materialService.AddList(inputDTO.Definition.Materials);
+            var semiFinishedProductCodes =
+            await _semiFinishedProductService.AddList(inputDTO.SemiFinishedProducts, product.Id);
             //add specification list
-            await _specificationService.AddList(inputDTO.Specifications, product.Id,
-                materialCodeList, inputDTO.Definition.Sizes, inputDTO.Definition.Colors);
+            await _specificationService.AddList(inputDTO.Specifications, product.Id, inputDTO.Sizes, inputDTO.Colors);
             //add process list
-            await _processService.AddList(inputDTO.Processes, product.Id, materialCodeList, semiFinishedProductCodeList);
-            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
-                <StepIOInputDTO, ProductionProcessStepIO, Material>
-                (_stepIOInputDTOWrapper.StepIOInputDTOList.Where(stepIOInputDTO => !stepIOInputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
-                materialCodeList, "MaterialCode", "Code", _entityListErrorWrapper);
-            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList
-                <StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
-                (_stepIOInputDTOWrapper.StepIOInputDTOList.Where(stepIOInputDTO => !stepIOInputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
-                semiFinishedProductCodeList, "SemiFinishedProductCode", "Code", _entityListErrorWrapper);
+            var materialIds = inputDTO.Specifications[0].BOMs.Select(bom => bom.MaterialId).ToList();
+            await _processService.AddList(inputDTO.Processes, product.Id, materialIds, semiFinishedProductCodes);
+            var stepIOWithSemiFinishedProduct = _stepIOInputDTOWrapper.StepIOInputDTOList
+                                .Where(stepIO => !stepIO.MaterialId.IsNullOrEmpty())
+                                .ToList();
+            var stepIOWithMaterialId = _stepIOInputDTOWrapper.StepIOInputDTOList
+                                .Where(stepIO => !stepIO.MaterialId.IsNullOrEmpty())
+                                .ToList();
+            CheckInputDTOsContainsAllSemiFinishProductIds(stepIOWithSemiFinishedProduct, semiFinishedProductCodes);
+            CheckInputDTOsContainsAllMaterialId(stepIOWithMaterialId,materialIds);
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Failed", _entityListErrorWrapper);
             }
-            await HandleUploadProductImage(inputDTO);
-            await HandleUploadQualityStandardImage();
+            // await HandleUploadProductImage(inputDTO);
+            // await HandleUploadQualityStandardImage();
             await _productRepository.Save();
-            /*return new CreateUpdateResponseDTO<Product>
-            {
-                Id = product.Id,
-                Code = product.Code
-            };*/
             var productDTO = _mapper.Map<ProductDTO>(product);
             return productDTO;
         }
 
-        private async Task<Guid> HandleAddCategory(string category)
+        private void CheckCategoryExist(Guid categoryId)
         {
-            CategoryDTO existedCategoryDTO = await _categoryService.DetailsByName(category);
-            if (existedCategoryDTO == null)
+            var existCategory = _categoryService.Details(categoryId);
+            if (existCategory == null)
             {
-                CreateUpdateResponseDTO<Category> categoryCreateResponse = await _categoryService.Add(new CategoryInputDTO
-                {
-                    Name = category
-                });
-                return categoryCreateResponse.Id;
+                throw new APIException((int)HttpStatusCode.BadRequest, "Category Not Found");
             }
-            else return existedCategoryDTO.Id;
         }
-        private Product HandleAddProduct(ProductDefinitionInputDTO inputDTO, Guid categoryId)
+        private Product HandleAddProduct(ProductInputDTO inputDTO)
         {
             Product product = _mapper.Map<Product>(inputDTO);
-            product.CategoryId = categoryId;
+            product.CategoryId = inputDTO.CategoryId;
             product.CreatorId = _currentLoginUser.Id;
             product.Status = ProductStatus.Pending;
             _productRepository.Add(product);
             return product;
         }
-        private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
+
+        private void CheckInputDTOsContainsAllSemiFinishProductIds(List<StepIOInputDTO> inputDTOs,
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes)
         {
-            //upload product image
-            string fileURL = "";
-            Product unAddedProduct = _productRepository.GetUnAddedEntity();
-            foreach (IFormFile file in inputDTO.Definition.Images)
+            List<FormError> errors = new List<FormError>();
+            foreach (var inputDTO in inputDTOs)
             {
-                if (file != null)
+                int equal = 0;
+                foreach (var semiCode in semiFinishedProductCodes)
                 {
-                    string filePath = $"{typeof(Product).Name}/{unAddedProduct.Id}/Images/{file.FileName}";
-                    string url = await _firebaseStorageService.UploadFile(filePath, file);
-                    fileURL += url + ";";
-                }
-            }
-            fileURL = fileURL.Remove(fileURL.Length - 1);
-            unAddedProduct.ImageURLs = fileURL;
-        }
-        private async Task HandleUploadQualityStandardImage()
-        {
-            //upload qauality standard image
-            string fileURL = "";
-            Product unAddedProduct = _productRepository.GetUnAddedEntity();
-            List<QualityStandard> unAddedQualityStandardList = _qualityStandardRepository.GetUnAddedEntityList();
-            foreach (QualityStandardImagesTemp qualityStandardImagesTemp in _qualityStandardImagesTempWrapper.QualityStandardImagesTemps)
-            {
-                QualityStandard qualityStandardImageAdd = unAddedQualityStandardList
-                .Where(qualityStandard => qualityStandard.Id.Equals(qualityStandardImagesTemp.QualityStandardId))
-                .FirstOrDefault();
-                if (qualityStandardImageAdd != null)
-                {
-                    foreach (IFormFile image in qualityStandardImagesTemp.Images)
+                    if (inputDTO.SemiFinishedProductCode.Equals(semiCode.Code))
                     {
-                        string filePath =
-                        $"{typeof(Product).Name}/{unAddedProduct.Id}/{typeof(ProductSpecification).Name}/" +
-                        $"{qualityStandardImageAdd.ProductSpecificationId}/{typeof(QualityStandard).Name}/" +
-                        $"{qualityStandardImageAdd.Id}/Images/{image.FileName}";
-                        string url = await _firebaseStorageService.UploadFile(filePath, image);
-                        fileURL += url + ";";
+                        equal++;
                     }
-                    fileURL = fileURL.Remove(fileURL.Length - 1);
-                    qualityStandardImageAdd.ImageURL = fileURL;
-                    fileURL = "";
+                }
+                if (equal == 0)
+                {
+                    errors.Add(new FormError
+                    {
+                        EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
+                        ErrorMessage = $"SemiFinishedProductCode : {inputDTO.SemiFinishedProductCode} not exist in SemiFinishProduct list of Product",
+                        Property = "SemiFinishedProductCode"
+                    });
                 }
             }
+            List<FormError> errorsMissingSemi = new List<FormError>();
+            foreach (var semiCode in semiFinishedProductCodes)
+            {
+                int equal = 0;
+                foreach (var inputDTO in inputDTOs)
+                {
+                    if (semiCode.Code.Equals(inputDTO.SemiFinishedProductCode))
+                    {
+                        equal++;
+                    }
+                }
+                if (equal == 0)
+                {
+                    errorsMissingSemi.Add(new FormError
+                    {
+                        EntityOrder = semiFinishedProductCodes.IndexOf(semiCode) + 1,
+                        ErrorMessage = $"StepIO list missing SemiFinishedProductCode : {semiCode.Code}",
+                        Property = "Code"
+                    });
+                }
+            }
+            if (errors.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors, _entityListErrorWrapper);
+            }
+            if (semiFinishedProductCodes.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<SemiFinishedProduct>(errorsMissingSemi, _entityListErrorWrapper);
+            }
         }
+
+        private void CheckInputDTOsContainsAllMaterialId(List<StepIOInputDTO> inputDTOs, List<Guid> materialIds)
+        {
+            List<FormError> errors = new List<FormError>();
+            foreach (var inputDTO in inputDTOs)
+            {
+                int equal = 0;
+                foreach (var materialId in materialIds)
+                {
+                    if (inputDTO.MaterialId.Equals(materialId))
+                    {
+                        equal++;
+                    }
+                }
+                if (equal == 0)
+                {
+                    errors.Add(new FormError
+                    {
+                        EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
+                        ErrorMessage = $"MaterialId : {inputDTO.SemiFinishedProductCode} not exist in Material list of Specification",
+                        Property = "MaterialId"
+                    });
+                }
+            }
+            List<FormError> errorsMissingMaterial = new List<FormError>();
+            foreach (var materialId in materialIds)
+            {
+                int equal = 0;
+                foreach (var inputDTO in inputDTOs)
+                {
+                    if (materialId.Equals(inputDTO.MaterialId))
+                    {
+                        equal++;
+                    }
+                }
+                if (equal == 0)
+                {
+                    errorsMissingMaterial.Add(new FormError
+                    {
+                        EntityOrder = materialIds.IndexOf(materialId) + 1,
+                        ErrorMessage = $"StepIO list missing MaterialId : {materialId}",
+                        Property = "Id"
+                    });
+                }
+            }
+            if (errors.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors, _entityListErrorWrapper);
+            }
+            if (errorsMissingMaterial.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errorsMissingMaterial, _entityListErrorWrapper);
+            }
+        }
+
+        // private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
+        // {
+        //     //upload product image
+        //     string fileURL = "";
+        //     Product unAddedProduct = _productRepository.GetUnAddedEntity();
+        //     foreach (IFormFile file in inputDTO.Definition.Images)
+        //     {
+        //         if (file != null)
+        //         {
+        //             string filePath = $"{typeof(Product).Name}/{unAddedProduct.Id}/Images/{file.FileName}";
+        //             string url = await _firebaseStorageService.UploadFile(filePath, file);
+        //             fileURL += url + ";";
+        //         }
+        //     }
+        //     fileURL = fileURL.Remove(fileURL.Length - 1);
+        //     unAddedProduct.ImageURLs = fileURL;
+        // }
+        // private async Task HandleUploadQualityStandardImage()
+        // {
+        //     //upload qauality standard image
+        //     string fileURL = "";
+        //     Product unAddedProduct = _productRepository.GetUnAddedEntity();
+        //     List<QualityStandard> unAddedQualityStandardList = _qualityStandardRepository.GetUnAddedEntityList();
+        //     foreach (QualityStandardImagesTemp qualityStandardImagesTemp in _qualityStandardImagesTempWrapper.QualityStandardImagesTemps)
+        //     {
+        //         QualityStandard qualityStandardImageAdd = unAddedQualityStandardList
+        //         .Where(qualityStandard => qualityStandard.Id.Equals(qualityStandardImagesTemp.QualityStandardId))
+        //         .FirstOrDefault();
+        //         if (qualityStandardImageAdd != null)
+        //         {
+        //             foreach (IFormFile image in qualityStandardImagesTemp.Images)
+        //             {
+        //                 string filePath =
+        //                 $"{typeof(Product).Name}/{unAddedProduct.Id}/{typeof(ProductSpecification).Name}/" +
+        //                 $"{qualityStandardImageAdd.ProductSpecificationId}/{typeof(QualityStandard).Name}/" +
+        //                 $"{qualityStandardImageAdd.Id}/Images/{image.FileName}";
+        //                 string url = await _firebaseStorageService.UploadFile(filePath, image);
+        //                 fileURL += url + ";";
+        //             }
+        //             fileURL = fileURL.Remove(fileURL.Length - 1);
+        //             qualityStandardImageAdd.ImageURL = fileURL;
+        //             fileURL = "";
+        //         }
+        //     }
+        // }
 
         #endregion Add Product
 
@@ -441,7 +531,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<List<CreateProductListingDTO>> GetAllProductForCreateProductionPlan()
         {
             List<Product> products = await _productRepository.GetAll().ToListAsync();
-            
+
             return _mapper.Map<List<CreateProductListingDTO>>(products);
 
         }

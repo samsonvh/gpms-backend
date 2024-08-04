@@ -10,6 +10,6 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
         public float SizeWidth { get; set; }
         public float Consumption { get; set; }
         public string? Description { get; set; }
-        public string MaterialCode { get; set; }
+        public Guid MaterialId { get; set; }
     }
 }

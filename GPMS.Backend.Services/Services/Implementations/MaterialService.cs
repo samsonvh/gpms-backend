@@ -49,70 +49,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         #region Add List
         public async Task<List<CreateUpdateResponseDTO<Material>>> AddList(List<MaterialInputDTO> inputDTOs)
         {
-            ServiceUtils.ValidateInputDTOList<MaterialInputDTO, Material>
-                (inputDTOs, _materialValidator, _entityListErrorWrapper);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<MaterialInputDTO, Material>
-                (inputDTOs, "Code", _entityListErrorWrapper);
-            await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
-            List<CreateUpdateResponseDTO<Material>> responses = new List<CreateUpdateResponseDTO<Material>>();
-            foreach (MaterialInputDTO materialInputDTO in inputDTOs)
-            {
-                Material material = _mapper.Map<Material>(materialInputDTO);
-                CreateUpdateResponseDTO<Material> response = new CreateUpdateResponseDTO<Material>
-                {
-                    Code = materialInputDTO.Code
-                };
-                if (materialInputDTO.IsNew)
-                {
-                    _materialRepository.Add(material);
-                    response.Id = material.Id;
-                }
-                else
-                {
-                    Material existedMaterial = await _materialRepository
-                    .Search(material => material.Code.Equals(materialInputDTO.Code))
-                    .FirstOrDefaultAsync();
-                    response.Id = existedMaterial.Id;
-                }
-
-                responses.Add(response);
-            }
-            return responses;
-        }
-
-        private async Task CheckMaterialCodeInMaterialInInputDTOList(List<MaterialInputDTO> inputDTOs)
-        {
-            List<FormError> errors = new List<FormError>();
-            foreach (MaterialInputDTO materialInputDTO in inputDTOs)
-            {
-                int entityOrder = 1;
-                Material existedMaterial = await _materialRepository
-                                            .Search(material => material.Code.Equals(materialInputDTO.Code))
-                                            .FirstOrDefaultAsync();
-                if (materialInputDTO.IsNew && existedMaterial != null)
-                {
-                    errors.Add(new FormError
-                    {
-                        Property = "Code",
-                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} duplicated in system",
-                        EntityOrder = entityOrder
-                    });
-                }
-                else if (!materialInputDTO.IsNew && existedMaterial == null)
-                {
-                    errors.Add(new FormError
-                    {
-                        Property = materialInputDTO.GetType().GetProperty("Code").Name,
-                        ErrorMessage = $"There is a {typeof(Material).Name} with Code : {materialInputDTO.Code} is not existed in system",
-                        EntityOrder = entityOrder
-                    });
-                }
-                entityOrder++;
-            }
-            if (errors.Count > 0)
-            {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors, _entityListErrorWrapper);
-            }
+            throw new NotImplementedException();
         }
         #endregion
         public async Task<MaterialDTO> Details(Guid id)
@@ -177,7 +114,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             ServiceUtils.ValidateInputDTO<MaterialInputDTO, Material>
                 (inputDTO, _materialValidator, _entityListErrorWrapper);
             List<MaterialInputDTO> inputDTOs = [inputDTO];
-            await CheckMaterialCodeInMaterialInInputDTOList(inputDTOs);
+            await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<MaterialInputDTO,Material>
+                (inputDTO,_materialRepository,"Code","Code",_entityListErrorWrapper);
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Create Material Failed", _entityListErrorWrapper);

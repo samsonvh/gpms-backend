@@ -525,6 +525,10 @@ namespace GPMS.Backend.Services.Services.Implementations
                                         .Include(productionPlan => productionPlan.ProductionRequirements)
                                             .ThenInclude(requirement => requirement.ProductSpecification)
                                                 .ThenInclude(specification => specification.Product)
+                                                    .ThenInclude(product => product.ProductionProcesses)
+                                        .Include(productionPlan => productionPlan.ProductionRequirements)
+                                            .ThenInclude(requirement => requirement.ProductionEstimations)
+                                                .ThenInclude(estimation => estimation.ProductionSeries)
                                         .Include(productionPlan => productionPlan.ParentProductionPlan)
                                             .ThenInclude(productionPlan => productionPlan.ParentProductionPlan)
                                         .FirstOrDefaultAsync();
@@ -596,24 +600,38 @@ namespace GPMS.Backend.Services.Services.Implementations
                     _productRepository.Update(product);
                 }
             }
-            //Chuyển 
+            //Chuyển current process của các Series thuộc estimation đầu tiên sang process đầu tiên của product 
+            foreach (var requirement in productionPlan.ProductionRequirements)
+            {
+                var seriesOfFirstEstimation = productionPlan.ProductionRequirements
+                    .SelectMany(requirement => requirement.ProductionEstimations)
+                    .FirstOrDefault(estimation => estimation.DayNumber == 1)
+                    .ProductionSeries
+                    .ToList();
+                foreach (var series in seriesOfFirstEstimation)
+                {
+                    series.CurrentProcess = requirement.ProductSpecification.Product
+                    .ProductionProcesses.FirstOrDefault(process => process.OrderNumber == 1).Name;
+                    series.Status = ProductionSeriesStatus.InProduction;
+                }
+            }
             productionPlan.Status = ProductionPlanStatus.InProgress;
             productionPlan.ActualStartingDate = DateTime.UtcNow;
             _productionPlanRepository.Update(productionPlan);
             await _productRepository.Save();
         }
+        #endregion
 
         public Task<ProductionPlanDTO> Add(ProductionPlanInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ProductionPlanDTO> Update(Guid id,ProductionPlanInputDTO inputDTO)
+        public Task<ProductionPlanDTO> Update(Guid id, ProductionPlanInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }
 
 
-        #endregion
     }
 }

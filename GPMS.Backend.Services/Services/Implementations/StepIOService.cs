@@ -26,6 +26,7 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class StepIOService : IStepIOService
     {
         private readonly IGenericRepository<ProductionProcessStepIO> _stepIORepository;
+        private readonly IGenericRepository<SemiFinishedProduct> _semiFinishedProduct;
         private readonly IValidator<StepIOInputDTO> _stepIOValidator;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
@@ -33,58 +34,60 @@ namespace GPMS.Backend.Services.Services.Implementations
 
         public StepIOService(
             IGenericRepository<ProductionProcessStepIO> stepIORepository,
+            IGenericRepository<SemiFinishedProduct> semiFinishedProduct,
             IValidator<StepIOInputDTO> stepIOValidator,
             IMapper mapper,
             EntityListErrorWrapper entityListErrorWrapper,
             StepIOInputDTOWrapper stepIOInputDTOWrapper)
         {
             _stepIORepository = stepIORepository;
+            _semiFinishedProduct = semiFinishedProduct;
             _stepIOValidator = stepIOValidator;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
         }
-
-        public async Task AddList(List<StepIOInputDTO> inputDTOs, Guid stepId,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList,
-        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
+        #region Add List
+        public async Task AddList(List<StepIOInputDTO> inputDTOs, Guid stepId, 
+        List<Guid> materialIds, 
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes)
         {
             ServiceUtils.ValidateInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
                 (inputDTOs, _stepIOValidator, _entityListErrorWrapper);
+            var stepIOWithMaterialId = inputDTOs.Where(inputDTO => !inputDTO.MaterialId.IsNullOrEmpty()).ToList();
+            var stepIOWithSemiFinishProductCode = inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList();
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
-                    "MaterialCode", _entityListErrorWrapper);
+                (stepIOWithMaterialId,"MaterialId", _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-                (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
-                    "SemiFinishedProductCode", _entityListErrorWrapper);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, Material>
-                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
-                    materialCodeList, "MaterialCode", _entityListErrorWrapper);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<StepIOInputDTO, ProductionProcessStepIO, SemiFinishedProduct>
-                (inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList(),
-                    semiFinsihedProductCodeList, "SemiFinishedProductCode", _entityListErrorWrapper);
+            (stepIOWithSemiFinishProductCode,"SemiFinishedProductCode", _entityListErrorWrapper);
             CheckContainsOnlyOneOutputAndAtLeastOneInput(inputDTOs);
             foreach (StepIOInputDTO stepIOInputDTO in inputDTOs)
             {
                 ProductionProcessStepIO productionProcessStepIO = _mapper.Map<ProductionProcessStepIO>(stepIOInputDTO);
                 productionProcessStepIO.ProductionProcessStepId = stepId;
-                if (!stepIOInputDTO.MaterialCode.IsNullOrEmpty())
+                if (!stepIOInputDTO.MaterialId.IsNullOrEmpty())
                 {
-                    CreateUpdateResponseDTO<Material> existedMaterialCode =
-                    materialCodeList.FirstOrDefault(materialCode => materialCode.Code.Equals(stepIOInputDTO.MaterialCode));
-                    if (existedMaterialCode != null) productionProcessStepIO.MaterialId = existedMaterialCode.Id;
+                    var existedMaterialId =
+                    materialIds.FirstOrDefault(materialIds => materialIds.Equals(stepIOInputDTO.MaterialId));
+                    if (existedMaterialId != null) productionProcessStepIO.MaterialId = existedMaterialId;
                 }
                 else if (!stepIOInputDTO.SemiFinishedProductCode.IsNullOrEmpty())
                 {
-                    CreateUpdateResponseDTO<SemiFinishedProduct> existedSemiFinishedProductCode =
-                    semiFinsihedProductCodeList.FirstOrDefault(semiFinishedProductCode => semiFinishedProductCode.Code.Equals(stepIOInputDTO.SemiFinishedProductCode));
-                    if (existedSemiFinishedProductCode != null) productionProcessStepIO.SemiFinishedProductId = existedSemiFinishedProductCode.Id;
+                    var existedSemiFinishedProductCode =
+                    semiFinishedProductCodes.FirstOrDefault(semiFinishedProductCode => semiFinishedProductCode.Code.Equals(stepIOInputDTO.SemiFinishedProductCode));
+                    if (existedSemiFinishedProductCode != null) 
+                    {
+                        productionProcessStepIO.SemiFinishedProductId = existedSemiFinishedProductCode.Id;
+                    }
+                        
                 }
                 _stepIORepository.Add(productionProcessStepIO);
                 _stepIOInputDTOWrapper.StepIOInputDTOList.Add(stepIOInputDTO);
             }
         }
 
+        
+        #endregion
         #region Get All StepIO
         public async Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetAll(StepIOFilterModel stepIOFilterModel)
         {

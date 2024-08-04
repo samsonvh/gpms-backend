@@ -53,9 +53,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task AddList(List<ProcessInputDTO> inputDTOs, Guid productId, 
-        List<CreateUpdateResponseDTO<Material>> materialCodeList, 
-        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList)
+        public async Task AddList(List<ProcessInputDTO> inputDTOs, Guid productId,
+        List<Guid> materialIds, 
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes)
         {
             ServiceUtils.ValidateInputDTOList<ProcessInputDTO,ProductProductionProcess>
                 (inputDTOs,_processValidator,_entityListErrorWrapper);
@@ -72,7 +72,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productProductionProcess.ProductId = productId;
                 _processRepository.Add(productProductionProcess);
                 await _stepService.AddList(processInputDTO.Steps, productProductionProcess.Id,
-                materialCodeList,semiFinishedProductCodeList);
+                materialIds,semiFinishedProductCodes);
             }
         }
 

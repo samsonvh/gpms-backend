@@ -16,8 +16,7 @@ namespace GPMS.Backend.Services.Services
     : IBaseService<QualityStandardInputDTO,CreateUpdateResponseDTO<QualityStandard>,
     QualityStandardListingDTO,QualityStandardDTO, QualityStandardFilterModel>
     {
-        Task AddList (List<QualityStandardInputDTO> inputDTOs, Guid specificationId, 
-        List<CreateUpdateResponseDTO<Material>> materialCodeList);
+        Task AddList (List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<Guid> materialIds);
 
         Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAllQualityOfSpecification(Guid specificationId, QualityStandardFilterModel qualityStandardFilterModel);
     }

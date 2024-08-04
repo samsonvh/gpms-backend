@@ -27,9 +27,6 @@ namespace GPMS.Backend.Services.Utils.Validators
                 .When(inputDTO => !inputDTO.Description.IsNullOrEmpty())
                 .WithMessage("Description can not longer than 500 characters");
 
-            RuleFor(inputDTO => inputDTO.MaterialCode).MaximumLength(20)
-                .When(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty())
-                .WithMessage("Material code can not longer than 20 characters");
         }
     }
 }

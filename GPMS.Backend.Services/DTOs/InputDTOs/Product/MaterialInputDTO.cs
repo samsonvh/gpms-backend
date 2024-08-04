@@ -15,6 +15,5 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product
         public string? ColorCode { get; set; }
         public string? ColorName { get; set; }
         public string? Description { get; set; }
-        public bool IsNew { get; set; }
     }
 }

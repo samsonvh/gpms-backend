@@ -62,23 +62,62 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList, string sizes, string colors)
+        public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, string sizes, string colors)
         {
-            ServiceUtils.ValidateInputDTOList<SpecificationInputDTO,ProductSpecification>
-                (inputDTOs,_specificationValidator,_entityListErrorWrapper);
-            ValidateSizeAndColorInSpecification(sizes,colors,inputDTOs);
-            Warehouse existedProductWarehouse = await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse")).FirstOrDefaultAsync();
-            foreach (SpecificationInputDTO specificationInputDTO in inputDTOs)
+            ServiceUtils.ValidateInputDTOList<SpecificationInputDTO, ProductSpecification>
+                (inputDTOs, _specificationValidator, _entityListErrorWrapper);
+            ValidateSizeAndColorInSpecification(sizes, colors, inputDTOs);
+            CheckMaterialInEverySpecification(inputDTOs);
+            Warehouse existedProductWarehouse =
+                await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse"))
+                                            .FirstOrDefaultAsync();
+            foreach (SpecificationInputDTO inputDTO in inputDTOs)
             {
-                ProductSpecification productSpecification = _mapper.Map<ProductSpecification>(specificationInputDTO);
+                ProductSpecification productSpecification = _mapper.Map<ProductSpecification>(inputDTO);
                 productSpecification.ProductId = productId;
                 productSpecification.WarehouseId = existedProductWarehouse.Id;
                 productSpecification.InventoryQuantity = 0;
                 _specificationRepository.Add(productSpecification);
-                await _measurementService.AddList(specificationInputDTO.Measurements, productSpecification.Id);
-                await _billOfMaterialService.AddList(specificationInputDTO.BOMs, productSpecification.Id,materialCodeList);
-                await _qualityStandardService.AddList(specificationInputDTO.QualityStandards, productSpecification.Id, materialCodeList);
+                await _measurementService.AddList(inputDTO.Measurements, productSpecification.Id);
+                await _billOfMaterialService.AddList(inputDTO.BOMs, productSpecification.Id);
+                var materialIds = inputDTO.BOMs.Select(bom => bom.MaterialId).ToList();
+                await _qualityStandardService.AddList(inputDTO.QualityStandards, productSpecification.Id, materialIds);
+            }
+        }
+
+        private void CheckMaterialInEverySpecification(List<SpecificationInputDTO> inputDTOs)
+        {
+            List<FormError> errors = new List<FormError>();
+            foreach (var inputDTO in inputDTOs)
+            {
+                var materialIds = inputDTO.BOMs.Select(bom => bom.MaterialId).ToList();
+                materialIds.Sort();
+                int notEqualCount = 0;
+                foreach (var inputDTOCompare in inputDTOs)
+                {
+                    var materialIdsCompare = inputDTOCompare.BOMs.Select(bom => bom.MaterialId).ToList();
+                    materialIdsCompare.Sort();
+
+                    if (!materialIds.Equals(materialIdsCompare))
+                    {
+                        notEqualCount++;
+
+                    }
+                }
+                if (notEqualCount > 0)
+                {
+                    errors.Add
+                        (new FormError
+                        {
+                            EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
+                            ErrorMessage = $"Material list in Specification with size :{inputDTO.Size} and color : {inputDTO.Color} is not equal to other material list of other specification",
+                            Property = "BOMs"
+                        });
+                }
+            }
+            if (errors.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors,_entityListErrorWrapper);
             }
         }
 
@@ -135,8 +174,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         private void ValidateSizeAndColorInSpecification(string productSizes,
         string productColors, List<SpecificationInputDTO> specificationInputDTOs)
         {
-            var sizes = productSizes.Split(",",StringSplitOptions.TrimEntries);
-            var colors = productColors.Split(",",StringSplitOptions.TrimEntries);
+            var sizes = productSizes.Split(",", StringSplitOptions.TrimEntries);
+            var colors = productColors.Split(",", StringSplitOptions.TrimEntries);
             List<FormError> errors = new List<FormError>();
             foreach (SpecificationInputDTO specificationInputDTO in specificationInputDTOs)
             {
@@ -159,7 +198,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors, _entityListErrorWrapper);
             }
         }
 

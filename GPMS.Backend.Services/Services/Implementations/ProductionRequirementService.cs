@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Enums.Types;
@@ -8,9 +9,11 @@ using GPMS.Backend.Data.Models.Products.Specifications;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -88,7 +91,27 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-
+        public async Task<DefaultPageResponseListingDTO<ProductionRequirementListingDTO>> GetAllByProductionPlanId(Guid productionPlanId, RequirementFilterModel requirementFilterModel)
+        {
+            var query = _productionRequirementRepository
+                            .Search(requirement => requirement.ProductionPlanId.Equals(productionPlanId));
+            query = query.SortBy(requirementFilterModel);  
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(requirementFilterModel);
+            var result = await query.ProjectTo<ProductionRequirementListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            DefaultPageResponseListingDTO<ProductionRequirementListingDTO> resposne = 
+            new DefaultPageResponseListingDTO<ProductionRequirementListingDTO>
+            {
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = requirementFilterModel.Pagination.PageIndex,
+                    PageSize = requirementFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                },
+                Data = result
+            };
+            return resposne;
+        }
 
         private async Task ValidateSpecification(Guid productSpecificationId, int entityOrder)
         {

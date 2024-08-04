@@ -1,6 +1,8 @@
 ﻿using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +15,6 @@ namespace GPMS.Backend.Services.Services
     {
         Task AddRequirementListForAnnualProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId);
         Task AddRequirementListForChildProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId);
-
+        Task<DefaultPageResponseListingDTO<ProductionRequirementListingDTO>> GetAllByProductionPlanId(Guid productionPlanId, RequirementFilterModel requirementFilterModel);
     }
 }

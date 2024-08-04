@@ -16,8 +16,8 @@ namespace GPMS.Backend.Services.Services
     ProcessListingDTO,ProcessDTO,ProcessFilterModel>
     {
         Task AddList(List<ProcessInputDTO> inputDTOs, Guid productId,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList, 
-        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodeList);
+        List<Guid> materialIds, 
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes);
         Task<DefaultPageResponseListingDTO<ProcessListingDTO>> GetAllProcessOfProduct(Guid productId, ProcessFilterModel processFilterModel);
     }
 }

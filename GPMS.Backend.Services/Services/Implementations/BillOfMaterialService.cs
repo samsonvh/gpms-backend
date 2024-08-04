@@ -22,17 +22,20 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class BillOfMaterialService : IBillOfMaterialService
     {
         private readonly IGenericRepository<BillOfMaterial> _billOfMaterialRepository;
+        private readonly IGenericRepository<Material> _materialRepository;
         private readonly IValidator<BOMInputDTO> _billOfMaterialValidator;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         public BillOfMaterialService(
             IGenericRepository<BillOfMaterial> billOfMaterialRepository,
+            IGenericRepository<Material> materialRepository,
             IValidator<BOMInputDTO> billOfMaterialValidator,
             IMapper mapper,
             EntityListErrorWrapper entityListErrorWrapper
             )
         {
             _billOfMaterialRepository = billOfMaterialRepository;
+            _materialRepository = materialRepository;
             _billOfMaterialValidator = billOfMaterialValidator;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
@@ -48,23 +51,44 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task AddList(
-        List<BOMInputDTO> inputDTOs, Guid specificationId,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList)
+        public async Task AddList(List<BOMInputDTO> inputDTOs, Guid specificationId)
         {
             ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>
-                (inputDTOs, _billOfMaterialValidator,_entityListErrorWrapper);
+                (inputDTOs, _billOfMaterialValidator, _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO,BillOfMaterial>
-                (inputDTOs,"MaterialCode",_entityListErrorWrapper);
-            ServiceUtils.CheckForeignEntityCodeListContainsAllForeignEntityCodeInInputDTOList<BOMInputDTO,BillOfMaterial,Material>
-                (inputDTOs, materialCodeList, "MaterialCode","Code",_entityListErrorWrapper);
-            foreach (BOMInputDTO bomInputDTO in inputDTOs)
+                (inputDTOs,"MaterialId",_entityListErrorWrapper);
+            CheckMaterialExist(inputDTOs);
+            foreach (BOMInputDTO inputDTO in inputDTOs)
             {
-                BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(bomInputDTO);
+                BillOfMaterial billOfMaterial = _mapper.Map<BillOfMaterial>(inputDTO);
                 billOfMaterial.ProductSpecificationId = specificationId;
-                billOfMaterial.MaterialId = materialCodeList
-                .First(materialCode => materialCode.Code.Equals(bomInputDTO.MaterialCode)).Id;
+                billOfMaterial.MaterialId = inputDTO.MaterialId;
                 _billOfMaterialRepository.Add(billOfMaterial);
+            }
+        }
+
+        private void CheckMaterialExist(List<BOMInputDTO> inputDTOs)
+        {
+            List<FormError> errors = new List<FormError>();
+            foreach (var inputDTO in inputDTOs)
+            {
+                var materialExist = _materialRepository.Details(inputDTO.MaterialId);
+                if (materialExist == null)
+                {
+                    errors.Add
+                    (
+                        new FormError
+                        {
+                            EntityOrder = inputDTOs.IndexOf(inputDTO),
+                            ErrorMessage = $"Material with MaterialId: {inputDTO.MaterialId} not exist",
+                            Property = "MaterialId"
+                        }
+                    );
+                }
+            }
+            if (errors.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors,_entityListErrorWrapper);
             }
         }
 

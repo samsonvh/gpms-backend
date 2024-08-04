@@ -38,20 +38,14 @@ namespace GPMS.Backend.Controllers
         [Route(APIEndPoint.PRODUCTS_V1)]
         [SwaggerOperation(Summary = "Define product using form")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Define Product Successfully")]
-        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Define Product Failed", typeof(List<EntityListError>))]
+        [SwaggerResponse((int)HttpStatusCode.BadRequest, "Define Product Failed")]
         [Produces("application/json")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> DefineProduct([FromForm] ProductInputDTO productInputDTO)
+        public async Task<IActionResult> DefineProduct([FromBody] ProductInputDTO productInputDTO)
         {
             _currentLoginUser.DecryptAccessToken(Request.Headers["Authorization"]);
-            var result = await _productService.Add(productInputDTO);
-            BaseReponse baseReponse = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Define Product Successfully",
-                Data = result
-            };
-            return Ok(baseReponse);
+            var response = await _productService.Add(productInputDTO);
+            return Ok(response);
         }
 
         [HttpGet]

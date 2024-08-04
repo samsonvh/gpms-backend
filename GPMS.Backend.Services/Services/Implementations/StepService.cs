@@ -42,9 +42,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
         }
-        public async Task AddList(List<StepInputDTO> inputDTOs, Guid processId,
-        List<CreateUpdateResponseDTO<Material>> materialCodeList,
-        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList)
+        public async Task AddList(List<StepInputDTO> inputDTOs, Guid processId, 
+        List<Guid> materialIds, 
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes)
         {
             ServiceUtils.ValidateInputDTOList<StepInputDTO, ProductionProcessStep>
                 (inputDTOs, _stepValidator,_entityListErrorWrapper);
@@ -61,7 +61,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionProcessStep.ProductionProcessId = processId;
                 _stepRepository.Add(productionProcessStep);
                 await _stepIOService.AddList(stepInputDTO.StepIOs, productionProcessStep.Id,
-                materialCodeList, semiFinsihedProductCodeList);
+                materialIds, semiFinishedProductCodes);
             }
         }
 

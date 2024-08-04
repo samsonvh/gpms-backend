@@ -13,8 +13,8 @@ namespace GPMS.Backend.Services.Services
     public interface IStepService
     {
         Task AddList(List<StepInputDTO> inputDTOs, Guid processId, 
-        List<CreateUpdateResponseDTO<Material>> materialCodeList, 
-        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinsihedProductCodeList);
+        List<Guid> materialIds, 
+        List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes);
         Task<DefaultPageResponseListingDTO<StepListingDTO>> GetAll(StepFilterModel stepFilterModel);
     }
 }
