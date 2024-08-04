@@ -451,12 +451,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (Product product in productList)
             {
                 ProductListingDTO productListingDTO = _mapper.Map<ProductListingDTO>(product);
-                if (!product.ImageURLs.IsNullOrEmpty())
+                if (!string.IsNullOrEmpty(product.ImageURLs))
                 {
-                    string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.None);
-                    productListingDTO.ImageURLs.AddRange(imageArr);
+                    string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.RemoveEmptyEntries);
+                    productListingDTO.ImageURL = imageArr.FirstOrDefault();
                 }
-                else productListingDTO.ImageURLs = null;
+                else productListingDTO.ImageURL = null;
                 if (!product.Sizes.IsNullOrEmpty())
                 {
                     string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);

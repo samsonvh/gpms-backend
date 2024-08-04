@@ -8,6 +8,7 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
 using GPMS.Backend.Services.Services.Implementations;
 using Microsoft.AspNetCore.Authorization;
@@ -43,19 +44,13 @@ namespace GPMS.Backend.Controllers
         [HttpGet]
         [Route(APIEndPoint.CATEGORY_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Category")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Category List")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Category List", typeof(CategoryDTO))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllCategory()
+        public async Task<IActionResult> GetAllCategory([FromBody] CategoryFilterModel categoryFilterModel)
         {
-            var data = await _categoryService.GetAll();
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Category List",
-                Data = data
-            };
-            return Ok(response);
+            var data = await _categoryService.GetAll(categoryFilterModel);
+            return Ok(data);
         }
 
         [HttpGet]

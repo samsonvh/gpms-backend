@@ -69,7 +69,7 @@ namespace GPMS.Backend.Services.Utils
 
             CreateMap<Product, ChangeStatusResponseDTO<Product, ProductStatus>>();
             CreateMap<Product, ProductListingDTO>()
-            .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore())
+            .ForMember(productListingDTO => productListingDTO.ImageURL, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
             CreateMap<Product,CreateProductListingDTO>();
@@ -189,6 +189,13 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(warehouseTicketDto => warehouseTicketDto.ProductSpeccificationId,
                                 opt => opt.MapFrom(warehouseTicket => warehouseTicket.ProductSpecificationId));
 
+            //inspection request
+            CreateMap<InspectionRequestInputDTO, InspectionRequest>();
+
+            CreateMap<InspectionRequest, InspectionRequestDTO>()
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.ProductionSeriesCode, opt => opt.MapFrom(inspectionRequest => inspectionRequest.ProductionSeries.Code))
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.CreatorName, opt => opt.MapFrom(inspectionRequest => inspectionRequest.Creator.FullName))
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.ReviewerName, opt => opt.MapFrom(inspectionRequest => inspectionRequest.Reviewer.FullName));
         }
     }
 }

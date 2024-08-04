@@ -4,14 +4,18 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
+using GPMS.Backend.Data.Models.Staffs;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -62,9 +66,24 @@ namespace GPMS.Backend.Services.Services.Implementations
                                         .FirstOrDefaultAsync());
         }
 
-        public async Task<List<CategoryDTO>> GetAll()
+        public async Task<DefaultPageResponseListingDTO<CategoryDTO>> GetAll(CategoryFilterModel categoryFilterModel)
         {
-            return _mapper.Map<List<CategoryDTO>>(await _categoryRepository.GetAll().ToListAsync());
+            var query = _categoryRepository.GetAll();
+            query = query.SortBy<Category>(categoryFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<Category>(categoryFilterModel);
+            var categories = await query.ProjectTo<CategoryDTO>(_mapper.ConfigurationProvider) 
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<CategoryDTO>
+            {
+                Data = categories,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = categoryFilterModel.Pagination.PageIndex,
+                    PageSize = categoryFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
     }
 }

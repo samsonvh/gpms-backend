@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GPMS.Backend.Services.DTOs.LisingDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace GPMS.Backend.Services.DTOs
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public ICollection<StaffDTO> Staffs { get; set; }
+        public ICollection<StaffListingDTO> Staffs { get; set; }
     }
 }
