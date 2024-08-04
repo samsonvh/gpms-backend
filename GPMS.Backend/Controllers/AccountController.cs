@@ -81,7 +81,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerResponse((int)HttpStatusCode.OK, "Change stauts of account successfully", typeof(AccountDTO))]
         [SwaggerResponse((int)HttpStatusCode.BadRequest, "Invalid status")]
         [Produces("application/json")]
-        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] string status)
+        public async Task<IActionResult> ChangeStatus([FromRoute] Guid id, [FromBody] AccountInputStatus status)
         {
             var account = await _accountService.ChangeStatus(id, status);
             return Ok(account);
