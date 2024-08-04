@@ -113,5 +113,9 @@ namespace GPMS.Backend
         public const string WAREHOUSE_REQUESTS_V1 = API_VERSION_1 + "/warehouse-requests";
 
         #endregion Production Plans
+
+        //Inspection Requests
+        public const string INSPECTION_REQUESTS_V1 = API_VERSION_1 + "/inspection-requests";
+        public const string INSPECTION_REQUEST_ID_V1 = INSPECTION_REQUESTS_V1 + "/{id}";
     }
 }

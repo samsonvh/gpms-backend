@@ -185,6 +185,11 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(warehouseTicketDto => warehouseTicketDto.ProductSpeccificationId,
                                 opt => opt.MapFrom(warehouseTicket => warehouseTicket.ProductSpecificationId));
 
+            //inspection request
+            CreateMap<InspectionRequestInputDTO, InspectionRequest>();
+
+            CreateMap<InspectionRequest, InspectionRequestDTO>()
+           .ForMember(dest => dest.ProductionSeriesCode, opt => opt.MapFrom(src => src.ProductionSeries.Code));
         }
     }
 }
