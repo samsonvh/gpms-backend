@@ -191,7 +191,9 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<InspectionRequestInputDTO, InspectionRequest>();
 
             CreateMap<InspectionRequest, InspectionRequestDTO>()
-           .ForMember(dest => dest.ProductionSeriesCode, opt => opt.MapFrom(src => src.ProductionSeries.Code));
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.ProductionSeriesCode, opt => opt.MapFrom(inspectionRequest => inspectionRequest.ProductionSeries.Code))
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.CreatorName, opt => opt.MapFrom(inspectionRequest => inspectionRequest.Creator.FullName))
+           .ForMember(inspectionRequestDTO => inspectionRequestDTO.ReviewerName, opt => opt.MapFrom(inspectionRequest => inspectionRequest.Reviewer.FullName));
         }
     }
 }
