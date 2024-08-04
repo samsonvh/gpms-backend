@@ -56,13 +56,7 @@ namespace GPMS.Backend.Controllers
         {
             /*CurrentLoginUserDTO currentLoginUserDTO = JWTUtils.DecryptAccessToken(Request.Headers["Authorization"]);*/
             var deparment = await _departmentService.Details(id);
-            BaseReponse baseReponse = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get details of deparment successfully",
-                Data = deparment
-            };
-            return Ok(baseReponse);
+            return Ok(deparment);
         }
     }
 }
