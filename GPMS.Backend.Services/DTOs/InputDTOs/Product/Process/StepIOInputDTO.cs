@@ -12,7 +12,7 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Process
         public float? Consumption { get; set; }
         public bool IsProduct { get; set; }
         public ProductionProcessStepIOType Type { get; set; }
-        public string? MaterialCode { get; set; }
+        public string? MaterialId { get; set; }
         public string? SemiFinishedProductCode { get; set; }
     }
 }

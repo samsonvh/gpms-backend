@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.Product.InputDTOs.Product;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Services;
@@ -28,13 +29,24 @@ namespace GPMS.Backend.Controllers
             _categoryService = categoryService;
         }
 
+        [HttpPost]
+        [Route(APIEndPoint.CATEGORY_V1)]
+        [SwaggerOperation(Summary = "Create Category")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Create Category Successfully")]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> CreateCatgory(CategoryInputDTO categoryInputDTO)
+        {
+            return Ok(await _categoryService.Add(categoryInputDTO));
+        }
+
         [HttpGet]
         [Route(APIEndPoint.CATEGORY_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Category")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Category List")]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllCategory ()
+        public async Task<IActionResult> GetAllCategory()
         {
             var data = await _categoryService.GetAll();
             BaseReponse response = new BaseReponse

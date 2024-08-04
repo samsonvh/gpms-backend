@@ -56,25 +56,25 @@ namespace GPMS.Backend.Services.Services.Implementations
         public async Task<List<CreateUpdateResponseDTO<SemiFinishedProduct>>> AddList(List<SemiFinishedProductInputDTO> inputDTOs, Guid productId)
         {
             ServiceUtils.ValidateInputDTOList<SemiFinishedProductInputDTO, SemiFinishedProduct>
-                (inputDTOs, _semiFinishedProductValidator,_entityListErrorWrapper);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<SemiFinishedProductInputDTO,SemiFinishedProduct>
-                (inputDTOs,"Code",_entityListErrorWrapper);
+                (inputDTOs, _semiFinishedProductValidator, _entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<SemiFinishedProductInputDTO, SemiFinishedProduct>
+                (inputDTOs, "Code", _entityListErrorWrapper);
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOListAndDatabase<SemiFinishedProductInputDTO, SemiFinishedProduct>
-                (inputDTOs,_semiFinishedProductRepository,"Code","Code",_entityListErrorWrapper);
-            List<CreateUpdateResponseDTO<SemiFinishedProduct>> responses = 
-                new List<CreateUpdateResponseDTO<SemiFinishedProduct>>();
+                (inputDTOs, _semiFinishedProductRepository, "Code", "Code", _entityListErrorWrapper);
+            List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishProductCodes = new List<CreateUpdateResponseDTO<SemiFinishedProduct>>();
             foreach (SemiFinishedProductInputDTO semiFinishedProductInputDTO in inputDTOs)
             {
                 SemiFinishedProduct semiFinishedProduct = _mapper.Map<SemiFinishedProduct>(semiFinishedProductInputDTO);
                 semiFinishedProduct.ProductId = productId;
                 _semiFinishedProductRepository.Add(semiFinishedProduct);
-                responses.Add(new CreateUpdateResponseDTO<SemiFinishedProduct>
+                semiFinishProductCodes.Add
+                (new CreateUpdateResponseDTO<SemiFinishedProduct>
                 {
                     Code = semiFinishedProduct.Code,
                     Id = semiFinishedProduct.Id
                 });
             }
-            return responses;
+            return semiFinishProductCodes;
         }
 
         public Task<SemiFinishedProductDTO> Details(Guid id)
@@ -150,7 +150,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<SemiFinishedProductDTO> Update(Guid id,SemiFinishedProductInputDTO inputDTO)
+        public Task<SemiFinishedProductDTO> Update(Guid id, SemiFinishedProductInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

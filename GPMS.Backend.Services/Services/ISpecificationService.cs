@@ -15,10 +15,9 @@ namespace GPMS.Backend.Services.Services
 {
     public interface ISpecificationService
     : IBaseService<SpecificationInputDTO, CreateUpdateResponseDTO<ProductSpecification>,
-        SpecificationListingDTO, SpecificationDTO,SpecificationFilterModel>
+        SpecificationListingDTO, SpecificationDTO, SpecificationFilterModel>
     {
-        Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, 
-        List<CreateUpdateResponseDTO<Material>> materialCodeList, string sizes, string colors);
+        Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, string sizes, string colors);
         Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId);
         Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilterModel);
 

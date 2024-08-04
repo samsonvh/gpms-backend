@@ -33,16 +33,14 @@ namespace GPMS.Backend.Services.Services.Implementations
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
         }
-        public async Task<CreateUpdateResponseDTO<Category>> Add(CategoryInputDTO inputDTO)
+        public async Task<CategoryDTO> Add(CategoryInputDTO inputDTO)
         {
             ServiceUtils.ValidateInputDTO<CategoryInputDTO,Category>
             (inputDTO, _categoryValidator,_entityListErrorWrapper);
             Category category = _mapper.Map<Category>(inputDTO);
             _categoryRepository.Add(category);
-            return new CreateUpdateResponseDTO<Category>
-            {
-                Id = category.Id
-            };
+            await _categoryRepository.Save();
+            return _mapper.Map<CategoryDTO>(category);
         }
 
         public async Task<CategoryDTO> Details(Guid id)

@@ -11,7 +11,7 @@ namespace GPMS.Backend.Services.Services
 {
     public interface ICategoryService 
     {
-        Task<CreateUpdateResponseDTO<Category>> Add(CategoryInputDTO inputDTO);
+        Task<CategoryDTO> Add(CategoryInputDTO inputDTO);
         Task<List<CategoryDTO>> GetAll();
         Task<CategoryDTO> DetailsByName (string name);
         Task<CategoryDTO> Details(Guid id);

@@ -59,8 +59,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<CategoryInputDTO, Category>();
             CreateMap<Category, CategoryDTO>().ReverseMap();
             //Product 
-            CreateMap<ProductDefinitionInputDTO, Product>()
-            .ForMember(product => product.Category, options => options.Ignore())
+            CreateMap<ProductInputDTO, Product>()
             .ForMember(product => product.SemiFinishedProducts, options => options.Ignore());
             CreateMap<Product, ProductDTO>()
                 .ForMember(productDTO => productDTO.Category, opt => opt.MapFrom(product => product.Category))
@@ -154,6 +153,9 @@ namespace GPMS.Backend.Services.Utils
                 //take
                 .ForMember(dest => dest.ProductSpecification, opt => opt.MapFrom(src => src.ProductSpecification))
                 .ForMember(dest => dest.ProductionEstimations, opt => opt.Ignore());
+
+            CreateMap<ProductionRequirement,ProductionRequirementListingDTO>()
+                .ForMember(requirementListingDTO => requirementListingDTO.SpecificationId, opt => opt.MapFrom(src => src.ProductSpecificationId));
 
             //Production Estimation
             CreateMap<ProductionEstimation, ProductionEstimationDTO>()

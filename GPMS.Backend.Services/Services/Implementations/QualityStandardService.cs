@@ -53,37 +53,47 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<CreateUpdateResponseDTO<Material>> materialCodeList)
+        #region Add Quality Standard
+        public async Task AddList(List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<Guid> materialIds)
         {
             ServiceUtils.ValidateInputDTOList<QualityStandardInputDTO, QualityStandard>
                 (inputDTOs, _qualityStandardValidator, _entityListErrorWrapper);
-            ServiceUtils.CheckForeignEntityCodeInInputDTOListExistedInForeignEntityCodeList<QualityStandardInputDTO, QualityStandard, Material>
-                (inputDTOs.Where(inputDTO => !inputDTO.MaterialCode.IsNullOrEmpty()).ToList(),
-            materialCodeList, "MaterialCode", _entityListErrorWrapper);
+            CheckMaterialIdExistInMaterialIds(inputDTOs, materialIds);
             foreach (QualityStandardInputDTO qualityStandardInputDTO in inputDTOs)
             {
                 QualityStandard qualityStandard = _mapper.Map<QualityStandard>(qualityStandardInputDTO);
                 qualityStandard.ProductSpecificationId = specificationId;
-                if (!qualityStandardInputDTO.MaterialCode.IsNullOrEmpty())
-                {
-                    CreateUpdateResponseDTO<Material> materialCode = materialCodeList
-                    .FirstOrDefault(materialCode => materialCode.Code.Equals(qualityStandardInputDTO.MaterialCode));
-                    qualityStandard.MaterialId = materialCode.Id;
-                }
-                else qualityStandard.MaterialId = null;
                 _qualityStandardRepository.Add(qualityStandard);
-                if (!qualityStandardInputDTO.Images.IsNullOrEmpty() && qualityStandardInputDTO.Images.Count > 0)
-                {
-                    _qualityStandardImagesTempWrapper
-                    .QualityStandardImagesTemps.Add(new QualityStandardImagesTemp
-                    {
-                        QualityStandardId = qualityStandard.Id,
-                        Images = qualityStandardInputDTO.Images
-                    });
-                }
             }
         }
 
+        private void CheckMaterialIdExistInMaterialIds(List<QualityStandardInputDTO> inputDTOs, List<Guid> materialIds)
+        {
+            List<FormError> errors = new List<FormError>();
+            foreach (var inputDTO in inputDTOs)
+            {
+                if (!materialIds.Contains(inputDTO.MaterialId))
+                {
+                    errors.Add
+                    (
+                        new FormError
+                        {
+                            EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
+                            ErrorMessage = $"MaterialId : {inputDTO.MaterialId} of Quality Standard not exist in material list in BOM",
+                            Property = "MaterialId"
+                        }
+
+                    );
+                }
+            }
+            if (errors.Count > 0)
+            {
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<QualityStandard>(errors,_entityListErrorWrapper);
+            }
+        }
+
+
+        #endregion
         public Task<QualityStandardDTO> Details(Guid id)
         {
             throw new NotImplementedException();
@@ -178,7 +188,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
-        public Task<QualityStandardDTO> Update(Guid id,QualityStandardInputDTO inputDTO)
+        public Task<QualityStandardDTO> Update(Guid id, QualityStandardInputDTO inputDTO)
         {
             throw new NotImplementedException();
         }

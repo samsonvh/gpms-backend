@@ -16,7 +16,6 @@ namespace GPMS.Backend.Services.Services
     : IBaseService<BOMInputDTO, CreateUpdateResponseDTO<BillOfMaterial>,
     BOMListingDTO,BOMDTO, BaseFilterModel>
     {
-        Task AddList(List<BOMInputDTO> inputDTOs,Guid specificationId, 
-        List<CreateUpdateResponseDTO<Material>> materialCodeList);
+        Task AddList(List<BOMInputDTO> inputDTOs,Guid specificationId);
     }
 }
