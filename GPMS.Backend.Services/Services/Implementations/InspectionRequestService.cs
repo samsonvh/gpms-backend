@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GPMS.Backend.Data.Enums.Others;
 using GPMS.Backend.Data.Enums.Statuses.Requests;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Models.Requests;
@@ -24,34 +25,37 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IMapper _mapper;
         private readonly CurrentLoginUserDTO _currentLoginUser;
         private readonly IGenericRepository<ProductionSeries> _productionSeriesRepoitory;
+        private readonly IGenericRepository<ProductionPlan> _productionPlanRepository;
 
         public InspectionRequestService(IGenericRepository<InspectionRequest> inspectionRequestRepository,
                                                        IGenericRepository<Staff> staffRepository,
                                                        IMapper mapper,
                                                        CurrentLoginUserDTO currentLoginUserDTO,
-                                                       IGenericRepository<ProductionSeries> productionSeriesRepository)
+                                                       IGenericRepository<ProductionSeries> productionSeriesRepository,
+                                                       IGenericRepository<ProductionPlan> productionPlanRepository)
         {
             _inspectionRequestRepository = inspectionRequestRepository;
             _staffRepository = staffRepository;
             _mapper = mapper;
             _currentLoginUser = currentLoginUserDTO;
             _productionSeriesRepoitory = productionSeriesRepository;
+            _productionPlanRepository = productionPlanRepository;
         }
 
-        public async Task<InspectionRequestDTO> Add(InspectionRequestInputDTO inputDTO)
+        /*public async Task<InspectionRequestDTO> Add(InspectionRequestInputDTO inputDTO)
         {
-            var productionSeries = await _productionSeriesRepoitory
+            *//*var productionSeries = await _productionSeriesRepoitory
                 .Search(productionSeries => productionSeries.Id == inputDTO.ProductionSeriesId)
                 .FirstOrDefaultAsync();
 
             if (productionSeries == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Production Series not found");
-            }
+            }*//*
 
             var inspectionRequest = _mapper.Map<InspectionRequest>(inputDTO);
             inspectionRequest.CreatorId = _currentLoginUser.Id;
-            inspectionRequest.ProductionSeriesId = productionSeries.Id;
+            *//*inspectionRequest.ProductionSeriesId = productionSeries.Id;*//*
             inspectionRequest.Status = InspectionRequestStatus.Pending;
 
             var creator = await _staffRepository
@@ -67,14 +71,53 @@ namespace GPMS.Backend.Services.Services.Implementations
             await _inspectionRequestRepository.Save();
 
             return _mapper.Map<InspectionRequestDTO>(inspectionRequest);
+        }*/
+
+        public async Task<InspectionRequestDTO> Add(InspectionRequestInputDTO inputDTO)
+        {
+            var inspectionRequest = _mapper.Map<InspectionRequest>(inputDTO);
+            inspectionRequest.CreatorId = _currentLoginUser.Id;
+            inspectionRequest.Status = InspectionRequestStatus.Pending;
+
+            var creator = await _staffRepository
+                .Search(creator => creator.Id == _currentLoginUser.Id)
+                .FirstOrDefaultAsync();
+
+            if (creator == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Creator Staff not found");
+            }
+
+            var productionSeries = await _productionSeriesRepoitory
+                .Search(productionSeries => productionSeries.Id == inputDTO.ProductionSeriesId)
+                .FirstOrDefaultAsync();
+
+            if (productionSeries == null)
+            {
+                throw new APIException((int)HttpStatusCode.NotFound, "Production Series not found");
+            }
+
+            inspectionRequest.Creator = creator;
+            inspectionRequest.ProductionSeries = productionSeries;
+
+            _inspectionRequestRepository.Add(inspectionRequest);
+            await _inspectionRequestRepository.Save();
+
+            var inspectionRequestDTO = _mapper.Map<InspectionRequestDTO>(inspectionRequest);
+            inspectionRequestDTO.CreatorName = creator.FullName;
+            inspectionRequestDTO.ProductionSeriesCode = productionSeries.Code;
+
+            return inspectionRequestDTO;
         }
+
 
         public async Task<InspectionRequestDTO> Details(Guid id)
         {
-            var inspectionRequest = _inspectionRequestRepository
+            var inspectionRequest = await _inspectionRequestRepository
                 .Search(inspectionRequest => inspectionRequest.Id == id)
                 .Include(inspectionRequest => inspectionRequest.Creator)
                 .Include(inspectionRequest => inspectionRequest.Reviewer)
+                .Include(inspectionRequest => inspectionRequest.ProductionSeries)
                 .FirstOrDefaultAsync();
 
             if (inspectionRequest == null)
@@ -82,7 +125,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Inspection Request not found");
             }
 
-            return _mapper.Map<InspectionRequestDTO>(inspectionRequest);
+            var inspectionRequestDTO = _mapper.Map<InspectionRequestDTO>(inspectionRequest);
+            return inspectionRequestDTO;
         }
     }
 }
