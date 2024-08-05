@@ -60,10 +60,12 @@ namespace GPMS.Backend
         public const string SPECIFICATIONS_ID_V1 = API_VERSION_1 + "/specifications" + "/{id}";
         //Measurements
         public const string MEASUREMENT_V1 = API_VERSION_1 + "/measurements";
+        public const string MEASUREMENT_OF_PRODUCT_ID_V1 = SPECIFICATIONS_ID_V1 + "/measurements";
 
         //Bill Of Materials 
-        public const string BILL_OF_MATERIALS_OF_SPECIFICATION_ID_V1 = SPECIFICATION_ID_OF_PRODUCT_ID_v1 + "/bill-of-materials";
+        public const string BILL_OF_MATERIALS_OF_SPECIFICATION_ID_V1 = SPECIFICATIONS_ID_V1 + "/bill-of-materials";
         public const string BILL_OF_MATERIAL_ID_OF_SPECIFICATION_ID_V1 = BILL_OF_MATERIALS_OF_SPECIFICATION_ID_V1 + "/{billOfMaterialId}";
+        /*public const string BILL_OF_MATERIALS_ID_OF_SPECIFICATION_ID_V1 = */
         //Processes 
         public const string PROCESSES_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/processes";
         public const string PROCESS_ID_OF_PRODUCT_ID_V1 = PROCESSES_OF_PRODUCT_ID_V1 + "/{processId}";

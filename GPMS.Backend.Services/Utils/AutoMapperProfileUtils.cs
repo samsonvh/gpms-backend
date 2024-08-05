@@ -100,6 +100,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<BOMInputDTO, BillOfMaterial>();
             CreateMap<BillOfMaterial, BOMDTO>()
                 .ForMember(bomDTO => bomDTO.Material, opt => opt.MapFrom(bom => bom.Material));
+            CreateMap<BillOfMaterial, BOMListingDTO>();
             //Quality Standard
             CreateMap<QualityStandardInputDTO, QualityStandard>();
             CreateMap<QualityStandard, QualityStandardDTO>()

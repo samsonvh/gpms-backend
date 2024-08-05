@@ -159,12 +159,12 @@ namespace GPMS.Backend.Services.Services.Implementations
             return query;
         }
 
-        public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)
+        /*public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)
         {
             List<ProductSpecification> specifications = await _specificationRepository
                 .Search(specification => specification.ProductId == productId).ToListAsync();
             return _mapper.Map<List<CreateProductSpecificationListingDTO>>(specifications);
-        }
+        }*/
 
 
         public Task UpdateList(List<SpecificationInputDTO> inputDTOs)
@@ -210,6 +210,27 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task<SpecificationDTO> Update(Guid id, SpecificationInputDTO inputDTO)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAllSpcificationByProductId(Guid productId, SpecificationFilterModel specificationFilterModel)
+        {
+            var query = _specificationRepository.GetAll().Where(query => query.ProductId == productId);
+            query = Filters(query, specificationFilterModel);
+            query = query.SortBy<ProductSpecification>(specificationFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<ProductSpecification>(specificationFilterModel);
+            var specifications = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<SpecificationListingDTO>
+            {
+                Data = specifications,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = specificationFilterModel.Pagination.PageIndex,
+                    PageSize = specificationFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
     }
 }
