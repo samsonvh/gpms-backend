@@ -86,6 +86,27 @@ namespace GPMS.Backend.Services.Services.Implementations
                 }
             };
         }
+
+        public async Task<DefaultPageResponseListingDTO<StepListingDTO>> GetAllStepOfProcess(Guid processId, StepFilterModel stepFilterModel)
+        {
+            var query = _stepRepository.GetAll().Where(step => step.ProductionProcessId == processId);
+            query = Filters(query, stepFilterModel);
+            query = query.SortBy<ProductionProcessStep>(stepFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<ProductionProcessStep>(stepFilterModel);
+            var steps = await query.ProjectTo<StepListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<StepListingDTO>
+            {
+                Data = steps,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = stepFilterModel.Pagination.PageIndex,
+                    PageSize = stepFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
         #endregion
 
         private IQueryable<ProductionProcessStep> Filters(IQueryable<ProductionProcessStep> query, StepFilterModel stepFilterModel)

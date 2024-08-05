@@ -39,5 +39,16 @@ namespace GPMS.Backend.Controllers
             return Ok(response);
         }
 
+        [HttpPost]
+        [Route(APIEndPoint.STEPS_OF_PROCESS_ID_OF_PROCESS_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all steps of process")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all steps successfully", typeof(DefaultPageResponseListingDTO<StepListingDTO>))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Step not found")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAllStepsOfProcess([FromRoute] Guid id, [FromBody] StepFilterModel stepFilterModel)
+        {
+            var response = await _stepService.GetAllStepOfProcess(id, stepFilterModel);
+            return Ok(response);
+        }
     }
 }
