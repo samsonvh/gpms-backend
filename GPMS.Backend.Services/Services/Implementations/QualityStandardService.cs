@@ -167,6 +167,8 @@ namespace GPMS.Backend.Services.Services.Implementations
                 {
                     string[] imageArr = qualityStandard.ImageURL.Split(";", StringSplitOptions.None);
                     qualityListingDTO.ImageURL.AddRange(imageArr);
+                    var firstImageURL = imageArr.FirstOrDefault();
+
                 }
                 qualityListingDTOs.Add(qualityListingDTO);
             }

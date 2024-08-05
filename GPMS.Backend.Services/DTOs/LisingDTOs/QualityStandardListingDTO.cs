@@ -9,6 +9,6 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public List<string> ImageURL { get; set; } = new List<string>();
+        public List<string>? ImageURL { get; set; } = new List<string>();
     }
 }
