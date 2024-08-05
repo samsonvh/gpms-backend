@@ -27,7 +27,7 @@ namespace GPMS.Backend.Controllers
             _specificationService = specificationService;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(APIEndPoint.SPECIFICATIONS_OF_PRODUCT_ID_V1)]
         [SwaggerOperation(Summary = "Get all specification for create production plan", Description = "Factory director, Production manager can get all specification for create production plan")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(List<CreateProductSpecificationListingDTO>))]

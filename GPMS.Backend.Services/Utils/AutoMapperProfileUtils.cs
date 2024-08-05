@@ -69,7 +69,7 @@ namespace GPMS.Backend.Services.Utils
 
             CreateMap<Product, ChangeStatusResponseDTO<Product, ProductStatus>>();
             CreateMap<Product, ProductListingDTO>()
-            .ForMember(productListingDTO => productListingDTO.ImageURL, options => options.Ignore())
+            .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
             .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
             CreateMap<Product,CreateProductListingDTO>();
