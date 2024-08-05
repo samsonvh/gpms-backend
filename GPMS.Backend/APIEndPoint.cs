@@ -13,6 +13,7 @@ namespace GPMS.Backend
         public const string FILTER = "/filter";
         public const string APPROVE = "/approve";
         public const string DECLINE = "/decline";
+        public const string IMAGE = "/images";
 
         //Authentication
         public const string AUTH_V1 = API_VERSION_1 + "/auth";

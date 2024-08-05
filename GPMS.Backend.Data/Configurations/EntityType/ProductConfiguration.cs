@@ -18,7 +18,6 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Name).HasMaxLength(100);
             builder.Property(e => e.Sizes).HasMaxLength(100);
             builder.Property(e => e.Colors).HasMaxLength(100);
-            builder.Property(e => e.ImageURLs).HasMaxLength(4000).IsRequired(false);
             builder.Property(e => e.Description).HasMaxLength(500).IsRequired(false);
             builder.Property(e => e.Status);
             builder.Property(e => e.CreatedDate).IsRequired().HasDefaultValue(DateTime.UtcNow);
