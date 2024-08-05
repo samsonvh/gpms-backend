@@ -8,6 +8,7 @@ using GPMS.Backend.Services.DTOs;
 using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.PageRequests;
 
 namespace GPMS.Backend.Services.Services
@@ -17,5 +18,6 @@ namespace GPMS.Backend.Services.Services
     BOMListingDTO,BOMDTO, BaseFilterModel>
     {
         Task AddList(List<BOMInputDTO> inputDTOs,Guid specificationId);
+        Task<DefaultPageResponseListingDTO<BOMListingDTO>> GetAllBomBySpecification(Guid specificationId, BOMFilterModel bOMFilterModel);
     }
 }

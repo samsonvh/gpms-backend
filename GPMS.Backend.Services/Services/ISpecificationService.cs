@@ -18,8 +18,10 @@ namespace GPMS.Backend.Services.Services
         SpecificationListingDTO, SpecificationDTO, SpecificationFilterModel>
     {
         Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, string sizes, string colors);
-        Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId);
+        /*Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId);*/
         Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilterModel);
+
+        Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAllSpcificationByProductId(Guid productId, SpecificationFilterModel specificationFilterModel);
 
     }
 }

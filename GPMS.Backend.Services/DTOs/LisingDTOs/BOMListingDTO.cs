@@ -7,6 +7,9 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
     public class BOMListingDTO
     {
-        
+        public Guid Id { get; set; }
+        public float sizeWidth { get; set; }
+        public float Consumption { get; set; }
+        public MaterialListingDTO Material {  get; set; }
     }
 }

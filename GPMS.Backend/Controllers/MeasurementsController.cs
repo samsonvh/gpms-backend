@@ -36,5 +36,17 @@ namespace GPMS.Backend.Controllers
             var pageResponses = await _measurementService.GetAll(measurementFilterModel);
             return Ok(pageResponses);
         }
+
+        [HttpPost]
+        [Route(APIEndPoint.MEASUREMENT_OF_PRODUCT_ID_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all measurement of specification")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all measurement successfully", typeof(List<MeasurementListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllMeasurementsBySpecification([FromRoute] Guid id, [FromBody] MeasurementFilterModel measurementFilterModel)
+        {
+            var pageResponses = await _measurementService.GetAllMeasurementsByProductId(id, measurementFilterModel);
+            return Ok(pageResponses);
+        }
     }
 }
