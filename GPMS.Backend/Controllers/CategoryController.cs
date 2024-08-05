@@ -41,7 +41,7 @@ namespace GPMS.Backend.Controllers
             return Ok(await _categoryService.Add(categoryInputDTO));
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route(APIEndPoint.CATEGORY_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get All Category")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Category List", typeof(CategoryDTO))]
