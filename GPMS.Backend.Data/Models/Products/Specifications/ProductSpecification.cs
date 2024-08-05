@@ -10,6 +10,7 @@ namespace GPMS.Backend.Data.Models.Products.Specifications
         public string Size { get; set; }
         public string Color { get; set; }
         public int InventoryQuantity { get; set; }
+        public string ImageURLs { get; set; }
 
         public Guid ProductId { get; set; }
         public  Product Product { get; set; }

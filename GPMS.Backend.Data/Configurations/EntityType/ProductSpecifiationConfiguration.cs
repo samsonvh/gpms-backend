@@ -17,6 +17,7 @@ namespace GPMS.Backend.Data.Configurations.EntityType
             builder.Property(e => e.Size).HasMaxLength(100);
             builder.Property(e => e.Color).HasMaxLength(100);
             builder.Property(e => e.InventoryQuantity);
+            builder.Property(e => e.ImageURLs).HasMaxLength(4000).IsRequired(false);
 
             builder.HasOne(e => e.Product).WithMany(e => e.Specifications).HasForeignKey(e => e.ProductId).OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(e => e.Warehouse).WithMany(e => e.Specifications).HasForeignKey(e => e.WarehouseId).OnDelete(DeleteBehavior.NoAction);

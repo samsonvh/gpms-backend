@@ -86,6 +86,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             throw new NotImplementedException();
         }
 
+        #region Get Detail
         public async Task<ProductDTO> Details(Guid id)
         {
             var product = await _productRepository
@@ -119,7 +120,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 Description = product.Description,
                 Sizes = !string.IsNullOrEmpty(product.Sizes) ? product.Sizes.Split(',').Select(size => size.Trim()).ToList() : new List<string>(),
                 Colors = !string.IsNullOrEmpty(product.Colors) ? product.Colors.Split(',').Select(color => color.Trim()).ToList() : new List<string>(),
-                ImageURLs = !string.IsNullOrEmpty(product.ImageURLs) ? product.ImageURLs.Split(';').Select(imageURL => imageURL.Trim()).ToList() : new List<string>(),
+                // ImageURLs = !string.IsNullOrEmpty(product.ImageURLs) ? product.ImageURLs.Split(';').Select(imageURL => imageURL.Trim()).ToList() : new List<string>(),
                 CreatedDate = product.CreatedDate,
                 Status = product.Status.ToString(),
                 CreatorName = product.Creator.FullName,
@@ -146,6 +147,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return productDTO;
         }
+        #endregion
 
         public Task<List<ProductListingDTO>> GetAll()
         {
@@ -451,12 +453,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             foreach (Product product in productList)
             {
                 ProductListingDTO productListingDTO = _mapper.Map<ProductListingDTO>(product);
-                if (!string.IsNullOrEmpty(product.ImageURLs))
-                {
-                    string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                    productListingDTO.ImageURL = imageArr.FirstOrDefault();
-                }
-                else productListingDTO.ImageURL = null;
                 if (!product.Sizes.IsNullOrEmpty())
                 {
                     string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);

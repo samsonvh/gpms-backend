@@ -14,7 +14,7 @@ namespace GPMS.Backend.Services.DTOs
         public string? Description { get; set; }
         public List<string>? Sizes { get; set; } = new List<string>();
         public List<string> Colors { get; set; }
-        public List<string>? ImageURLs { get; set; }
+        // public List<string>? ImageURLs { get; set; }
         public DateTime? CreatedDate { get; set; }
         public string Status { get; set; }
         public CategoryDTO Category { get; set; }
