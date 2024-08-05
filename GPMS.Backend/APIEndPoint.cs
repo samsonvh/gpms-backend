@@ -70,12 +70,15 @@ namespace GPMS.Backend
         public const string PROCESSES_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/processes";
         public const string PROCESS_ID_OF_PRODUCT_ID_V1 = PROCESSES_OF_PRODUCT_ID_V1 + "/{processId}";
         public const string PROCESS_V1 = API_VERSION_1 + "/processes";
+        public const string PROCESS_ID_V1 = PROCESS_V1 + "/{id}";
         //Steps 
         public const string STEPS_OF_PROCESS_ID_V1 = PROCESS_ID_OF_PRODUCT_ID_V1 + "/steps";
         public const string STEP_ID_OF_PROCESS_ID_V1 = STEPS_OF_PROCESS_ID_V1 + "/{stepId}";
         public const string STEPS_V1 = API_VERSION_1 + "/steps";
+        public const string STEPS_OF_PROCESS_ID_OF_PROCESS_V1 = PROCESS_ID_V1 + "/steps";
         //StepInputOutput
         public const string STEP_INPUT_OUTPUT_V1 = API_VERSION_1 + "/step-input-outputs";
+        public const string STEP_INPUT_OUTPUT_OF_STEP_ID_V1 = STEPS_V1 + "/{id}" + "/step-input-outputs";
         //SemiFinishedProduct
         public const string SEMI_FINISHED_PRODUCT_V1 = API_VERSION_1 + "/semi-finished-products";
         public const string SEMI_FINISHED_PRODUCT_OF_PRODUCT_ID_V1 = PRODUCTS_ID_V1 + "/semi-finished-products";

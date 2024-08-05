@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -149,6 +150,27 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors,_entityListErrorWrapper);
             }
+        }
+
+        public async Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetALlStepIOByStep(Guid stepId, StepIOFilterModel stepIOFilterModel)
+        {
+            var query = _stepIORepository.GetAll().Where(step => step.ProductionProcessStepId == stepId);
+            query = Filters(query, stepIOFilterModel);
+            query = query.SortBy<ProductionProcessStepIO>(stepIOFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<ProductionProcessStepIO>(stepIOFilterModel);
+            var stepIOs = await query.ProjectTo<StepIOListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<StepIOListingDTO>
+            {
+                Data = stepIOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = stepIOFilterModel.Pagination.PageIndex,
+                    PageSize = stepIOFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
     }
 }
