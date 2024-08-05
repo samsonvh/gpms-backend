@@ -9,7 +9,7 @@ namespace GPMS.Backend.Data.Repositories.Implementation
 {
     public class GenericRepository<Entity> : IGenericRepository<Entity> where Entity : class
     {
-        private GPMSDbContext _dbContext;
+        private readonly GPMSDbContext _dbContext;
         public GenericRepository(GPMSDbContext dbContext)
         {
             _dbContext = dbContext;

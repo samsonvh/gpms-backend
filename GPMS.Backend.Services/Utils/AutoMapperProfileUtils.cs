@@ -113,7 +113,8 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(dest => dest.ProductionProcessSteps, opt => opt.MapFrom(src => src.Steps));
             CreateMap<ProductProductionProcess, ProcessListingDTO>();
             //Step
-            CreateMap<StepInputDTO, Data.Models.Products.ProductionProcesses.ProductionProcessStep>();
+            CreateMap<StepInputDTO, ProductionProcessStep>();
+
             CreateMap<ProductionProcessStep, ProductionProcessStepDTO>()
                 .ForMember(productionProcessStepDTO => productionProcessStepDTO.ProductionProcessStepIOs, opt =>
                                 opt.MapFrom(productionProcessstep => productionProcessstep.ProductionProcessStepIOs));
@@ -168,7 +169,8 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionSeries => productionSeries.CurrentProcess, options => options.Ignore())
                 .ForMember(productionSeries => productionSeries.FaultyQuantity, options => options.Ignore());
             CreateMap<ProductionSeries, ProductionSeriesDTO>();
-            CreateMap<StepIOInputDTO, ProductionProcessStepIO>().ReverseMap();
+            CreateMap<StepIOInputDTO, ProductionProcessStepIO>()
+                    .ForMember(dest => dest.MaterialId, opt => opt.Ignore());
 
             //WarehouseRequest
             CreateMap<WarehouseRequestInputDTO, WarehouseRequest>();
