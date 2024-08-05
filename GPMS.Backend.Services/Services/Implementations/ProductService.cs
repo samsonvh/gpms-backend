@@ -454,9 +454,9 @@ namespace GPMS.Backend.Services.Services.Implementations
                 if (!string.IsNullOrEmpty(product.ImageURLs))
                 {
                     string[] imageArr = product.ImageURLs.Split(";", StringSplitOptions.RemoveEmptyEntries);
-                    productListingDTO.ImageURL = imageArr.FirstOrDefault();
+                    productListingDTO.ImageURLs = imageArr.Take(1).ToList();
                 }
-                else productListingDTO.ImageURL = null;
+                else productListingDTO.ImageURLs = null;
                 if (!product.Sizes.IsNullOrEmpty())
                 {
                     string[] sizeArr = product.Sizes.Split(",", StringSplitOptions.TrimEntries);
