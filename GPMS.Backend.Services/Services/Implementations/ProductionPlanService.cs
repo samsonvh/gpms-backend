@@ -277,8 +277,10 @@ namespace GPMS.Backend.Services.Services.Implementations
                     childProductionPlanDTO.CreatedDate = childProductionPlan.CreatedDate;
                     childProductionPlanDTO.Status = childProductionPlan.Status.ToString();
                     childProductionPlanDTO.CreatorName = childProductionPlan.Creator.FullName;
-                    if (childProductionPlan.Reviewer != null)
-                        childProductionPlanDTO.ParentProductionPlan.ReviewerName = childProductionPlan.Reviewer.FullName;
+                    childProductionPlanDTO.ReviewerName = childProductionPlan.Reviewer?.FullName;
+
+                    /*if (childProductionPlan.Reviewer != null)
+                        childProductionPlanDTO.ParentProductionPlan.ReviewerName = childProductionPlan.Reviewer.FullName;*/
                     childProductionPlans.Add(childProductionPlanDTO);
                 }
                 productionPlanDTO.ChildProductionPlans = childProductionPlans;
