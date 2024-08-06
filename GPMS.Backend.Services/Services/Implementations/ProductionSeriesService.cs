@@ -1,12 +1,20 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
+using GPMS.Backend.Data.Enums.Statuses.Products;
+using GPMS.Backend.Data.Enums.Times;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Data.Repositories;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
+using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,6 +61,48 @@ namespace GPMS.Backend.Services.Services.Implementations
                 productionSeries.Status = ProductionSeriesStatus.Pending;
                 _productionSeriesRepository.Add(productionSeries);
             }
+        }
+
+        #region Get All Series Of Estimation
+        public async Task<DefaultPageResponseListingDTO<ProductionSeriesListingDTO>> GetAllSeriesOfEstimation(Guid estimationId, ProductionSeriesFilterModel productionSeriesFilterModel)
+        {
+            IQueryable<ProductionSeries> query = _productionSeriesRepository
+                .GetAll().Where(series => series.ProductionEstimationId == estimationId);
+            query = Filter(query, productionSeriesFilterModel);
+            int totalItem = query.Count();
+            query = query.SortBy<ProductionSeries>(productionSeriesFilterModel);
+            query = query.PagingEntityQuery(productionSeriesFilterModel);
+            var data = await query.ProjectTo<ProductionSeriesListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            return new DefaultPageResponseListingDTO<ProductionSeriesListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = productionSeriesFilterModel.Pagination.PageIndex,
+                    PageSize = productionSeriesFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        #endregion GetAll Sereies Of Estimation
+
+        private IQueryable<ProductionSeries> Filter(IQueryable<ProductionSeries> query, ProductionSeriesFilterModel productionSeriesFilterModel)
+        {
+            if (!productionSeriesFilterModel.Code.IsNullOrEmpty())
+            {
+                query = query.Where(productionSeries => productionSeries.Code.ToLower()
+                                .Contains(productionSeriesFilterModel.Code.ToLower()));
+            }
+
+            if (!productionSeriesFilterModel.Status.IsNullOrEmpty()
+                    && Enum.TryParse<ProductionSeriesStatus>(productionSeriesFilterModel.Status, true, out ProductionSeriesStatus parsedProductionSeriesStatus))
+            {
+                query = query
+                .Where(product => product.Status.Equals(parsedProductionSeriesStatus));
+            }
+
+            return query;
         }
 
         private async void CheckSeriesQuantityWithProductionEstimation(List<ProductionSeriesInputDTO> inputDTOs, Guid productionEstimationId)
