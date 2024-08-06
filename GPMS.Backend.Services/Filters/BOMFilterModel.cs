@@ -8,6 +8,6 @@ namespace GPMS.Backend.Services.Filters
 {
     public class BOMFilterModel : BaseFilterModel
     {
-        
+        public BOMMaterialFilterModel? Material { get; set; }
     }
 }

@@ -72,7 +72,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             ServiceUtils.ValidateInputDTOList<SpecificationInputDTO, ProductSpecification>
                 (inputDTOs, _specificationValidator, _entityListErrorWrapper);
             ValidateSizeAndColorInSpecification(sizes, colors, inputDTOs);
-            // CheckMaterialInEverySpecification(inputDTOs);
             Warehouse existedProductWarehouse =
                 await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse"))
                                             .FirstOrDefaultAsync();
@@ -90,106 +89,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        // private void CheckMaterialInEverySpecification(List<SpecificationInputDTO> inputDTOs)
-        // {
-        //     List<FormError> errors = new List<FormError>();
-        //     foreach (var inputDTO in inputDTOs)
-        //     {
-        //         var materialIds = inputDTO.BOMs.Select(bom => bom.MaterialId).ToList();
-        //         materialIds.Sort();
-        //         int notEqualCount = 0;
-        //         foreach (var inputDTOCompare in inputDTOs)
-        //         {
-        //             var materialIdsCompare = inputDTOCompare.BOMs.Select(bom => bom.MaterialId).ToList();
-        //             materialIdsCompare.Sort();
-
-        //             if (!materialIds.Equals(materialIdsCompare))
-        //             {
-        //                 notEqualCount++;
-
-        //             }
-        //         }
-        //         if (notEqualCount > 0)
-        //         {
-        //             errors.Add
-        //                 (new FormError
-        //                 {
-        //                     EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
-        //                     ErrorMessage = $"Material list in Specification with size :{inputDTO.Size} and color : {inputDTO.Color} is not equal to other material list of other specification",
-        //                     Property = "BOMs"
-        //                 });
-        //         }
-        //     }
-        //     if (errors.Count > 0)
-        //     {
-        //         ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors, _entityListErrorWrapper);
-        //     }
-        // }
-        #endregion
-        public async Task<SpecificationDTO> Details(Guid id)
-        {
-            var specificationExisted = await 
-            _specificationRepository.Search(spec => spec.Id.Equals(id))
-            .Include(spec => spec.Measurements)
-            .Include(spec => spec.BillOfMaterials)
-            .Include(spec => spec.QualityStandards)
-            .FirstOrDefaultAsync();
-            if (specificationExisted == null)
-            {
-                throw new APIException((int)HttpStatusCode.BadRequest, "Specification Not Found");
-            }
-            return _mapper.Map<SpecificationDTO>(specificationExisted);
-        }
-        #region  Get All
-        public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilter)
-        {
-            var query = _specificationRepository.GetAll();
-            query = Filters(query, specificationFilter);
-            query = query.SortBy<ProductSpecification>(specificationFilter);
-            int totalItem = query.Count();
-            query = query.PagingEntityQuery(specificationFilter);
-            var data = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider)
-                                    .ToListAsync();
-            
-            return new DefaultPageResponseListingDTO<SpecificationListingDTO>
-            {
-                Data = data,
-                Pagination = new PaginationResponseModel
-                {
-                    PageIndex = specificationFilter.Pagination.PageIndex,
-                    PageSize = specificationFilter.Pagination.PageSize,
-                    TotalRows = totalItem
-                }
-            };
-        }
-
-        private IQueryable<ProductSpecification> Filters(IQueryable<ProductSpecification> query, SpecificationFilterModel specificationFilter)
-        {
-            if (!specificationFilter.Size.IsNullOrEmpty())
-            {
-                query = query.Where(process => process.Size.Contains(specificationFilter.Size));
-            }
-            if (!specificationFilter.Color.IsNullOrEmpty())
-            {
-                query = query.Where(process => process.Color.Contains(specificationFilter.Color));
-            }
-            return query;
-        }
-        #endregion
-        public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)
-        {
-            List<ProductSpecification> specifications = await _specificationRepository
-                .Search(specification => specification.ProductId == productId).ToListAsync();
-            return _mapper.Map<List<CreateProductSpecificationListingDTO>>(specifications);
-        }
-
-
-        public Task UpdateList(List<SpecificationInputDTO> inputDTOs)
-        {
-            throw new NotImplementedException();
-        }
         private void ValidateSizeAndColorInSpecification(string productSizes,
-        string productColors, List<SpecificationInputDTO> specificationInputDTOs)
+            string productColors, List<SpecificationInputDTO> specificationInputDTOs)
         {
             var sizes = productSizes.Split(",", StringSplitOptions.TrimEntries);
             var colors = productColors.Split(",", StringSplitOptions.TrimEntries);
@@ -219,6 +120,67 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
+        #endregion
+        #region Get Detail By Id
+        public async Task<SpecificationDTO> Details(Guid id)
+        {
+            var specificationExisted = await
+            _specificationRepository.Search(spec => spec.Id.Equals(id))
+            .Include(spec => spec.Measurements)
+            .Include(spec => spec.BillOfMaterials)
+            .Include(spec => spec.QualityStandards)
+            .FirstOrDefaultAsync();
+            if (specificationExisted == null)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Specification Not Found");
+            }
+            return _mapper.Map<SpecificationDTO>(specificationExisted);
+        }
+        #endregion
+        #region  Get All
+        public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilter)
+        {
+            var query = _specificationRepository.GetAll();
+            query = Filters(query, specificationFilter);
+            query = query.SortBy<ProductSpecification>(specificationFilter);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(specificationFilter);
+            var data = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider)
+                                    .ToListAsync();
+
+            return new DefaultPageResponseListingDTO<SpecificationListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = specificationFilter.Pagination.PageIndex,
+                    PageSize = specificationFilter.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<ProductSpecification> Filters(IQueryable<ProductSpecification> query, SpecificationFilterModel specificationFilter)
+        {
+            if (!specificationFilter.Size.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Size.Contains(specificationFilter.Size));
+            }
+            if (!specificationFilter.Color.IsNullOrEmpty())
+            {
+                query = query.Where(process => process.Color.Contains(specificationFilter.Color));
+            }
+            return query;
+        }
+        #endregion
+
+
+        public Task UpdateList(List<SpecificationInputDTO> inputDTOs)
+        {
+            throw new NotImplementedException();
+        }
+
+
         public Task<SpecificationDTO> Add(SpecificationInputDTO inputDTO)
         {
             throw new NotImplementedException();
@@ -239,11 +201,11 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Specification Not Found");
             }
-            var updatedSpecification = await HandleUploadSpecificationImage(inputDTO,existedSpecification);
+            var updatedSpecification = await HandleUploadSpecificationImage(inputDTO, existedSpecification);
             return _mapper.Map<SpecificationDTO>(updatedSpecification);
         }
         private async Task<ProductSpecification> HandleUploadSpecificationImage
-            (ImageSpecificationInputDTO inputDTO,ProductSpecification specification)
+            (ImageSpecificationInputDTO inputDTO, ProductSpecification specification)
         {
             //upload specification image
             string fileURL = "";
@@ -261,6 +223,28 @@ namespace GPMS.Backend.Services.Services.Implementations
             _specificationRepository.Update(specification);
             await _specificationRepository.Save();
             return specification;
+        }
+        #endregion
+        #region Get All By ProductId
+        public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAllSpcificationByProductId(Guid productId, SpecificationFilterModel specificationFilterModel)
+        {
+            var query = _specificationRepository.GetAll().Where(query => query.ProductId == productId);
+            query = Filters(query, specificationFilterModel);
+            query = query.SortBy<ProductSpecification>(specificationFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<ProductSpecification>(specificationFilterModel);
+            var specifications = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<SpecificationListingDTO>
+            {
+                Data = specifications,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = specificationFilterModel.Pagination.PageIndex,
+                    PageSize = specificationFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
         }
         #endregion
     }

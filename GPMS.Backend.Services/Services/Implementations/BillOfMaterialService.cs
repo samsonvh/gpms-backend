@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using FluentValidation;
 using FluentValidation.Results;
 using GPMS.Backend.Data.Models.Products;
@@ -14,8 +15,11 @@ using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
+using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.PageRequests;
 using GPMS.Backend.Services.Utils;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GPMS.Backend.Services.Services.Implementations
 {
@@ -55,8 +59,8 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             ServiceUtils.ValidateInputDTOList<BOMInputDTO, BillOfMaterial>
                 (inputDTOs, _billOfMaterialValidator, _entityListErrorWrapper);
-            ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO,BillOfMaterial>
-                (inputDTOs,"MaterialId",_entityListErrorWrapper);
+            ServiceUtils.CheckFieldDuplicatedInInputDTOList<BOMInputDTO, BillOfMaterial>
+                (inputDTOs, "MaterialId", _entityListErrorWrapper);
             CheckMaterialExist(inputDTOs);
             foreach (BOMInputDTO inputDTO in inputDTOs)
             {
@@ -88,7 +92,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errors, _entityListErrorWrapper);
             }
         }
 
@@ -135,6 +139,41 @@ namespace GPMS.Backend.Services.Services.Implementations
         public Task UpdateList(List<BOMInputDTO> inputDTOs)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<DefaultPageResponseListingDTO<BOMListingDTO>> GetAllBomBySpecification(Guid specificationId, BOMFilterModel bOMFilterModel)
+        {
+            var query = _billOfMaterialRepository.GetAll().Where(bom => bom.ProductSpecificationId == specificationId);
+            query = Filters(query, bOMFilterModel);
+            query = query.SortBy<BillOfMaterial>(bOMFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<BillOfMaterial>(bOMFilterModel);
+            var measurements = await query.ProjectTo<BOMListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<BOMListingDTO>
+            {
+                Data = measurements,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = bOMFilterModel.Pagination.PageIndex,
+                    PageSize = bOMFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+
+        private IQueryable<BillOfMaterial> Filters(IQueryable<BillOfMaterial> query, BOMFilterModel bOMFilterModel)
+        {
+            if (!string.IsNullOrEmpty(bOMFilterModel.Material?.Code))
+            {
+                query = query.Where(bom => bom.Material.Code.Contains(bOMFilterModel.Material.Code));
+            }
+
+            if (!string.IsNullOrEmpty(bOMFilterModel.Material?.Name))
+            {
+                query = query.Where(bom => bom.Material.Name.Contains(bOMFilterModel.Material.Name));
+            }
+            return query;
         }
     }
 }

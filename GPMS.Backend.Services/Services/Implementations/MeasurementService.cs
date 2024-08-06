@@ -112,5 +112,26 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        public async Task<DefaultPageResponseListingDTO<MeasurementListingDTO>> GetAllMeasurementsByProductId(Guid specificationId, MeasurementFilterModel measurementFilterModel)
+        {
+            var query = _measurementRepository.GetAll().Where(query => query.ProductSpecificationId == specificationId);
+            query = Filters(query, measurementFilterModel);
+            query = query.SortBy<Measurement>(measurementFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery<Measurement>(measurementFilterModel);
+            var measurements = await query.ProjectTo<MeasurementListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            return new DefaultPageResponseListingDTO<MeasurementListingDTO>
+            {
+                Data = measurements,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = measurementFilterModel.Pagination.PageIndex,
+                    PageSize = measurementFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
     }
 }

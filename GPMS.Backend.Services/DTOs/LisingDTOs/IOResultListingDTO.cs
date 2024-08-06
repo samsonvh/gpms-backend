@@ -1,14 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace GPMS.Backend.Services.DTOs.LisingDTOs
 {
-    public class QualityStandardListingDTO
+    public class IOResultListingDTO
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
-        public List<string>? ImageURL { get; set; } = new List<string>();
+        public float Consumption {  get; set; }
+        public int Quantity { get; set; }
     }
 }

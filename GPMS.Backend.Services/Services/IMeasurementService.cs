@@ -15,6 +15,6 @@ namespace GPMS.Backend.Services.Services
     : IBaseService<MeasurementInputDTO,CreateUpdateResponseDTO<Measurement>,
     MeasurementListingDTO,MeasurementDTO,MeasurementFilterModel>
     {
-        
+        Task<DefaultPageResponseListingDTO<MeasurementListingDTO>> GetAllMeasurementsByProductId(Guid specificationId, MeasurementFilterModel measurementFilterModel);
     }
 }

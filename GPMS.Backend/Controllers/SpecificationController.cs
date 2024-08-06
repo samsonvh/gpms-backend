@@ -29,23 +29,15 @@ namespace GPMS.Backend.Controllers
         }
 
         [HttpPost]
-        [Route(APIEndPoint.SPECIFICATIONS_OF_PRODUCT_ID_V1)]
-        [SwaggerOperation(Summary = "Get all specification for create production plan", Description = "Factory director, Production manager can get all specification for create production plan")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(List<CreateProductSpecificationListingDTO>))]
+        [Route(APIEndPoint.SPECIFICATIONS_OF_PRODUCT_ID_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all specification by product", Description = "Factory director, Production manager can get all specification for create production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(DefaultPageResponseListingDTO<SpecificationListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> GetAllProductsForCreateProductionPlan([FromRoute] Guid id)
+        public async Task<IActionResult> GetAllSpecificationsByProduct([FromRoute] Guid id, [FromBody] SpecificationFilterModel specificationFilterModel)
         {
-            List<CreateProductSpecificationListingDTO> createProductSpecificationListingDTOs = 
-                await _specificationService.GetSpecificationByProductId(id);
-
-            BaseReponse response = new BaseReponse
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Message = "Get all specification successfully",
-                Data = createProductSpecificationListingDTOs
-            };
-            return Ok(response);
+            var specficiations = await _specificationService.GetAllSpcificationByProductId(id, specificationFilterModel);
+            return Ok(specficiations);
         }
 
         [HttpPost]

@@ -21,6 +21,7 @@ using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
+using GPMS.Backend.Data.Models.Results;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -103,6 +104,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<BOMInputDTO, BillOfMaterial>();
             CreateMap<BillOfMaterial, BOMDTO>()
                 .ForMember(bomDTO => bomDTO.Material, opt => opt.MapFrom(bom => bom.Material));
+            CreateMap<BillOfMaterial, BOMListingDTO>();
             //Quality Standard
             CreateMap<QualityStandardInputDTO, QualityStandard>();
             CreateMap<QualityStandard, QualityStandardDTO>()
@@ -130,6 +132,12 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductionProcessStep, StepListingDTO>();
             //StepIO
             CreateMap<ProductionProcessStepIO, StepIOListingDTO>();
+            //StepResult
+            CreateMap<ProductionProcessStepResult,  StepResultListingDTO>()
+                .ForMember(dto => dto.InspectionRequestResultCode, opt => opt.MapFrom(result => result.InspectionRequestResult.Code))
+                .ForMember(dto => dto.ProductionSeriesCode, opt => opt.MapFrom(result => result.ProductionSeries.Code))
+                .ForMember(dto => dto.StepCode, opt => opt.MapFrom(result => result.ProductionProcessStep.Code));
+            CreateMap<ProductionProcessStepIOResult, IOResultListingDTO>();
             //Production Plan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>()
             .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
@@ -167,6 +175,9 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(productionEstimation => productionEstimation.ProductionSeries, options => options.Ignore())
                 .ForMember(productionEstimation => productionEstimation.Quarter, options => options.Ignore())
                 .ForMember(productionEstimation => productionEstimation.Month, options => options.Ignore());
+            CreateMap<ProductionEstimation, ProductionEstimationListingDTO>()
+                .ForMember(dest => dest.Quarter, opt => opt.MapFrom(src => (int?)src.Quarter))
+                .ForMember(dest => dest.Month, opt => opt.MapFrom(src => (int?)src.Month));
             //Production Series
             CreateMap<ProductionSeriesInputDTO, ProductionSeries>()
                 .ForMember(productionSeries => productionSeries.CurrentProcess, options => options.Ignore())
@@ -174,7 +185,7 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductionSeries, ProductionSeriesDTO>();
             CreateMap<StepIOInputDTO, ProductionProcessStepIO>()
                     .ForMember(dest => dest.MaterialId, opt => opt.Ignore());
-
+            CreateMap<ProductionSeries, ProductionSeriesListingDTO>();
             //WarehouseRequest
             CreateMap<WarehouseRequestInputDTO, WarehouseRequest>();
             CreateMap<WarehouseRequest, CreateUpdateResponseDTO<WarehouseRequest>>();
