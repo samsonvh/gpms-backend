@@ -6,11 +6,9 @@ using Microsoft.AspNetCore.Http;
 
 namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
 {
-    public class QualityStandardInputDTO
+    public class ImageQualityStandardInputDTO
     {
-        public string Name { get; set; }
-        public string? Description { get; set; }
+        public Guid QualityStandardId { get; set; }
         public List<IFormFile>? Images { get; set; }
-        public Guid MaterialId { get; set; }
     }
 }

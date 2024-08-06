@@ -129,7 +129,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         #region Update 
         public async Task<MaterialDTO> Update(Guid id, MaterialInputDTO inputDTO)
         {
-            var existedMaterial = _materialRepository.Details(id);
+            var existedMaterial =  _materialRepository.Details(id);
             if (existedMaterial == null)
             {
                 throw new APIException((int)HttpStatusCode.NotFound, "Material Not Found");

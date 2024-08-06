@@ -19,5 +19,6 @@ namespace GPMS.Backend.Services.Services
         Task AddList (List<QualityStandardInputDTO> inputDTOs, Guid specificationId, List<Guid> materialIds);
 
         Task<DefaultPageResponseListingDTO<QualityStandardListingDTO>> GetAllQualityOfSpecification(Guid specificationId, QualityStandardFilterModel qualityStandardFilterModel);
+        Task<QualityStandardDTO> UploadImages (ImageQualityStandardInputDTO inputDTO);
     }
 }

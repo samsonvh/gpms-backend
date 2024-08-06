@@ -9,6 +9,7 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
     {
         public Guid Id { get; set; }
         public int InventoryQuantity { get; set; }
+        public List<string>? ImageURLs { get; set; }
         public string Size { get; set; }
         public string Color { get; set; }
     }

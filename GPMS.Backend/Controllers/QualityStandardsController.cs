@@ -1,4 +1,5 @@
-﻿using GPMS.Backend.Services.DTOs.LisingDTOs;
+﻿using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Services;
@@ -46,6 +47,17 @@ namespace GPMS.Backend.Controllers
         {
             var pageResponses = await _qualityStandardService.GetAllQualityOfSpecification(id, qualityStandardFilterModel);
             return Ok(pageResponses);
+        }
+        [HttpPost]
+        [Route(APIEndPoint.QUALITY_STANDARD_V1 + APIEndPoint.IMAGE)]
+        [SwaggerOperation(Summary = "Upload Image For Quality Standard Of Product", Description = "Production manager upload image for quality standard of product")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Upload Image For quality standard of product successfully")]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> UploadImageForQualityStandard(ImageQualityStandardInputDTO inputDTO)
+        {
+            var response = await _qualityStandardService.UploadImages(inputDTO);
+            return Ok(response);
         }
     }
 }

@@ -70,7 +70,8 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<Product, ChangeStatusResponseDTO<Product, ProductStatus>>();
             CreateMap<Product, ProductListingDTO>()
             .ForMember(productListingDTO => productListingDTO.Sizes, options => options.Ignore())
-            .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore());
+            .ForMember(productListingDTO => productListingDTO.Colors, options => options.Ignore())
+            .ForMember(productListingDTO => productListingDTO.ImageURLs, options => options.Ignore());
             CreateMap<Product,CreateProductListingDTO>();
             //SemiFinishedProduct
             CreateMap<SemiFinishedProduct, SemiFinishedProductListingDTO>();
@@ -87,11 +88,13 @@ namespace GPMS.Backend.Services.Utils
             .ForMember(specification => specification.Measurements, options => options.Ignore())
             .ForMember(specification => specification.QualityStandards, options => options.Ignore());
             CreateMap<ProductSpecification, SpecificationDTO>()
+                .ForMember(dest => dest.ImageURLs,opt => opt.MapFrom(src => src.ImageURLs.Split(";",StringSplitOptions.TrimEntries).ToList()))
                 .ForMember(specificationDTO => specificationDTO.Measurements, opt => opt.MapFrom(productSpecification => productSpecification.Measurements))
                 .ForMember(specificationDTO => specificationDTO.QualityStandards, opt => opt.MapFrom(productSpecification => productSpecification.QualityStandards))
                 .ForMember(specificationDTO => specificationDTO.BillOfMaterials, opt => opt.MapFrom(productSpecification => productSpecification.BillOfMaterials));
             CreateMap<ProductSpecification,CreateProductSpecificationListingDTO>();
-            CreateMap<ProductSpecification, SpecificationListingDTO>();
+            CreateMap<ProductSpecification, SpecificationListingDTO>()
+                .ForMember(dest => dest.ImageURLs, options => options.MapFrom(src => src.ImageURLs.Split(";",StringSplitOptions.TrimEntries)[0]));
             //Measurement
             CreateMap<MeasurementInputDTO, Measurement>();
             CreateMap<Measurement, MeasurementDTO>();

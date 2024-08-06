@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Net.NetworkInformation;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using FluentValidation;
@@ -16,6 +17,7 @@ using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Exceptions;
 using GPMS.Backend.Services.Filters;
 using GPMS.Backend.Services.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -25,6 +27,7 @@ namespace GPMS.Backend.Services.Services.Implementations
     {
         private readonly IGenericRepository<Product> _productRepository;
         private readonly IGenericRepository<ProductSpecification> _specificationRepository;
+        private readonly IFirebaseStorageService _firebaseStorageService;
         private readonly IQualityStandardService _qualityStandardService;
         private readonly IMeasurementService _measurementService;
         private readonly IBillOfMaterialService _billOfMaterialService;
@@ -36,6 +39,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         public SpecificationService(
             IGenericRepository<Product> productRepository,
             IGenericRepository<ProductSpecification> specificationRepository,
+            IFirebaseStorageService firebaseStorageService,
             IQualityStandardService qualityStandardService,
             IMeasurementService measurementService,
             IBillOfMaterialService billOfMaterialService,
@@ -47,6 +51,7 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             _productRepository = productRepository;
             _specificationRepository = specificationRepository;
+            _firebaseStorageService = firebaseStorageService;
             _qualityStandardService = qualityStandardService;
             _measurementService = measurementService;
             _billOfMaterialService = billOfMaterialService;
@@ -61,13 +66,13 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
-
+        #region Add List
         public async Task AddList(List<SpecificationInputDTO> inputDTOs, Guid productId, string sizes, string colors)
         {
             ServiceUtils.ValidateInputDTOList<SpecificationInputDTO, ProductSpecification>
                 (inputDTOs, _specificationValidator, _entityListErrorWrapper);
             ValidateSizeAndColorInSpecification(sizes, colors, inputDTOs);
-            CheckMaterialInEverySpecification(inputDTOs);
+            // CheckMaterialInEverySpecification(inputDTOs);
             Warehouse existedProductWarehouse =
                 await _warehouseRepository.Search(warehouse => warehouse.Name.Equals("Product Warehouse"))
                                             .FirstOrDefaultAsync();
@@ -85,47 +90,57 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        private void CheckMaterialInEverySpecification(List<SpecificationInputDTO> inputDTOs)
+        // private void CheckMaterialInEverySpecification(List<SpecificationInputDTO> inputDTOs)
+        // {
+        //     List<FormError> errors = new List<FormError>();
+        //     foreach (var inputDTO in inputDTOs)
+        //     {
+        //         var materialIds = inputDTO.BOMs.Select(bom => bom.MaterialId).ToList();
+        //         materialIds.Sort();
+        //         int notEqualCount = 0;
+        //         foreach (var inputDTOCompare in inputDTOs)
+        //         {
+        //             var materialIdsCompare = inputDTOCompare.BOMs.Select(bom => bom.MaterialId).ToList();
+        //             materialIdsCompare.Sort();
+
+        //             if (!materialIds.Equals(materialIdsCompare))
+        //             {
+        //                 notEqualCount++;
+
+        //             }
+        //         }
+        //         if (notEqualCount > 0)
+        //         {
+        //             errors.Add
+        //                 (new FormError
+        //                 {
+        //                     EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
+        //                     ErrorMessage = $"Material list in Specification with size :{inputDTO.Size} and color : {inputDTO.Color} is not equal to other material list of other specification",
+        //                     Property = "BOMs"
+        //                 });
+        //         }
+        //     }
+        //     if (errors.Count > 0)
+        //     {
+        //         ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors, _entityListErrorWrapper);
+        //     }
+        // }
+        #endregion
+        public async Task<SpecificationDTO> Details(Guid id)
         {
-            List<FormError> errors = new List<FormError>();
-            foreach (var inputDTO in inputDTOs)
+            var specificationExisted = await 
+            _specificationRepository.Search(spec => spec.Id.Equals(id))
+            .Include(spec => spec.Measurements)
+            .Include(spec => spec.BillOfMaterials)
+            .Include(spec => spec.QualityStandards)
+            .FirstOrDefaultAsync();
+            if (specificationExisted == null)
             {
-                var materialIds = inputDTO.BOMs.Select(bom => bom.MaterialId).ToList();
-                materialIds.Sort();
-                int notEqualCount = 0;
-                foreach (var inputDTOCompare in inputDTOs)
-                {
-                    var materialIdsCompare = inputDTOCompare.BOMs.Select(bom => bom.MaterialId).ToList();
-                    materialIdsCompare.Sort();
-
-                    if (!materialIds.Equals(materialIdsCompare))
-                    {
-                        notEqualCount++;
-
-                    }
-                }
-                if (notEqualCount > 0)
-                {
-                    errors.Add
-                        (new FormError
-                        {
-                            EntityOrder = inputDTOs.IndexOf(inputDTO) + 1,
-                            ErrorMessage = $"Material list in Specification with size :{inputDTO.Size} and color : {inputDTO.Color} is not equal to other material list of other specification",
-                            Property = "BOMs"
-                        });
-                }
+                throw new APIException((int)HttpStatusCode.BadRequest, "Specification Not Found");
             }
-            if (errors.Count > 0)
-            {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductSpecification>(errors,_entityListErrorWrapper);
-            }
+            return _mapper.Map<SpecificationDTO>(specificationExisted);
         }
-
-        public Task<SpecificationDTO> Details(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
+        #region  Get All
         public async Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAll(SpecificationFilterModel specificationFilter)
         {
             var query = _specificationRepository.GetAll();
@@ -133,7 +148,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             query = query.SortBy<ProductSpecification>(specificationFilter);
             int totalItem = query.Count();
             query = query.PagingEntityQuery(specificationFilter);
-            var data = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            var data = await query.ProjectTo<SpecificationListingDTO>(_mapper.ConfigurationProvider)
+                                    .ToListAsync();
+            
             return new DefaultPageResponseListingDTO<SpecificationListingDTO>
             {
                 Data = data,
@@ -158,7 +175,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             return query;
         }
-
+        #endregion
         public async Task<List<CreateProductSpecificationListingDTO>> GetSpecificationByProductId(Guid productId)
         {
             List<ProductSpecification> specifications = await _specificationRepository
@@ -211,5 +228,40 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        #region Upload Image
+        public async Task<SpecificationDTO> UploadImages(ImageSpecificationInputDTO inputDTO)
+        {
+            var existedSpecification = await _specificationRepository.Search(spec => spec.Id.Equals(inputDTO.SpecificationId))
+                                                                .Include(spec => spec.Product)
+                                                                .FirstOrDefaultAsync();
+            if (existedSpecification == null)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Specification Not Found");
+            }
+            var updatedSpecification = await HandleUploadSpecificationImage(inputDTO,existedSpecification);
+            return _mapper.Map<SpecificationDTO>(updatedSpecification);
+        }
+        private async Task<ProductSpecification> HandleUploadSpecificationImage
+            (ImageSpecificationInputDTO inputDTO,ProductSpecification specification)
+        {
+            //upload specification image
+            string fileURL = "";
+            foreach (IFormFile file in inputDTO.Images)
+            {
+                if (file != null)
+                {
+                    string filePath = $"{typeof(Product).Name}/{specification.Product.Id}/{typeof(ProductSpecification).Name}/{specification.Id}/Images/{file.FileName}";
+                    string url = await _firebaseStorageService.UploadFile(filePath, file);
+                    fileURL += url + ";";
+                }
+            }
+            fileURL = fileURL.Remove(fileURL.Length - 1);
+            specification.ImageURLs = fileURL;
+            _specificationRepository.Update(specification);
+            await _specificationRepository.Save();
+            return specification;
+        }
+        #endregion
     }
 }
