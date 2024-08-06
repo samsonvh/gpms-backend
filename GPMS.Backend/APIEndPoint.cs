@@ -103,10 +103,11 @@ namespace GPMS.Backend
         //Series
         public const string SERIES_OF_ESTIMATION_ID_V1 = ESTIMATION_ID_OF_REQUIREMENT_ID_V1 + "/series";
         public const string SERIES_ID_OF_ESTIMATION_ID_V1 = SERIES_OF_ESTIMATION_ID_V1 + "/{seriesId}";
-        public const string PRODUCTION_SERIES_OF_ESTIMATION_ID_V1 = API_VERSION_1 + "/estimations" + "/{id}";
+        public const string PRODUCTION_SERIES_OF_ESTIMATION_ID_V1 = API_VERSION_1 + "/estimations" + "/{id}" + "/series";
         //Production Process Step Results 
         public const string PRODUCTION_PROCESS_STEP_RESULTS_OF_SERIES_ID_V1 = API_VERSION_1 + "/production-process-step-results";
-        public const string PRODUCTION_PROCESS_STEP_RESULT_ID_OF_SERIES_ID_V1 = PRODUCTION_PROCESS_STEP_RESULTS_OF_SERIES_ID_V1 + "/{productionProcessStepResultId}";
+        /*public const string PRODUCTION_PROCESS_STEP_RESULT_ID_OF_SERIES_ID_V1 = PRODUCTION_PROCESS_STEP_RESULTS_OF_SERIES_ID_V1 + "/{productionProcessStepResultId}";*/
+        public const string PRODUCTION_PROCESS_STEP_RESULT_OF_SERIES_ID_V1 = API_VERSION_1 + "/series" + "/{id}" + "/production-process-step-results";
         //Inspection Requests
         public const string INSPECTION_REQUESTS_OF_SERIES_ID_V1 = SERIES_ID_OF_ESTIMATION_ID_V1 + "/inspection-requests";
         public const string INSPECTION_REQUEST_ID_OF_SERIES_ID_V1 = INSPECTION_REQUESTS_OF_SERIES_ID_V1 + "/{inspectionRequestId}";
@@ -126,5 +127,8 @@ namespace GPMS.Backend
         //Inspection Requests
         public const string INSPECTION_REQUESTS_V1 = API_VERSION_1 + "/inspection-requests";
         public const string INSPECTION_REQUEST_ID_V1 = INSPECTION_REQUESTS_V1 + "/{id}";
+
+        //InputOutput Result
+        public const string INPUT_OUTPUT_RESULT_OF_RESULT_V1 = API_VERSION_1 + "/step-results" + "/{id}" + "/input-output-results";
     }
 }
