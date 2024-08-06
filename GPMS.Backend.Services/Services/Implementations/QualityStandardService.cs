@@ -28,12 +28,14 @@ namespace GPMS.Backend.Services.Services.Implementations
     public class QualityStandardService : IQualityStandardService
     {
         private readonly IGenericRepository<QualityStandard> _qualityStandardRepository;
+        private readonly IFirebaseStorageService _firebaseStorageService;
         private readonly IValidator<QualityStandardInputDTO> _qualityStandardValidator;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly QualityStandardImagesTempWrapper _qualityStandardImagesTempWrapper;
         public QualityStandardService(
             IGenericRepository<QualityStandard> qualityStandardRepository,
+            IFirebaseStorageService firebaseStorageService,
             IValidator<QualityStandardInputDTO> qualityStandardValidator,
             IMapper mapper,
             EntityListErrorWrapper entityListErrorWrapper,
@@ -41,6 +43,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             )
         {
             _qualityStandardRepository = qualityStandardRepository;
+            _firebaseStorageService = firebaseStorageService;
             _qualityStandardValidator = qualityStandardValidator;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
@@ -88,7 +91,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<QualityStandard>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<QualityStandard>(errors, _entityListErrorWrapper);
             }
         }
 
@@ -194,5 +197,44 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             throw new NotImplementedException();
         }
+
+        #region Upload Image
+        public async Task<QualityStandardDTO> UploadImages(ImageQualityStandardInputDTO inputDTO)
+        {
+            var qualityStandardExist = await _qualityStandardRepository
+                .Search(qualityStandard => qualityStandard.Id.Equals(inputDTO.QualityStandardId))
+                .Include(qualityStandard => qualityStandard.ProductSpecification)
+                    .ThenInclude(specification => specification.Product)
+                    .FirstOrDefaultAsync();
+            if (qualityStandardExist == null)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Quality Standard Not Found");
+            }
+            var updatedQualityStandard = await HandleUploadSpecificationImage(inputDTO,qualityStandardExist);
+            return _mapper.Map<QualityStandardDTO>(updatedQualityStandard);
+        }
+
+        private async Task<QualityStandard> HandleUploadSpecificationImage
+            (ImageQualityStandardInputDTO inputDTO, QualityStandard qualityStandard)
+        {
+            //upload qualityStandard image
+            string fileURL = "";
+            foreach (IFormFile file in inputDTO.Images)
+            {
+                if (file != null)
+                {
+                    string filePath = $"{typeof(Product).Name}/{qualityStandard.ProductSpecification.ProductId}/{typeof(ProductSpecification).Name}/{qualityStandard.ProductSpecificationId}/{typeof(QualityStandard).Name}/{qualityStandard.Id}/Images/{file.FileName}";
+                    string url = await _firebaseStorageService.UploadFile(filePath, file);
+                    fileURL += url + ";";
+                }
+            }
+            fileURL = fileURL.Remove(fileURL.Length - 1);
+            qualityStandard.ImageURL = fileURL;
+            _qualityStandardRepository.Update(qualityStandard);
+            await _qualityStandardRepository.Save();
+            return qualityStandard;
+        }
+
+        #endregion
     }
 }

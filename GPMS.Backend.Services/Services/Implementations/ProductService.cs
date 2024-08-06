@@ -36,7 +36,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         private readonly IMaterialService _materialService;
         private readonly ISpecificationService _specificationService;
         private readonly IProcessService _processService;
-        private readonly IFirebaseStorageService _firebaseStorageService;
         private readonly IMapper _mapper;
         private readonly EntityListErrorWrapper _entityListErrorWrapper;
         private readonly StepIOInputDTOWrapper _stepIOInputDTOWrapper;
@@ -53,7 +52,6 @@ namespace GPMS.Backend.Services.Services.Implementations
         IMaterialService materialService,
         ISpecificationService specificationService,
         IProcessService processService,
-        IFirebaseStorageService firebaseStorageService,
         IMapper mapper,
         EntityListErrorWrapper entityListErrorWrapper,
         StepIOInputDTOWrapper stepIOInputDTOWrapper,
@@ -70,7 +68,6 @@ namespace GPMS.Backend.Services.Services.Implementations
             _materialService = materialService;
             _specificationService = specificationService;
             _processService = processService;
-            _firebaseStorageService = firebaseStorageService;
             _mapper = mapper;
             _entityListErrorWrapper = entityListErrorWrapper;
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
@@ -112,6 +109,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                 throw new APIException((int)HttpStatusCode.NotFound, "Product not found");
             }
 
+
             var productDTO = new ProductDTO
             {
                 Id = product.Id,
@@ -132,8 +130,14 @@ namespace GPMS.Backend.Services.Services.Implementations
 
                 Processes = _mapper.Map<List<ProcessDTO>>(product.ProductionProcesses)
             };
+            productDTO.ImageURLs = new List<string>();
             foreach (ProductSpecification specification in product.Specifications)
             {
+                if (!specification.ImageURLs.IsNullOrEmpty())
+                {
+                    var imageURLs = specification.ImageURLs.Split(";",StringSplitOptions.TrimEntries).ToList();
+                    productDTO.ImageURLs.AddRange(imageURLs);
+                }
                 foreach (QualityStandard qualityStandard in specification.QualityStandards)
                 {
                     if (!qualityStandard.ImageURL.IsNullOrEmpty())
@@ -174,7 +178,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             await ServiceUtils.CheckFieldDuplicatedWithInputDTOAndDatabase<ProductInputDTO, Product>
                 (inputDTO, _productRepository, "Code", "Code", _entityListErrorWrapper);
             //Add Category
-            CheckCategoryExist(inputDTO.CategoryId);
+            await CheckCategoryExistAsync(inputDTO.CategoryId);
             //Add Product
             Product product = HandleAddProduct(inputDTO);
             //add semifinish product list
@@ -192,7 +196,7 @@ namespace GPMS.Backend.Services.Services.Implementations
                                 .Where(stepIO => !stepIO.MaterialId.IsNullOrEmpty())
                                 .ToList();
             CheckInputDTOsContainsAllSemiFinishProductIds(stepIOWithSemiFinishedProduct, semiFinishedProductCodes);
-            CheckInputDTOsContainsAllMaterialId(stepIOWithMaterialId,materialIds);
+            CheckInputDTOsContainsAllMaterialId(stepIOWithMaterialId, materialIds);
             if (_entityListErrorWrapper.EntityListErrors.Count > 0)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Define Product Failed", _entityListErrorWrapper);
@@ -204,9 +208,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             return productDTO;
         }
 
-        private void CheckCategoryExist(Guid categoryId)
+        private async Task CheckCategoryExistAsync(Guid categoryId)
         {
-            var existCategory = _categoryService.Details(categoryId);
+            var existCategory = await _categoryService.Details(categoryId);
             if (existCategory == null)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Category Not Found");
@@ -330,60 +334,13 @@ namespace GPMS.Backend.Services.Services.Implementations
                 ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<Material>(errorsMissingMaterial, _entityListErrorWrapper);
             }
         }
-
-        // private async Task HandleUploadProductImage(ProductInputDTO inputDTO)
-        // {
-        //     //upload product image
-        //     string fileURL = "";
-        //     Product unAddedProduct = _productRepository.GetUnAddedEntity();
-        //     foreach (IFormFile file in inputDTO.Definition.Images)
-        //     {
-        //         if (file != null)
-        //         {
-        //             string filePath = $"{typeof(Product).Name}/{unAddedProduct.Id}/Images/{file.FileName}";
-        //             string url = await _firebaseStorageService.UploadFile(filePath, file);
-        //             fileURL += url + ";";
-        //         }
-        //     }
-        //     fileURL = fileURL.Remove(fileURL.Length - 1);
-        //     unAddedProduct.ImageURLs = fileURL;
-        // }
-        // private async Task HandleUploadQualityStandardImage()
-        // {
-        //     //upload qauality standard image
-        //     string fileURL = "";
-        //     Product unAddedProduct = _productRepository.GetUnAddedEntity();
-        //     List<QualityStandard> unAddedQualityStandardList = _qualityStandardRepository.GetUnAddedEntityList();
-        //     foreach (QualityStandardImagesTemp qualityStandardImagesTemp in _qualityStandardImagesTempWrapper.QualityStandardImagesTemps)
-        //     {
-        //         QualityStandard qualityStandardImageAdd = unAddedQualityStandardList
-        //         .Where(qualityStandard => qualityStandard.Id.Equals(qualityStandardImagesTemp.QualityStandardId))
-        //         .FirstOrDefault();
-        //         if (qualityStandardImageAdd != null)
-        //         {
-        //             foreach (IFormFile image in qualityStandardImagesTemp.Images)
-        //             {
-        //                 string filePath =
-        //                 $"{typeof(Product).Name}/{unAddedProduct.Id}/{typeof(ProductSpecification).Name}/" +
-        //                 $"{qualityStandardImageAdd.ProductSpecificationId}/{typeof(QualityStandard).Name}/" +
-        //                 $"{qualityStandardImageAdd.Id}/Images/{image.FileName}";
-        //                 string url = await _firebaseStorageService.UploadFile(filePath, image);
-        //                 fileURL += url + ";";
-        //             }
-        //             fileURL = fileURL.Remove(fileURL.Length - 1);
-        //             qualityStandardImageAdd.ImageURL = fileURL;
-        //             fileURL = "";
-        //         }
-        //     }
-        // }
-
         #endregion Add Product
 
         #region Change Product Status
 
         public async Task<ProductDTO> ChangeStatus(Guid id, string productStatus)
         {
-            var product = _productRepository.Details(id);
+            var product =  _productRepository.Details(id);
 
             if (product == null)
             {
@@ -445,7 +402,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             IQueryable<Product> query = _productRepository.GetAll();
             query = Filter(query, productFilterModel);
             query = query.SortBy(productFilterModel);
-            List<Product> productList = await query.ToListAsync();
+            List<Product> productList = await query.Include(product => product.Specifications).ToListAsync();
             productList = FilterColorAndSize(productList, productFilterModel);
             int totalItem = productList.Count;
             productList = productList.PagingEntityList(productFilterModel);
@@ -465,6 +422,19 @@ namespace GPMS.Backend.Services.Services.Implementations
                     productListingDTO.Colors.AddRange(colorArr);
                 }
                 else productListingDTO.Colors = null;
+                List<string> imageURLarrs = new List<string>();
+                foreach (var specification in product.Specifications)
+                {
+                    if (!specification.ImageURLs.IsNullOrEmpty())
+                    {
+                        var imgSpecificationArr = specification.ImageURLs.Split(";", StringSplitOptions.TrimEntries).ToList();
+                        imageURLarrs.AddRange(imgSpecificationArr);
+                    }
+                }
+                if (imageURLarrs.Count > 0)
+                {
+                    productListingDTO.ImageURLs.Add(imageURLarrs[0]);
+                }
                 productListingDTOs.Add(productListingDTO);
             }
 

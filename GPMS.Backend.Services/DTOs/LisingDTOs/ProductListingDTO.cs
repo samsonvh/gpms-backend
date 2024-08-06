@@ -12,9 +12,9 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
         public Guid Id { get; set; }
         public string Code { get; set; }
         public string Name { get; set; }
-        public string? ImageURL { get; set; }
         public List<string> Sizes { get; set; } = new List<string>();
         public List<string> Colors { get; set; } = new List<string>();
+        public List<string>? ImageURLs { get; set; } = new List<string>();
         public DateTime CreatedDate { get; set; }
         public string Status { get; set; }
     }

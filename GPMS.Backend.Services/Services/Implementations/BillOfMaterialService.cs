@@ -71,7 +71,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
         }
 
-        private void CheckMaterialExist(List<BOMInputDTO> inputDTOs)
+        private async void CheckMaterialExist(List<BOMInputDTO> inputDTOs)
         {
             List<FormError> errors = new List<FormError>();
             foreach (var inputDTO in inputDTOs)

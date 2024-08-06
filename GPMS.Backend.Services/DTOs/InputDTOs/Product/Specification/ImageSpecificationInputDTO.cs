@@ -4,11 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace GPMS.Backend.Services.DTOs.InputDTOs.Product
+namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
 {
-    public class ProductImageInputDTO
+    public class ImageSpecificationInputDTO
     {
         public Guid SpecificationId { get; set; }
-        public List<IFormFile> Images { get; set; }
+        public List<IFormFile>? Images { get; set; }
     }
 }

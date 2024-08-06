@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
@@ -41,7 +42,7 @@ namespace GPMS.Backend.Controllers
 
         [HttpPost]
         [Route(APIEndPoint.SPECIFICATIONS_V1 + APIEndPoint.FILTER)]
-        [SwaggerOperation(Summary = "Get all specification for create production plan", Description = "Factory director, Production manager can get all specification")]
+        [SwaggerOperation(Summary = "Get all specification ", Description = "Factory director, Production manager can get all specification")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(DefaultPageResponseListingDTO<SpecificationListingDTO>))]
         [Produces("application/json")]
         // [Authorize(Roles = "Manager")]
@@ -49,6 +50,30 @@ namespace GPMS.Backend.Controllers
         {
             var pageResponses = await _specificationService.GetAll(specificationFilterModel);
             return Ok(pageResponses);
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.SPECIFICATIONS_ID_V1)]
+        [SwaggerOperation(Summary = "Get specification Id ", Description = "Factory director, Production manager can get all specification")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all specification successfully", typeof(DefaultPageResponseListingDTO<SpecificationListingDTO>))]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetDetailSpecification([FromRoute] Guid id)
+        {
+            var pageResponses = await _specificationService.Details(id);
+            return Ok(pageResponses);
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.SPECIFICATIONS_V1 + APIEndPoint.IMAGE)]
+        [SwaggerOperation(Summary = "Upload Image For Product Specification", Description = "Production manager upload image for product specification")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Upload Image For Product Specification successfully")]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> UploadImageForProductSpecification(ImageSpecificationInputDTO inputDTO)
+        {
+            var response = await _specificationService.UploadImages(inputDTO);
+            return Ok(response);
         }
     }
 }

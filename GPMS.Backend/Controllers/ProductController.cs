@@ -97,18 +97,5 @@ namespace GPMS.Backend.Controllers
             List<CreateProductListingDTO> createProductListingDTOs = await _productService.GetAllProductForCreateProductionPlan();
             return Ok(createProductListingDTOs);
         }
-
-
-        [HttpPost]
-        [Route(APIEndPoint.PRODUCTS_ID_V1 + APIEndPoint.IMAGE)]
-        [SwaggerOperation(Summary = "Upload Image For Product Specification", Description = "Production manager upload image for product specification")]
-        [SwaggerResponse((int)HttpStatusCode.OK, "Upload Image For Product Specification successfully")]
-        [Produces("application/json")]
-        // [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> UploadImageForProductSpecification()
-        {
-            List<CreateProductListingDTO> createProductListingDTOs = await _productService.GetAllProductForCreateProductionPlan();
-            return Ok(createProductListingDTOs);
-        }
     }
 }
