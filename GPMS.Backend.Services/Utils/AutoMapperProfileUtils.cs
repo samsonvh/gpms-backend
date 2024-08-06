@@ -21,6 +21,7 @@ using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
+using GPMS.Backend.Data.Models.Results;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -128,6 +129,12 @@ namespace GPMS.Backend.Services.Utils
             CreateMap<ProductionProcessStep, StepListingDTO>();
             //StepIO
             CreateMap<ProductionProcessStepIO, StepIOListingDTO>();
+            //StepResult
+            CreateMap<ProductionProcessStepResult,  StepResultListingDTO>()
+                .ForMember(dto => dto.InspectionRequestResultCode, opt => opt.MapFrom(result => result.InspectionRequestResult.Code))
+                .ForMember(dto => dto.ProductionSeriesCode, opt => opt.MapFrom(result => result.ProductionSeries.Code))
+                .ForMember(dto => dto.StepCode, opt => opt.MapFrom(result => result.ProductionProcessStep.Code));
+            CreateMap<ProductionProcessStepIOResult, IOResultListingDTO>();
             //Production Plan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>()
             .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
