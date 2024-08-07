@@ -125,7 +125,7 @@ namespace GPMS.Backend.Controllers
         [SwaggerOperation(Summary = "Get all child production plan of parent production plan", Description = "Factory director, Production manager can get all child production plan of parent production plan")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all child production plan successfully", typeof(List<ProductionPlanListingDTO>))]
         [Produces("application/json")]
-        [Authorize(Roles = "Manager")]
+        /*[Authorize(Roles = "Manager")]*/
         public async Task<IActionResult> GetAllChildProductionPlans([FromBody] ProductionPlanFilterModel productionPlanFilterModel, [FromRoute] Guid id)
         {
             DefaultPageResponseListingDTO<ProductionPlanListingDTO> pageResponse = 
