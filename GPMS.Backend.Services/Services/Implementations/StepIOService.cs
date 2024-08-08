@@ -49,8 +49,8 @@ namespace GPMS.Backend.Services.Services.Implementations
             _stepIOInputDTOWrapper = stepIOInputDTOWrapper;
         }
         #region Add List
-        public async Task AddList(List<StepIOInputDTO> inputDTOs, Guid stepId, 
-        List<Guid> materialIds, 
+        public async Task AddList(List<StepIOInputDTO> inputDTOs, Guid stepId,
+        List<Guid> materialIds,
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes)
         {
             ServiceUtils.ValidateInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
@@ -58,9 +58,9 @@ namespace GPMS.Backend.Services.Services.Implementations
             var stepIOWithMaterialId = inputDTOs.Where(inputDTO => !inputDTO.MaterialId.IsNullOrEmpty()).ToList();
             var stepIOWithSemiFinishProductCode = inputDTOs.Where(inputDTO => !inputDTO.SemiFinishedProductCode.IsNullOrEmpty()).ToList();
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-                (stepIOWithMaterialId,"MaterialId", _entityListErrorWrapper);
+                (stepIOWithMaterialId, "MaterialId", _entityListErrorWrapper);
             ServiceUtils.CheckFieldDuplicatedInInputDTOList<StepIOInputDTO, ProductionProcessStepIO>
-            (stepIOWithSemiFinishProductCode,"SemiFinishedProductCode", _entityListErrorWrapper);
+            (stepIOWithSemiFinishProductCode, "SemiFinishedProductCode", _entityListErrorWrapper);
             CheckContainsOnlyOneOutputAndAtLeastOneInput(inputDTOs);
             foreach (StepIOInputDTO stepIOInputDTO in inputDTOs)
             {
@@ -76,18 +76,18 @@ namespace GPMS.Backend.Services.Services.Implementations
                 {
                     var existedSemiFinishedProductCode =
                     semiFinishedProductCodes.FirstOrDefault(semiFinishedProductCode => semiFinishedProductCode.Code.Equals(stepIOInputDTO.SemiFinishedProductCode));
-                    if (existedSemiFinishedProductCode != null) 
+                    if (existedSemiFinishedProductCode != null)
                     {
                         productionProcessStepIO.SemiFinishedProductId = existedSemiFinishedProductCode.Id;
                     }
-                        
+
                 }
                 _stepIORepository.Add(productionProcessStepIO);
                 _stepIOInputDTOWrapper.StepIOInputDTOList.Add(stepIOInputDTO);
             }
         }
 
-        
+
         #endregion
         #region Get All StepIO
         public async Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetAll(StepIOFilterModel stepIOFilterModel)
@@ -148,7 +148,7 @@ namespace GPMS.Backend.Services.Services.Implementations
             }
             if (errors.Count > 0)
             {
-                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors,_entityListErrorWrapper);
+                ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionProcessStepIO>(errors, _entityListErrorWrapper);
             }
         }
 
@@ -164,6 +164,35 @@ namespace GPMS.Backend.Services.Services.Implementations
             return new DefaultPageResponseListingDTO<StepIOListingDTO>
             {
                 Data = stepIOs,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = stepIOFilterModel.Pagination.PageIndex,
+                    PageSize = stepIOFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+        public async Task<PageResponseStepIOForStepResultListingDTO> GetALlStepIOByStepIdForStepResult(Guid stepId, StepIOFilterModel stepIOFilterModel)
+        {
+            var query = _stepIORepository.GetAll().Where(step => step.ProductionProcessStepId == stepId);
+            query = Filters(query, stepIOFilterModel);
+            query = query.SortBy(stepIOFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(stepIOFilterModel);
+            var inputQuery = query.Where(stepIO => stepIO.Type.Equals(ProductionProcessStepIOType.Input));
+            var outputQuery = query.Where(stepIO => stepIO.Type.Equals(ProductionProcessStepIOType.Output));
+            var stepInputs = await inputQuery.ProjectTo<StepIOForStepResultListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            var stepOutputs = await outputQuery.ProjectTo<StepIOForStepResultListingDTO>(_mapper.ConfigurationProvider)
+                                        .ToListAsync();
+            var StepIOForStepResultListingDTOWrapper = new StepIOForStepResultListingDTOWrapper
+            {
+                Inputs = stepInputs,
+                Outputs = stepOutputs
+            };
+            return new PageResponseStepIOForStepResultListingDTO
+            {
+                Data = StepIOForStepResultListingDTOWrapper,
                 Pagination = new PaginationResponseModel
                 {
                     PageIndex = stepIOFilterModel.Pagination.PageIndex,

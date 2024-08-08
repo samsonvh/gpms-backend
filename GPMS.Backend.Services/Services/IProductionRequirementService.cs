@@ -16,5 +16,7 @@ namespace GPMS.Backend.Services.Services
         Task AddRequirementListForAnnualProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId);
         Task AddRequirementListForChildProductionPlan(List<ProductionRequirementInputDTO> inputDTOs, Guid productionPlanId);
         Task<DefaultPageResponseListingDTO<ProductionRequirementListingDTO>> GetAllByProductionPlanId(Guid productionPlanId, RequirementFilterModel requirementFilterModel);
+        Task<DefaultPageResponseListingDTO<ProductionRequirementStepResultListingDTO>> 
+        GetAllRequirementHaveAvailableSeriesAtCurrentDayByProductionPlanId(Guid productionPlanId, RequirementFilterModel requirementFilterModel);
     }
 }

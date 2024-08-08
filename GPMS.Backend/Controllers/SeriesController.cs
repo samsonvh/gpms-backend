@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
@@ -36,6 +37,20 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllSeriesByEstimation([FromRoute] Guid id, [FromBody] ProductionSeriesFilterModel productionSeriesFilterModel)
         {
             var response = await _productionSeriesService.GetAllSeriesOfEstimation(id, productionSeriesFilterModel);
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route(APIEndPoint.PRODUCTION_SERIES_OF_REQUIREMENT_ID_AND_DAY_NUMBER_V1 + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all series by requirementId and day number ")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all series by requirementId and day number successfully", typeof(DefaultPageResponseListingDTO<ProductionSeriesListingDTO>))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Production Series not found")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAllSeriesByRequirementIdAndDayNumber
+            ([FromRoute] Guid id,[FromBody] ProductionSeriesFilterModel productionSeriesFilterModel)
+        {
+            var response = await _productionSeriesService.GetAllSeriesByRequirementIdAndDayNumber
+                (id ,productionSeriesFilterModel);
             return Ok(response);
         }
     }

@@ -27,6 +27,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using GPMS.Backend.Services.DTOs.InputDTOs.Results;
+using GPMS.Backend.Services.Utils.Validators.Result;
 
 namespace GPMS.Backend
 {
@@ -163,7 +165,8 @@ namespace GPMS.Backend
             services.AddTransient<IValidator<ProductionRequirementInputDTO>, ProductionRequirementInputDTOValidator>();
             services.AddTransient<IValidator<ProductionEstimationInputDTO>, ProductionEstimationValidator>();
             services.AddTransient<IValidator<ProductionSeriesInputDTO>, ProductionSeriesValidator>();
-
+              //step result 
+            services.AddTransient<IValidator<StepResultInputDTO>, StepResultValidator>();
             //Add Mapper
             services.AddAutoMapper(typeof(AutoMapperProfileUtils));
 

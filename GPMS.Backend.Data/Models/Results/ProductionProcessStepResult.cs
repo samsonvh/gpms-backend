@@ -15,7 +15,6 @@ namespace GPMS.Backend.Data.Models.Results
         public Guid Id { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedDate { get; set; }
-        public ProductionProcessStepResultStatus Status { get; set; }
 
         public Guid CreatorId { get; set; }
         public Staff Creator { get; set; }

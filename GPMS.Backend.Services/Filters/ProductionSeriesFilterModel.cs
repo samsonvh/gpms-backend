@@ -11,5 +11,6 @@ namespace GPMS.Backend.Services.Filters
     {
         public string? Code { get; set; }
         public string? Status { get; set; }
+        public int? DayNumber { get; set; }
     }
 }

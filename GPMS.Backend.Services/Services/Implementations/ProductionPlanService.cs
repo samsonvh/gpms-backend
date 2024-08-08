@@ -561,6 +561,18 @@ namespace GPMS.Backend.Services.Services.Implementations
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Can only start Production Plan with Production Plan Type set to Batch.");
             }
+            if (DateTime.Now.Month < productionPlan.ParentProductionPlan.ExpectedStartingDate.Month)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Production Plan sooner than Month of Expected Starting Date in Month Production Plan ");
+            }
+            if (DateTime.Now.AddDays(6) < productionPlan.ExpectedStartingDate && DateTime.Now.Month < productionPlan.ParentProductionPlan.ExpectedStartingDate.Month)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Production Plan sooner than Expected Starting Date 6 days and ");
+            }
+            if (DateTime.Now > productionPlan.ExpectedStartingDate)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Production Plan later than Expected Starting Date");
+            }
             if (productionPlan.ParentProductionPlan == null)
             {
                 throw new APIException((int)HttpStatusCode.BadRequest, "Cannot start Batch Production Plan don't have Month Production Plan.");

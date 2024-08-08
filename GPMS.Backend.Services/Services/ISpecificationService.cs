@@ -22,6 +22,5 @@ namespace GPMS.Backend.Services.Services
         Task<SpecificationDTO> UploadImages(ImageSpecificationInputDTO inputDTO);
 
         Task<DefaultPageResponseListingDTO<SpecificationListingDTO>> GetAllSpcificationByProductId(Guid productId, SpecificationFilterModel specificationFilterModel);
-
     }
 }

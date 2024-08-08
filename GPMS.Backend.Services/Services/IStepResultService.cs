@@ -1,4 +1,6 @@
-﻿using GPMS.Backend.Services.DTOs.LisingDTOs;
+﻿using GPMS.Backend.Services.DTOs;
+using GPMS.Backend.Services.DTOs.InputDTOs.Results;
+using GPMS.Backend.Services.DTOs.LisingDTOs;
 using GPMS.Backend.Services.DTOs.ResponseDTOs;
 using GPMS.Backend.Services.Filters;
 using System;
@@ -12,5 +14,6 @@ namespace GPMS.Backend.Services.Services
     public interface IStepResultService
     {
         Task<DefaultPageResponseListingDTO<StepResultListingDTO>> GetALlStepResultBySeries(Guid seriesId, StepResultFilterModel stepResultFilterModel);
+        Task<StepResultDTO> Add(Guid id,StepResultInputDTO stepResultInputDTO);
     }
 }
