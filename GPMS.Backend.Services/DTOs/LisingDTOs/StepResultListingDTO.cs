@@ -12,6 +12,5 @@ namespace GPMS.Backend.Services.DTOs.LisingDTOs
         public string? InspectionRequestResultCode { get; set; }
         public string StepCode { get; set; }
         public string ProductionSeriesCode { get; set; }
-        public string Status {  get; set; }
     }
 }

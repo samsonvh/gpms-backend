@@ -48,5 +48,17 @@ namespace GPMS.Backend.Controllers
             var response = await _stepIOService.GetALlStepIOByStep(id, stepIOFilterModel);
             return Ok(response);
         }
+        [HttpPost]
+        [Route(APIEndPoint.STEP_INPUT_OUTPUT_OF_STEP_ID_V1 + "/step-results" + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all production step input output of step for step result")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all production step input output of step for step result successfully", typeof(PageResponseStepIOForStepResultListingDTO))]
+        [SwaggerResponse((int)HttpStatusCode.NotFound, "Step input output not found")]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetALlStepIOByStepIdForStepResult([FromRoute] Guid id, [FromBody] StepIOFilterModel stepIOFilterModel)
+        {
+            var response = await _stepIOService.GetALlStepIOByStepIdForStepResult(id, stepIOFilterModel);
+            return Ok(response);
+        }
     }
 }

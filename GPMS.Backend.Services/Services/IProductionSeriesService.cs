@@ -15,5 +15,7 @@ namespace GPMS.Backend.Services.Services
     {
         Task AddList(List<ProductionSeriesInputDTO> inputDTOs, Guid productionEstimationId);
         Task<DefaultPageResponseListingDTO<ProductionSeriesListingDTO>> GetAllSeriesOfEstimation(Guid estimationId, ProductionSeriesFilterModel productionSeriesFilterModel);
+        Task<DefaultPageResponseListingDTO<ProductionSeriesListingDTO>> GetAllSeriesByRequirementIdAndDayNumber
+            (Guid requirementId,ProductionSeriesFilterModel productionSeriesFilterModel);
     }
 }

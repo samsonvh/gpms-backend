@@ -24,7 +24,7 @@ namespace GPMS.Backend.Controllers
             _productionRequirementService = productionRequirementService;
         }
         [HttpPost]
-        [Route(APIEndPoint.REQUIREMENT_ID_OF_PRODUCTION_PLAN_ID_V1 + APIEndPoint.FILTER)]
+        [Route(APIEndPoint.REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 + APIEndPoint.FILTER)]
         [SwaggerOperation(Summary = "Get all production requirement by production plan Id", Description = "Factory director, Production manager can get all production requirement by production plan id")]
         [SwaggerResponse((int)HttpStatusCode.OK, "Get all production requirement by production plan Id successfully")]
         [Produces("application/json")]
@@ -32,6 +32,16 @@ namespace GPMS.Backend.Controllers
         public async Task<IActionResult> GetAllProductionRequirementByProductionPlanId([FromBody] RequirementFilterModel requirementFilterModel, [FromRoute] Guid id)
         {
             return Ok(await _productionRequirementService.GetAllByProductionPlanId(id,requirementFilterModel));
+        }
+        [HttpPost]
+        [Route(APIEndPoint.REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 + APIEndPoint.STEP_INPUT_OUTPUT + APIEndPoint.FILTER)]
+        [SwaggerOperation(Summary = "Get all production requirement by production plan Id for view step input output info of in progress production plan", Description = "Factory director, Production manager can Get all production requirement by production plan Id for view step input output info of in progress production plan")]
+        [SwaggerResponse((int)HttpStatusCode.OK, "Get all production requirement by production plan Id successfully")]
+        [Produces("application/json")]
+        // [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetAllRequirementHaveAvailableSeriesAtCurrentDayByProductionPlanId([FromBody] RequirementFilterModel requirementFilterModel, [FromRoute] Guid id)
+        {
+            return Ok(await _productionRequirementService.GetAllRequirementHaveAvailableSeriesAtCurrentDayByProductionPlanId(id,requirementFilterModel));
         }
     }
 }

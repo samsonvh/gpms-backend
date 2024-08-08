@@ -125,5 +125,29 @@ namespace GPMS.Backend.Services.Services.Implementations
                 ServiceUtils.CheckErrorWithEntityExistAndAddErrorList<ProductionSeries>(errors,_entityListErrorWrapper);
             }
         }
+
+        #region Get All By Reqs Id And Day Number
+        public async Task<DefaultPageResponseListingDTO<ProductionSeriesListingDTO>> GetAllSeriesByRequirementIdAndDayNumber
+            (Guid requirementId,ProductionSeriesFilterModel productionSeriesFilterModel)
+        {
+            var query = _productionSeriesRepository
+            .Search(series => series.ProductionEstimation.DayNumber.Equals(productionSeriesFilterModel.DayNumber)
+                            && series.ProductionEstimation.ProductionRequirementId.Equals(requirementId));
+            query = query.SortBy(productionSeriesFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(productionSeriesFilterModel);
+            var data = await query.ProjectTo<ProductionSeriesListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            return new DefaultPageResponseListingDTO<ProductionSeriesListingDTO>
+            {
+                Data = data,
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = productionSeriesFilterModel.Pagination.PageIndex,
+                    PageSize = productionSeriesFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                }
+            };
+        }
+        #endregion
     }
 }

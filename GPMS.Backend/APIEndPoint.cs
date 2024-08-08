@@ -14,6 +14,7 @@ namespace GPMS.Backend
         public const string APPROVE = "/approve";
         public const string DECLINE = "/decline";
         public const string IMAGE = "/images";
+        public const string STEP_INPUT_OUTPUT = "/step-input-output";
 
         //Authentication
         public const string AUTH_V1 = API_VERSION_1 + "/auth";
@@ -94,16 +95,15 @@ namespace GPMS.Backend
         public const string PRODUCTION_PLANS_ID_V1_START = PRODUCTION_PLANS_ID_V1 + "/start";
         //Requirements
         public const string REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 = PRODUCTION_PLANS_ID_V1 + "/requirements";
-        /*public const string REQUIREMENT_ID_OF_PRODUCTION_PLAN_ID_V1 = REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 + "/{requirementId}";*/
-        public const string REQUIREMENT_ID_OF_PRODUCTION_PLAN_ID_V1 = REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1;
         public const string REQUIREMENT_ID_V1 = API_VERSION_1 + "/requirements" + "/{id}";
         //Estimations
-        public const string ESTIMATIONS_OF_REQUIREMENT_ID_V1 = REQUIREMENT_ID_OF_PRODUCTION_PLAN_ID_V1 + "/estimations";
+        public const string ESTIMATIONS_OF_REQUIREMENT_ID_V1 = REQUIREMENTS_OF_PRODUCTION_PLAN_ID_V1 + "/estimations";
         public const string ESTIMATION_ID_OF_REQUIREMENT_ID_V1 = REQUIREMENT_ID_V1 + "/estimations";
         //Series
         public const string SERIES_OF_ESTIMATION_ID_V1 = ESTIMATION_ID_OF_REQUIREMENT_ID_V1 + "/series";
         public const string SERIES_ID_OF_ESTIMATION_ID_V1 = SERIES_OF_ESTIMATION_ID_V1 + "/{seriesId}";
         public const string PRODUCTION_SERIES_OF_ESTIMATION_ID_V1 = API_VERSION_1 + "/estimations" + "/{id}" + "/series";
+        public const string PRODUCTION_SERIES_OF_REQUIREMENT_ID_AND_DAY_NUMBER_V1 = API_VERSION_1 + "/requirements" + "/{id}" + "/series";
         //Production Process Step Results 
         public const string PRODUCTION_PROCESS_STEP_RESULTS_OF_SERIES_ID_V1 = API_VERSION_1 + "/production-process-step-results";
         /*public const string PRODUCTION_PROCESS_STEP_RESULT_ID_OF_SERIES_ID_V1 = PRODUCTION_PROCESS_STEP_RESULTS_OF_SERIES_ID_V1 + "/{productionProcessStepResultId}";*/

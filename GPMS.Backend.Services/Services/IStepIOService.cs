@@ -17,5 +17,7 @@ namespace GPMS.Backend.Services.Services
         List<CreateUpdateResponseDTO<SemiFinishedProduct>> semiFinishedProductCodes);
         Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetAll(StepIOFilterModel stepIOFilterModel);
         Task<DefaultPageResponseListingDTO<StepIOListingDTO>> GetALlStepIOByStep(Guid stepId, StepIOFilterModel stepIOFilterModel);
+        Task<PageResponseStepIOForStepResultListingDTO> GetALlStepIOByStepIdForStepResult
+            (Guid stepId, StepIOFilterModel stepIOFilterModel);
     }
 }

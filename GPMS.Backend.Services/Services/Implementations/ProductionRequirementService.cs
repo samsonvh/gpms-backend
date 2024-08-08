@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using FluentValidation;
+using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Enums.Statuses.Products;
 using GPMS.Backend.Data.Enums.Types;
 using GPMS.Backend.Data.Models.ProductionPlans;
@@ -95,11 +96,11 @@ namespace GPMS.Backend.Services.Services.Implementations
         {
             var query = _productionRequirementRepository
                             .Search(requirement => requirement.ProductionPlanId.Equals(productionPlanId));
-            query = query.SortBy(requirementFilterModel);  
+            query = query.SortBy(requirementFilterModel);
             int totalItem = query.Count();
             query = query.PagingEntityQuery(requirementFilterModel);
             var result = await query.ProjectTo<ProductionRequirementListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
-            DefaultPageResponseListingDTO<ProductionRequirementListingDTO> resposne = 
+            DefaultPageResponseListingDTO<ProductionRequirementListingDTO> resposne =
             new DefaultPageResponseListingDTO<ProductionRequirementListingDTO>
             {
                 Pagination = new PaginationResponseModel
@@ -112,7 +113,55 @@ namespace GPMS.Backend.Services.Services.Implementations
             };
             return resposne;
         }
-
+        #region Get All  Available Series By Plan Id 
+        public async Task<DefaultPageResponseListingDTO<ProductionRequirementStepResultListingDTO>>
+            GetAllRequirementHaveAvailableSeriesAtCurrentDayByProductionPlanId
+            (Guid productionPlanId, RequirementFilterModel requirementFilterModel)
+        {
+            var today = DateTime.Now;
+            var existedProductionPlan = await _productionPlanRepository
+                        .Search(plan => plan.Id.Equals(productionPlanId) && plan.Status.Equals(ProductionPlanStatus.InProgress))
+                        .FirstOrDefaultAsync();
+            if (existedProductionPlan == null)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Production Plan Not Found");
+            }
+            DateTime startDay = (DateTime)existedProductionPlan.ActualStartingDate;
+            DateTime dueDay = (DateTime)existedProductionPlan.CompletionDate;
+            if (today < startDay || today > dueDay)
+            {
+                throw new APIException((int)HttpStatusCode.BadRequest, "Today is out of the range of actual start day and due date");
+            }
+            int dayNumber = (today - startDay).Days + 1;
+            var query = _productionRequirementRepository
+                            .Search(requirement => requirement.ProductionPlanId.Equals(productionPlanId)
+                                    && requirement.ProductionEstimations
+                                    .Where(estimation => estimation.DayNumber == dayNumber)
+                                    .SelectMany(estimation => estimation.ProductionSeries)
+                                    .Any(series => !series.Status.Equals(ProductionSeriesStatus.Pending)
+                                            && !series.Equals(ProductionSeriesStatus.Done)));
+            query = query.SortBy(requirementFilterModel);
+            int totalItem = query.Count();
+            query = query.PagingEntityQuery(requirementFilterModel);
+            var result = await query.ProjectTo<ProductionRequirementStepResultListingDTO>(_mapper.ConfigurationProvider).ToListAsync();
+            foreach (var requirementListingDTO in result)
+            {
+                requirementListingDTO.DayNumber = dayNumber;
+            }
+            DefaultPageResponseListingDTO<ProductionRequirementStepResultListingDTO> resposne =
+            new DefaultPageResponseListingDTO<ProductionRequirementStepResultListingDTO>
+            {
+                Pagination = new PaginationResponseModel
+                {
+                    PageIndex = requirementFilterModel.Pagination.PageIndex,
+                    PageSize = requirementFilterModel.Pagination.PageSize,
+                    TotalRows = totalItem
+                },
+                Data = result
+            };
+            return resposne;
+        }
+        #endregion
         private async Task ValidateSpecification(Guid productSpecificationId, int entityOrder)
         {
             List<FormError> errors = new List<FormError>();

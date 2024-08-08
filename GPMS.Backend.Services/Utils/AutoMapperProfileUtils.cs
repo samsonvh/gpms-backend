@@ -22,6 +22,7 @@ using GPMS.Backend.Data.Models.ProductionPlans;
 using GPMS.Backend.Services.DTOs.InputDTOs.ProductionPlan;
 using GPMS.Backend.Data.Enums.Statuses.ProductionPlans;
 using GPMS.Backend.Data.Models.Results;
+using GPMS.Backend.Services.DTOs.InputDTOs.Results;
 
 namespace GPMS.Backend.Services.Utils
 {
@@ -137,7 +138,9 @@ namespace GPMS.Backend.Services.Utils
                 .ForMember(dto => dto.InspectionRequestResultCode, opt => opt.MapFrom(result => result.InspectionRequestResult.Code))
                 .ForMember(dto => dto.ProductionSeriesCode, opt => opt.MapFrom(result => result.ProductionSeries.Code))
                 .ForMember(dto => dto.StepCode, opt => opt.MapFrom(result => result.ProductionProcessStep.Code));
-            CreateMap<ProductionProcessStepIOResult, IOResultListingDTO>();
+            CreateMap<ProductionProcessStepResult, StepResultInputDTO>();
+            //Input Output Result
+            CreateMap<StepResultInputDTO, ProductionProcessStepResult>();
             //Production Plan
             CreateMap<ProductionPlanInputDTO, ProductionPlan>()
             .ForMember(productionPlan => productionPlan.Type, options => options.Ignore())
@@ -167,7 +170,9 @@ namespace GPMS.Backend.Services.Utils
 
             CreateMap<ProductionRequirement,ProductionRequirementListingDTO>()
                 .ForMember(requirementListingDTO => requirementListingDTO.SpecificationId, opt => opt.MapFrom(src => src.ProductSpecificationId));
-
+            CreateMap<ProductionRequirement,ProductionRequirementStepResultListingDTO>()
+                .ForMember(dest => dest.SpecificationId, opt => opt.MapFrom(src => src.ProductSpecificationId))
+                .ForMember(dest => dest.DayNumber, opt => opt.Ignore());
             //Production Estimation
             CreateMap<ProductionEstimation, ProductionEstimationDTO>()
                 /*.ForMember(dest => dest.ProductionSeries, opt => opt.Ignore())*/;
