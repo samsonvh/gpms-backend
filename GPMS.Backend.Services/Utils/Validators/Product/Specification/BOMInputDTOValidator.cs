@@ -15,8 +15,10 @@ namespace GPMS.Backend.Services.Utils.Validators
         public BOMInputDTOValidator()
         {
             RuleFor(inputDTO => inputDTO.SizeWidth).GreaterThan(0)
+                .When(inputDTO => inputDTO.SizeWidth != null)
                 .WithMessage("Size Width must greater than 0");
             RuleFor(inputDTO => inputDTO.Consumption).GreaterThan(0)
+                .When(inputDTO => inputDTO.Consumption != null)
                 .WithMessage("Consumption must greater than 0");
             RuleFor(inputDTO => inputDTO.Description).MaximumLength(500)
                 .When(inputDTO => !inputDTO.Description.IsNullOrEmpty())

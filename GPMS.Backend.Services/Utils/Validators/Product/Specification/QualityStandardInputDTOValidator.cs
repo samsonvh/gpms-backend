@@ -19,7 +19,7 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.Name).MaximumLength(100)
                 .When(inputDTO => !inputDTO.Name.IsNullOrEmpty())
                 .WithMessage("Name can not longer than 100 characters");
-            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$")
+            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9À-ỹ\s-()]+$")
                 .When(inputDTO => !inputDTO.Name.IsNullOrEmpty())
                 .WithMessage("Name can not contains special character");
 

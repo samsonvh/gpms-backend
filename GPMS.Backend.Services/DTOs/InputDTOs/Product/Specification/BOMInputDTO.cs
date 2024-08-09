@@ -7,8 +7,8 @@ namespace GPMS.Backend.Services.DTOs.InputDTOs.Product.Specification
 {
     public class BOMInputDTO
     {
-        public float SizeWidth { get; set; }
-        public float Consumption { get; set; }
+        public float? SizeWidth { get; set; }
+        public float? Consumption { get; set; }
         public string? Description { get; set; }
         public Guid MaterialId { get; set; }
     }
