@@ -22,25 +22,25 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.Name).MaximumLength(100)
                 .When(inputDTO => !inputDTO.Name.IsNullOrEmpty())
                 .WithMessage("Name can not longer than 100 characters");
-            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$")
+            RuleFor(inputDTO => inputDTO.Name).Matches(@"^[a-zA-Z0-9À-ỹ\s-]+$")
                 .When(inputDTO => !inputDTO.Name.IsNullOrEmpty())
                 .WithMessage("Name can not contains special character");
 
-            RuleFor(inputDTO => inputDTO.ConsumptionUnit).NotNull().NotEmpty()
-                .WithMessage("ConsumptionUnit is required");
+            // RuleFor(inputDTO => inputDTO.ConsumptionUnit).NotNull().NotEmpty()
+            //     .WithMessage("ConsumptionUnit is required");
             RuleFor(inputDTO => inputDTO.ConsumptionUnit).MaximumLength(20)
                 .When(inputDTO => !inputDTO.ConsumptionUnit.IsNullOrEmpty())
                 .WithMessage("ConsumptionUnit can not longer than 20 characters");
-            RuleFor(inputDTO => inputDTO.ConsumptionUnit).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$")
+            RuleFor(inputDTO => inputDTO.ConsumptionUnit).Matches(@"^[a-zA-Z0-9À-ỹ\s-]+$")
                 .When(inputDTO => !inputDTO.ConsumptionUnit.IsNullOrEmpty())
                 .WithMessage("ConsumptionUnit can not contains special character");
 
-            RuleFor(inputDTO => inputDTO.SizeWidthUnit).NotNull().NotEmpty()
-                .WithMessage("Size width unit is required");
+            // RuleFor(inputDTO => inputDTO.SizeWidthUnit).NotNull().NotEmpty()
+            //     .WithMessage("Size width unit is required");
             RuleFor(inputDTO => inputDTO.SizeWidthUnit).MaximumLength(20)
                 .When(inputDTO => !inputDTO.SizeWidthUnit.IsNullOrEmpty())
                 .WithMessage("Size width unit can not longer than 20 characters");
-            RuleFor(inputDTO => inputDTO.SizeWidthUnit).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$")
+            RuleFor(inputDTO => inputDTO.SizeWidthUnit).Matches(@"^[a-zA-Z0-9À-ỹ\s-]+$")
                 .When(inputDTO => !inputDTO.SizeWidthUnit.IsNullOrEmpty())
                 .WithMessage("Size width unit can not contains special character");
 
@@ -55,7 +55,7 @@ namespace GPMS.Backend.Services.Utils.Validators
             RuleFor(inputDTO => inputDTO.ColorName).MaximumLength(20)
                 .When(inputDTO => !inputDTO.ColorName.IsNullOrEmpty())
                 .WithMessage("Color name can not longer than 20 characters");
-            RuleFor(inputDTO => inputDTO.ColorName).Matches(@"^[a-zA-Z0-9À-ỹ\s]+$")
+            RuleFor(inputDTO => inputDTO.ColorName).Matches(@"^[a-zA-Z0-9À-ỹ\s-]+$")
                 .When(inputDTO => !inputDTO.ColorName.IsNullOrEmpty())
                 .WithMessage("Color name can not contains special character");
 

@@ -3,8 +3,8 @@
     public class BillOfMaterial
     {
         public Guid Id { get; set; }
-        public float SizeWidth { get; set; }
-        public float Consumption { get; set; }
+        public float? SizeWidth { get; set; }
+        public float? Consumption { get; set; }
         public string? Description { get; set; }
 
         public Guid MaterialId { get; set; }
